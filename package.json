@@ -1,0 +1,19 @@
+{
+  "name": "playwright-appium-driver",
+  "version": "1.0.0",
+  "main": "index.js",
+  "engines": {
+    "node": "^18.20.4"
+  },
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@playwright/test": "^1.46.1",
+    "@types/node": "^22.5.2",
+    "webdriver": "^8.36.1",
+    "async-retry": "^1.3.3"
+  }
+}
