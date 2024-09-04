@@ -49,7 +49,6 @@ export async function getSessionDetails(sessionId: string): Promise<any> {
                 return;
             }
 
-            console.log("1. Reader...");
             const reader = response.body?.getReader();
 
             if (!reader) {
@@ -65,10 +64,8 @@ export async function getSessionDetails(sessionId: string): Promise<any> {
                 }
             };
 
-            console.log("2. Streaming...");
             await streamToFile();
             fileStream.close();
-            console.log('Video downloaded successfully!');
         },
         {
             retries: 10, // Retry up to 5 times only for 404

@@ -17,17 +17,13 @@ export const test = base.extend<{ client: any, saveVideo: void }>({
         await use(driver);
 
         // Ensure the session is closed after the test
-        console.log("**************Client fixture closing the session************");
         await driver.deleteSession();
-        console.log("**************Client fixture closed the session************");
     },
 
     saveVideo: [async ({}, use, testInfo) => {
-        // Ensure saveVideo runs after the client fixture has completed
-        await use(); // Ensure the test runs before executing the save logic
+        await use();
 
         // Now execute saveVideo after the session has been closed
-        console.log("******Called save Video fixture after client is closed****");
         console.log(`*****SessionID: ${sessionId} TestID: ${testInfo.testId}`);
         // Get the session details after the session is closed
         var data = await getSessionDetails(sessionId);
@@ -40,7 +36,6 @@ export const test = base.extend<{ client: any, saveVideo: void }>({
             `${testInfo.testId}.mp4`
         );
 
-        console.log(`Downloading video from: ${videoURL}`);
         // Download the video
         await downloadVideo(videoURL, pathToTestVideo);
         console.log(`Video saved to: ${pathToTestVideo}`);
