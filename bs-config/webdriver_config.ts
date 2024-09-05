@@ -13,9 +13,7 @@ export const commonConfig = {
   connectionRetryCount: 3,
   newCommandTimeout: 300000,
   framework: "mocha",
-  reporters: [
-    "spec",
-],
+  reporters: ["spec"],
   mochaOpts: {
     ui: "bdd",
     timeout: 180_000,
@@ -42,29 +40,28 @@ export const browserstackConfig = {
   key: process.env.BROWSERSTACK_ACCESS_KEY,
   hostname: "hub.browserstack.com",
   services: [
-      "browserstack",
-      {
-        opts: { forcelocal: false, localIdentifier: "Leap_Wallet_Tests" },
-        app: browserstackAppURL,
-      },
+    "browserstack",
+    {
+      opts: { forcelocal: false, localIdentifier: "Leap_Wallet_Tests" },
+      app: browserstackAppURL,
+    },
   ],
 };
 
 export const config = {
   ...commonConfig,
   ...browserstackConfig,
-  capabilities: 
-    {
-      "bstack:options": {
-        ...baseBStackOptions,
-        deviceName: "Google Pixel 8",
-        osVersion: "14.0",
-        platformName: "android",
-        buildIdentifier: "328",
-        buildName: "Leap Android build",
-        sessionName: "Bstack Android Leap Tests",
-      },
-      "appium:autoGrantPermissions": true,
-      "appium:app": browserstackAppURL
+  capabilities: {
+    "bstack:options": {
+      ...baseBStackOptions,
+      deviceName: "Google Pixel 8",
+      osVersion: "14.0",
+      platformName: "android",
+      buildIdentifier: "328",
+      buildName: "Leap Android build",
+      sessionName: "Bstack Android Leap Tests",
     },
+    "appium:autoGrantPermissions": true,
+    "appium:app": browserstackAppURL,
+  },
 };
