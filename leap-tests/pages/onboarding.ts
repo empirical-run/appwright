@@ -2,10 +2,10 @@ import { Client } from "webdriver";
 import {
   waitAndClick,
   isElementVisibleWithinTimeout,
-  setValue,
+  fill,
 } from "../../utils/actions";
 import test, { expect } from "@playwright/test";
-import { ELEMENT_TIMEOUT, pin } from "./constants";
+import { ELEMENT_TIMEOUT, OnboardingType, pin } from "./constants";
 
 export class OnboardingPage {
   readonly client: Client;
@@ -22,6 +22,13 @@ export class OnboardingPage {
   inputAt11Selector: string;
   invalidPhraseSelector: string;
   dashboardTextSelector: string;
+  seedPhraseButtonSelector: string;
+  keplrButtonSelector: string;
+  invalidImportPhraseSelector: string;
+  textFieldSelector: string;
+  importUsingKeplrButton: string;
+  importKeplrWalletButtonSelector: string;
+  importWalletSeedPhraseButtonSelector: string;
   constructor(client: Client) {
     this.client = client;
     this.setSelector();
@@ -35,20 +42,25 @@ export class OnboardingPage {
       this.importWalletButtonSelector = `//android.view.ViewGroup[@resource-id="import_wallet_button"]/android.view.ViewGroup`;
       this.copyButtonSelector = `//android.widget.TextView[@text="Copy to clipboard"]`;
       this.recoveryPhraseButtonSelector = `//android.widget.TextView[@text="Yes, I have saved it somewhere safe"]`;
-      (this.confirmButtonSelector =
-        '//android.widget.TextView[@text="Confirm"]'),
-        (this.recoveryPhraseComponentSelector =
-          '//android.widget.TextView[@text="Recovery Phrase"]'),
-        (this.inputAt4Selector =
-          '//android.widget.EditText[@resource-id="inputAt4"]'),
-        (this.inputAt7Selector =
-          '//android.widget.EditText[@resource-id="inputAt7"]'),
-        (this.inputAt11Selector =
-          '//android.widget.EditText[@resource-id="inputAt11"]'),
-        (this.invalidPhraseSelector =
-          '//android.widget.TextView[@text="Enter correct 4th, 7th, 11th word"]'),
-        (this.dashboardTextSelector =
-          '//android.widget.TextView[@text="YOUR PORTFOLIO"]');
+      this.confirmButtonSelector = '//android.widget.TextView[@text="Confirm"]';
+      this.recoveryPhraseComponentSelector =
+        '//android.widget.TextView[@text="Recovery Phrase"]';
+      this.inputAt4Selector =
+        '//android.widget.EditText[@resource-id="inputAt4"]';
+      this.inputAt7Selector =
+        '//android.widget.EditText[@resource-id="inputAt7"]';
+      this.inputAt11Selector =
+        '//android.widget.EditText[@resource-id="inputAt11"]';
+      this.invalidPhraseSelector =
+        '//android.widget.TextView[@text="Enter correct 4th, 7th, 11th word"]';
+      this.dashboardTextSelector =
+        '//android.widget.TextView[@text="YOUR PORTFOLIO"]';
+      this.invalidImportPhraseSelector = `//android.widget.TextView[@resource-id="text_input_error"]`;
+      this.textFieldSelector = `//android.widget.EditText[@resource-id="import_input"]`;
+      this.importUsingKeplrButton = `//android.widget.TextView[@text="Import Keplr"]/..`;
+      this.importKeplrWalletButtonSelector = `//android.widget.TextView[@text="Import Keplr wallet"]`;
+      this.seedPhraseButtonSelector = `//android.widget.TextView[@text="Using seed phrase"]/..`;
+      this.importWalletSeedPhraseButtonSelector = `//android.widget.TextView[@text="Import wallet"]/..`;
     }
   }
 
@@ -70,6 +82,13 @@ export class OnboardingPage {
     }
     await test.step("Enter your pin", async () => {
       await this.inputPin();
+    });
+  }
+
+  async importWalletWithPhrase(type: OnboardingType, phrase: string) {
+    await test.step("Import wallet", async () => {
+      await waitAndClick(this.client, this.importWalletButtonSelector);
+      await this.importWalletBasedOnType(type, phrase);
     });
   }
 
@@ -99,9 +118,9 @@ export class OnboardingPage {
     });
 
     await test.step("Enter incorrect phrase", async () => {
-      await setValue(this.client, this.inputAt4Selector, "wrong");
-      await setValue(this.client, this.inputAt7Selector, "recovery");
-      await setValue(this.client, this.inputAt11Selector, "phrase");
+      await fill(this.client, this.inputAt4Selector, "wrong");
+      await fill(this.client, this.inputAt7Selector, "recovery");
+      await fill(this.client, this.inputAt11Selector, "phrase");
       await waitAndClick(this.client, this.confirmButtonSelector);
     });
   }
@@ -125,9 +144,9 @@ export class OnboardingPage {
         this.recoveryPhraseButtonSelector,
         ELEMENT_TIMEOUT,
       );
-      await setValue(this.client, this.inputAt4Selector, words[3]);
-      await setValue(this.client, this.inputAt7Selector, words[6]);
-      await setValue(this.client, this.inputAt11Selector, words[10]);
+      await fill(this.client, this.inputAt4Selector, words[3]);
+      await fill(this.client, this.inputAt7Selector, words[6]);
+      await fill(this.client, this.inputAt11Selector, words[10]);
       await waitAndClick(this.client, this.confirmButtonSelector);
     });
   }
@@ -166,5 +185,23 @@ export class OnboardingPage {
     } else {
       return "";
     }
+  }
+
+  async importWalletBasedOnType(type: OnboardingType, phrase: string) {
+    await waitAndClick(
+      this.client,
+      OnboardingType.SEED_PHRASE
+        ? this.seedPhraseButtonSelector
+        : this.importUsingKeplrButton,
+      ELEMENT_TIMEOUT,
+    );
+    await fill(this.client, this.textFieldSelector, phrase);
+    await waitAndClick(
+      this.client,
+      OnboardingType.SEED_PHRASE
+        ? this.importWalletSeedPhraseButtonSelector
+        : this.importKeplrWalletButtonSelector,
+      ELEMENT_TIMEOUT,
+    );
   }
 }
