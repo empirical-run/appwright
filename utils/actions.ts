@@ -94,8 +94,8 @@ async function waitUntil<ReturnValue>(
   client: Client,
   condition: () => ReturnValue | Promise<ReturnValue>,
   {
-    timeout = 5000, // Default timeout to 5000ms (5 seconds)
-    interval = 500, // Default interval to 500ms
+    timeout = 5000,
+    interval = 500,
     timeoutMsg,
   }: Partial<WaitUntilOptions> = {},
 ): Promise<Exclude<ReturnValue, boolean>> {
@@ -128,10 +128,19 @@ async function waitUntil<ReturnValue>(
   });
 }
 
-export async function setValue(client: Client, xpath: string, value: string) {
-  const element = await client.findElement("xpath", xpath);
-  await client.elementSendKeys(
-    element["element-6066-11e4-a52e-4f735466cecf"],
-    value,
+export async function fill(client: Client, xpath: string, value: string) {
+  const isElementDisplayed = await isElementVisibleWithinTimeout(
+    client,
+    xpath,
+    {},
   );
+  if (isElementDisplayed) {
+    const element = await client.findElement("xpath", xpath);
+    await client.elementSendKeys(
+      element["element-6066-11e4-a52e-4f735466cecf"],
+      value,
+    );
+  } else {
+    throw new Error(`Element with XPath "${xpath}" not visible`);
+  }
 }

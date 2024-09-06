@@ -31,27 +31,18 @@ export async function downloadVideo(
   const dir = path.dirname(filePath);
   fs.mkdirSync(dir, { recursive: true });
   console.log(`URL is: ${url}`);
-  await new Promise((resolve) => setTimeout(resolve, 50_000));
+  await new Promise((resolve) => setTimeout(resolve, 10_000));
   const fileStream = fs.createWriteStream(filePath);
-
   await retry(
-    async (bail) => {
+    async () => {
       const response = await fetch(url, {
         method: "GET",
       });
 
       console.log(`Response: ${response.status}`);
-      if (response.status === 404) {
-        // Retry on 404
-        throw new Error(`Video not found: 404 (URL: ${url})`);
-      }
-
       if (response.status !== 200) {
-        // Bail out for non-404 and non-200 statuses
-        bail(
-          new Error(`Failed to download video: Status Code ${response.status}`),
-        );
-        return;
+        // Retry if not 200
+        throw new Error(`Video not found: ${response.status} (URL: ${url})`);
       }
 
       const reader = response.body?.getReader();
@@ -60,7 +51,6 @@ export async function downloadVideo(
         throw new Error("Failed to get reader from response body.");
       }
 
-      // Simple loop to read and write data chunks
       const streamToFile = async () => {
         // eslint-disable-next-line no-constant-condition
         while (true) {
@@ -74,9 +64,9 @@ export async function downloadVideo(
       fileStream.close();
     },
     {
-      retries: 10, // Retry up to 5 times only for 404
-      factor: 1, // No exponential backoff (retry after constant time)
-      minTimeout: 50000, // Minimum wait time between retries
+      retries: 10,
+      factor: 1,
+      minTimeout: 3_000,
       onRetry: (err, i) => {
         console.log(`Retry attempt ${i} failed: ${err.message}`);
       },
