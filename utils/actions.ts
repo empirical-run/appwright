@@ -144,3 +144,17 @@ export async function fill(client: Client, xpath: string, value: string) {
     throw new Error(`Element with XPath "${xpath}" not visible`);
   }
 }
+
+export async function tapAndroidElement(
+  client: Client,
+  { x, y }: { x: number; y: number },
+) {
+  await client.executeScript("mobile: clickGesture", [
+    {
+      x: x,
+      y: y,
+      duration: 100,
+      tapCount: 1,
+    },
+  ]);
+}

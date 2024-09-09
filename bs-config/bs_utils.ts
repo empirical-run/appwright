@@ -2,19 +2,19 @@ import fs from "fs";
 import path from "path";
 import retry from "async-retry";
 
+const _sessionBaseURL =
+  "https://api-cloud.browserstack.com/app-automate/sessions";
+
 export async function getSessionDetails(sessionId: string): Promise<any> {
   const userName = process.env.BROWSERSTACK_USERNAME;
   const accessKey = process.env.BROWSERSTACK_ACCESS_KEY;
-  const response = await fetch(
-    `https://api-cloud.browserstack.com/app-automate/sessions/${sessionId}.json`,
-    {
-      method: "GET",
-      headers: {
-        Authorization:
-          "Basic " + Buffer.from(`${userName}:${accessKey}`).toString("base64"),
-      },
+  const response = await fetch(`${_sessionBaseURL}/${sessionId}.json`, {
+    method: "GET",
+    headers: {
+      Authorization:
+        "Basic " + Buffer.from(`${userName}:${accessKey}`).toString("base64"),
     },
-  );
+  });
 
   if (!response.ok) {
     throw new Error(`Error fetching session details: ${response.statusText}`);
@@ -81,4 +81,67 @@ export async function downloadVideo(
   fileStream.on("error", (err) => {
     console.error(`Failed to write file: ${err.message}`);
   });
+}
+
+export async function setSessionName(sessionId: string, data: any) {
+  console.log(
+    `*****Calling setSessionDetails with sessionId: ${sessionId} and data: ${data}`,
+  );
+  const userName = process.env.BROWSERSTACK_USERNAME;
+  const accessKey = process.env.BROWSERSTACK_ACCESS_KEY;
+
+  const response = await fetch(`${_sessionBaseURL}/${sessionId}.json`, {
+    method: "PUT",
+    headers: {
+      Authorization:
+        "Basic " + Buffer.from(`${userName}:${accessKey}`).toString("base64"),
+      "Content-Type": "application/json", // Set the content type to JSON
+    },
+    body: JSON.stringify({ name: `${data}` }), // Set the request body
+  });
+
+  if (!response.ok) {
+    throw new Error(`Error setting session details: ${response.statusText}`);
+  }
+
+  // Parse and print the response
+  const responseData = await response.json();
+  console.log("Response from setting session details:", responseData);
+
+  return responseData;
+}
+
+export async function setSessionStatus(
+  sessionId: string,
+  status?: string,
+  reason?: string,
+) {
+  console.log(
+    `*****Calling setSessionDetails with sessionId: ${sessionId} and status: ${status} and reason: ${reason}`,
+  );
+  const userName = process.env.BROWSERSTACK_USERNAME;
+  const accessKey = process.env.BROWSERSTACK_ACCESS_KEY;
+
+  const response = await fetch(`${_sessionBaseURL}/${sessionId}.json`, {
+    method: "PUT",
+    headers: {
+      Authorization:
+        "Basic " + Buffer.from(`${userName}:${accessKey}`).toString("base64"),
+      "Content-Type": "application/json", // Set the content type to JSON
+    },
+    body: JSON.stringify({
+      status: status,
+      reason: reason,
+    }), // Set the request body
+  });
+
+  if (!response.ok) {
+    throw new Error(`Error setting session details: ${response.statusText}`);
+  }
+
+  // Parse and print the response
+  const responseData = await response.json();
+  console.log("Response from setting session details:", responseData);
+
+  return responseData;
 }
