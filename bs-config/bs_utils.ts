@@ -65,8 +65,8 @@ export async function downloadVideo(
     },
     {
       retries: 10,
-      factor: 1,
-      minTimeout: 3_000,
+      factor: 2,
+      minTimeout: 10_000,
       onRetry: (err, i) => {
         console.log(`Retry attempt ${i} failed: ${err.message}`);
       },
@@ -106,8 +106,6 @@ export async function setSessionName(sessionId: string, data: any) {
 
   // Parse and print the response
   const responseData = await response.json();
-  console.log("Response from setting session details:", responseData);
-
   return responseData;
 }
 

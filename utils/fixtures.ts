@@ -19,7 +19,6 @@ export const test = base.extend<{
 }>({
   client: async ({}, use, testInfo) => {
     // Start the WebDriver session
-    console.log(JSON.stringify(config));
     const driver = await WebDriver.newSession(config as any);
     sessionId = driver.sessionId;
     await setSessionName(sessionId, testInfo.title);
