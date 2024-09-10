@@ -57,11 +57,11 @@ export const config = {
       deviceName: "Google Pixel 8",
       osVersion: "14.0",
       platformName: "android",
-      buildIdentifier: "344",
+      buildIdentifier: "345",
       buildName: "Leap Android build",
       sessionName: "Bstack Android Leap Tests",
     },
     "appium:autoGrantPermissions": true,
-    "appium:app": browserstackAppURL,
+    "appium:app": process.env.BROWSERSTACK_APP_URL,
   },
 };
