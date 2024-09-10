@@ -23,6 +23,7 @@ export const commonConfig = {
   onComplete: async function () {},
 };
 
+
 const browserstackAppURL = process.env.BROWSERSTACK_APP_URL || "";
 
 export const baseBStackOptions = {
