@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "engines": {
-    "node": "^18.20.4"
+    "node": ">=18.20.4"
   },
   "scripts": {
     "lint": "eslint ."
