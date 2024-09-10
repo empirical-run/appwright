@@ -58,7 +58,6 @@ export const config = {
       deviceName: "Google Pixel 8",
       osVersion: "14.0",
       platformName: "android",
-      buildIdentifier: "345",
       buildName: "Leap Android build",
       sessionName: "Bstack Android Leap Tests",
     },

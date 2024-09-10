@@ -25,7 +25,7 @@ jobs:
         run: npm ci
 
       - name: Slack alert on start
-        run: npx @empiricalrun/reporter@${{ env.EMPIRICAL_RUN_VERSION }} test-run start appwright ${{ github.run_id }} playwright
+        run: npx @empiricalrun/reporter@${{ env.EMPIRICAL_RUN_VERSION }} test-run start leap-wallet ${{ github.run_id }} playwright
         continue-on-error: true
         env:
           RUN_TRIGGER_TYPE: ${{ github.event_name }}
@@ -41,7 +41,7 @@ jobs:
 
       - name: Send slack alert on tests complete
         if: always()
-        run: npx @empiricalrun/reporter@${{ env.EMPIRICAL_RUN_VERSION }} test-run tests-complete appwright ${{ github.run_id }} playwright
+        run: npx @empiricalrun/reporter@${{ env.EMPIRICAL_RUN_VERSION }} test-run tests-complete leap-wallet ${{ github.run_id }} playwright
         env:
           RUN_TRIGGER_TYPE: ${{ github.event_name }}
 
@@ -57,6 +57,6 @@ jobs:
 
       - name: Send slack alert on end
         if: always()
-        run: npx @empiricalrun/reporter@${{ env.EMPIRICAL_RUN_VERSION }} test-run end appwright ${{ github.run_id }} playwright
+        run: npx @empiricalrun/reporter@${{ env.EMPIRICAL_RUN_VERSION }} test-run end leap-wallet ${{ github.run_id }} playwright
         env:
           RUN_TRIGGER_TYPE: ${{ github.event_name }}
