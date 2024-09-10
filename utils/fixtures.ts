@@ -6,6 +6,7 @@ import {
   getSessionDetails,
   setSessionName,
   setSessionStatus,
+  updateBuildNumber,
 } from "../bs-config/bs_utils";
 import path from "path";
 import { OnboardingPage } from "../leap-tests/pages/onboarding";
@@ -19,7 +20,9 @@ export const test = base.extend<{
 }>({
   client: async ({}, use, testInfo) => {
     // Start the WebDriver session
-    const driver = await WebDriver.newSession(config as any);
+    const updatedConfig = await updateBuildNumber(config);
+    console.log("Updated Config: ", updatedConfig);
+    const driver = await WebDriver.newSession(updatedConfig as any);
     sessionId = driver.sessionId;
     await setSessionName(sessionId, testInfo.title);
     console.log(`SessionId: ${sessionId}`);

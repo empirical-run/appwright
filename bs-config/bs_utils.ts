@@ -143,3 +143,16 @@ export async function setSessionStatus(
 
   return responseData;
 }
+
+export async function updateBuildNumber(config: any) {
+  const env = process.env;
+  const newBuildNumber =
+    env.GITHUB_ACTIONS === "true" ? `CI ${env.GITHUB_RUN_ID}` : env.USER;
+
+  if (newBuildNumber) {
+    if (config.capabilities && config.capabilities["bstack:options"]) {
+      config.capabilities["bstack:options"].buildIdentifier = newBuildNumber;
+    }
+  }
+  return config;
+}

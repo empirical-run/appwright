@@ -23,7 +23,6 @@ export const commonConfig = {
   onComplete: async function () {},
 };
 
-
 const browserstackAppURL = process.env.BROWSERSTACK_APP_URL || "";
 
 export const baseBStackOptions = {
@@ -43,7 +42,6 @@ export const browserstackConfig = {
   services: [
     "browserstack",
     {
-      buildIdentifier: "${BUILD_NUMBER}",
       opts: { forcelocal: false, localIdentifier: "Leap_Wallet_Tests" },
     },
   ],
@@ -60,6 +58,7 @@ export const config = {
       platformName: "android",
       buildName: "Leap Android build",
       sessionName: "Bstack Android Leap Tests",
+      buildIdentifier: "${BUILD_NUMBER}",
     },
     "appium:autoGrantPermissions": true,
     "appium:app": browserstackAppURL,
