@@ -43,8 +43,8 @@ export const browserstackConfig = {
   services: [
     "browserstack",
     {
+      buildIdentifier: "${BUILD_NUMBER}",
       opts: { forcelocal: false, localIdentifier: "Leap_Wallet_Tests" },
-      app: browserstackAppURL,
     },
   ],
 };
@@ -62,6 +62,6 @@ export const config = {
       sessionName: "Bstack Android Leap Tests",
     },
     "appium:autoGrantPermissions": true,
-    "appium:app": process.env.BROWSERSTACK_APP_URL,
+    "appium:app": browserstackAppURL,
   },
 };
