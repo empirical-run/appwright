@@ -1,0 +1,53 @@
+name: Android Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  Android-Tests:
+    runs-on: ubuntu-latest
+    env:
+      SLACK_WEBHOOK_URL: "https://hooks.slack.com/services/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" # Internal notifications channel
+      EMPIRICAL_RUN_VERSION: "0.17.10"
+      TEST_RUN_GITHUB_ACTION_ID: ${{ github.run_id }}
+      PROJECT_NAME: "leap-wallet"
+
+    steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Slack alert on start
+        run: npx @empiricalrun/reporter@${{ env.EMPIRICAL_RUN_VERSION }} test-run start leap-wallet ${{ github.run_id }} playwright
+        continue-on-error: true
+        env:
+          RUN_TRIGGER_TYPE: ${{ github.event_name }}
+
+      - name: Run Android Test
+        run: npx playwright test
+        env:
+          BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
+          BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+          BROWSERSTACK_APP_URL: ${{ secrets.BROWSERSTACK_APP_URL }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+
+      - name: Send slack alert on end
+        if: always()
+        run: npx @empiricalrun/reporter@${{ env.EMPIRICAL_RUN_VERSION }} test-run end leap-wallet ${{ github.run_id }} playwright
+        env:
+          RUN_TRIGGER_TYPE: ${{ github.event_name }}

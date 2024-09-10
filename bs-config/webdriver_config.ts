@@ -43,7 +43,6 @@ export const browserstackConfig = {
     "browserstack",
     {
       opts: { forcelocal: false, localIdentifier: "Leap_Wallet_Tests" },
-      app: browserstackAppURL,
     },
   ],
 };
@@ -57,9 +56,9 @@ export const config = {
       deviceName: "Google Pixel 8",
       osVersion: "14.0",
       platformName: "android",
-      buildIdentifier: "344",
       buildName: "Leap Android build",
       sessionName: "Bstack Android Leap Tests",
+      buildIdentifier: "${BUILD_NUMBER}",
     },
     "appium:autoGrantPermissions": true,
     "appium:app": browserstackAppURL,

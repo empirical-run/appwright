@@ -65,8 +65,8 @@ export async function downloadVideo(
     },
     {
       retries: 10,
-      factor: 1,
-      minTimeout: 3_000,
+      factor: 2,
+      minTimeout: 10_000,
       onRetry: (err, i) => {
         console.log(`Retry attempt ${i} failed: ${err.message}`);
       },
@@ -106,8 +106,6 @@ export async function setSessionName(sessionId: string, data: any) {
 
   // Parse and print the response
   const responseData = await response.json();
-  console.log("Response from setting session details:", responseData);
-
   return responseData;
 }
 
@@ -144,4 +142,17 @@ export async function setSessionStatus(
   console.log("Response from setting session details:", responseData);
 
   return responseData;
+}
+
+export async function updateBuildNumber(config: any) {
+  const env = process.env;
+  const newBuildNumber =
+    env.GITHUB_ACTIONS === "true" ? `CI ${env.GITHUB_RUN_ID}` : env.USER;
+
+  if (newBuildNumber) {
+    if (config.capabilities && config.capabilities["bstack:options"]) {
+      config.capabilities["bstack:options"].buildIdentifier = newBuildNumber;
+    }
+  }
+  return config;
 }
