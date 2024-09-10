@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SLACK_WEBHOOK_URL: "https://hooks.slack.com/services/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" # Internal notifications channel
-      EMPIRICAL_RUN_VERSION: "0.17.5"
+      EMPIRICAL_RUN_VERSION: "0.17.10"
     steps:
       - name: Setup Node.js
         uses: actions/setup-node@v4
