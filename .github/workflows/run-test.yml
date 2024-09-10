@@ -11,6 +11,9 @@ jobs:
     env:
       SLACK_WEBHOOK_URL: "https://hooks.slack.com/services/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" # Internal notifications channel
       EMPIRICAL_RUN_VERSION: "0.17.10"
+      TEST_RUN_GITHUB_ACTION_ID: ${{ github.run_id }}
+      PROJECT_NAME: "leap-wallet"
+
     steps:
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -44,16 +47,6 @@ jobs:
         run: npx @empiricalrun/reporter@${{ env.EMPIRICAL_RUN_VERSION }} test-run tests-complete leap-wallet ${{ github.run_id }} playwright
         env:
           RUN_TRIGGER_TYPE: ${{ github.event_name }}
-
-      - uses: empirical-run/r2-upload-action@master
-        if: always()
-        with:
-          r2-account-id: ${{ secrets.R2_ACCOUNT_ID }}
-          r2-access-key-id: ${{ secrets.R2_ACCESS_KEY_ID }}
-          r2-secret-access-key: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-          r2-bucket: ${{ secrets.R2_BUCKET }}
-          source-dir: playwright-report
-          destination-dir: ./leap-wallet/mobile/${{ github.run_id }}
 
       - name: Send slack alert on end
         if: always()
