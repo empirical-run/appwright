@@ -7,7 +7,7 @@ on:
 
 jobs:
   Android-Tests:
-    runs-on: warp-ubuntu-latest-arm64-2x
+    runs-on: ubuntu-latest
     env:
       SLACK_WEBHOOK_URL: "https://hooks.slack.com/services/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" # Internal notifications channel
       EMPIRICAL_RUN_VERSION: "0.17.5"
