@@ -3,6 +3,7 @@ import {
   waitAndClick,
   isElementVisibleWithinTimeout,
   fill,
+  tapAndroidElement,
 } from "../../utils/actions";
 import test, { expect } from "@playwright/test";
 import { ELEMENT_TIMEOUT, OnboardingType, pin } from "./constants";
@@ -29,6 +30,7 @@ export class OnboardingPage {
   importUsingKeplrButton: string;
   importKeplrWalletButtonSelector: string;
   importWalletSeedPhraseButtonSelector: string;
+  enableNotificationsSelector: string;
   constructor(client: Client) {
     this.client = client;
     this.setSelector();
@@ -59,8 +61,9 @@ export class OnboardingPage {
       this.textFieldSelector = `//android.widget.EditText[@resource-id="import_input"]`;
       this.importUsingKeplrButton = `//android.widget.TextView[@text="Import Keplr"]/..`;
       this.importKeplrWalletButtonSelector = `//android.widget.TextView[@text="Import Keplr wallet"]`;
-      this.seedPhraseButtonSelector = `//android.widget.TextView[@text="Using seed phrase"]/..`;
+      this.seedPhraseButtonSelector = `//android.widget.TextView[@text="Using recovery phrase"]/..`;
       this.importWalletSeedPhraseButtonSelector = `//android.widget.TextView[@text="Import wallet"]/..`;
+      this.enableNotificationsSelector = `(//android.widget.TextView[@text="Enable Notifications"])[2]`;
     }
   }
 
@@ -152,6 +155,18 @@ export class OnboardingPage {
   }
 
   async isDashboardVisible(): Promise<boolean> {
+    test.step("Enable notifications", async () => {
+      if (
+        await isElementVisibleWithinTimeout(
+          this.client,
+          this.enableNotificationsSelector,
+          { timeout: ELEMENT_TIMEOUT },
+        )
+      ) {
+        await waitAndClick(this.client, this.enableNotificationsSelector);
+        await tapAndroidElement(this.client, { x: 129, y: 996 });
+      }
+    });
     return test.step("Check if dashboard is visible", async () => {
       return await isElementVisibleWithinTimeout(
         this.client,
