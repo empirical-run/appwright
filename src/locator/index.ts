@@ -1,8 +1,11 @@
 // @ts-ignore
 import { Client } from "webdriver";
 import { test } from "../fixture";
-import { WaitUntilOptions } from "../providers/driver/types/base";
-import Timer from "../providers/driver/webdriver/types/timer";
+import {
+  WaitUntilOptions,
+  webdriverErrors,
+} from "../providers/driver/types/base";
+import retry from "async-retry";
 
 function boxedStep(target: Function, context: ClassMethodDecoratorContext) {
   return function replacementMethod(...args: any) {
@@ -75,8 +78,11 @@ export class Locator {
               return false;
             }
           } catch (error) {
-            // TODO: Handle stale element error
-            //stale element reference: The element 'By.xpath: //android.widget.TextView[@text="YOUR PORTFOLIO"]' is not linked to the same object in DOM anymore
+            //@ts-ignore
+            if (error.includes(webdriverErrors.StaleElementReferenceError)) {
+              console.log(`Stale element detected. Retrying...`);
+              throw error;
+            }
             console.log(
               `Error while checking visibility of element with XPath "${this.xpath}": ${error}`,
             );
@@ -108,17 +114,31 @@ export class Locator {
     }
 
     const fn = condition.bind(this.driver);
-    const timer = new Timer(
-      options?.interval ?? 500,
-      options?.timeout ?? 5000,
-      fn,
-      true,
-    );
 
-    return (timer as any).catch((e: Error) => {
+    try {
+      return await retry(
+        async () => {
+          const result = await fn();
+
+          if (result === false) {
+            throw new Error("Element not found yet, Retrying...");
+          }
+
+          return result as Exclude<ReturnValue, boolean>; // Return the result if valid
+        },
+        {
+          maxTimeout: 20_000,
+          factor: 1,
+          onRetry: (err, attempt) => {
+            console.log(`Attempt ${attempt} failed: ${err.message}`);
+          },
+        },
+      );
+      //@ts-ignore
+    } catch (e: Error) {
       if (e.message === "timeout") {
         if (typeof options?.timeoutMsg === "string") {
-          throw new Error(options.timeoutMsg);
+          throw new Error(`Timeout Error: ${options.timeoutMsg}`);
         }
         throw new Error(
           `waitUntil condition timed out after ${options?.timeout}ms`,
@@ -128,7 +148,7 @@ export class Locator {
       throw new Error(
         `waitUntil condition failed with the following reason: ${(e && e.message) || e}`,
       );
-    });
+    }
   }
 
   @boxedStep

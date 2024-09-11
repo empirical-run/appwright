@@ -26,3 +26,7 @@ export type WaitUntilOptions = {
   timeoutMsg?: string;
   interval?: number;
 };
+
+export enum webdriverErrors {
+  StaleElementReferenceError = "stale element reference",
+}
