@@ -60,7 +60,6 @@ export class Locator {
     }
   }
 
-  @boxedStep
   async isElementVisibleWithinTimeout(
     options?: WaitUntilOptions,
   ): Promise<boolean> {
@@ -151,7 +150,6 @@ export class Locator {
     }
   }
 
-  @boxedStep
   async click(options?: WaitUntilOptions) {
     try {
       await this.waitUntil(

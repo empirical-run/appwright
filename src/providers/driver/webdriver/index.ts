@@ -55,7 +55,6 @@ export class AppwrightDriver implements IAppwrightDriver {
     return new Locator(this.client, xpath);
   }
 
-  @boxedStep
   async isElementVisibleWithinTimeout(
     xpath: string,
     options?: WaitUntilOptions,
