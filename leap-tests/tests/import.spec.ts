@@ -1,8 +1,11 @@
-import { isElementVisibleWithinTimeout } from "../../utils/actions";
-import { test, expect } from "../../utils/fixtures";
-import { INVALID_KEY, OnboardingType } from "../pages/constants";
+import {
+  ELEMENT_TIMEOUT,
+  INVALID_KEY,
+  OnboardingType,
+} from "../pages/constants";
 import { OnboardingPage } from "../pages/onboarding";
 import { SEED_PHRASE_12_USER, SEED_PHRASE_24_USER } from "../test-data";
+import { expect, test } from "../../src/index";
 
 test("Import wallet using 12 words Seed Phrase", async ({ client }) => {
   const onboardingPage = new OnboardingPage(client);
@@ -11,7 +14,9 @@ test("Import wallet using 12 words Seed Phrase", async ({ client }) => {
     OnboardingType.SEED_PHRASE,
     SEED_PHRASE_12_USER.phrase,
   );
-  expect(await onboardingPage.isDashboardVisible()).toBe(true);
+  await expect(
+    client.locator(onboardingPage.dashboardTextSelector),
+  ).toBeVisible({ timeout: ELEMENT_TIMEOUT });
 });
 
 test("Import wallet using 24 words Seed Phrase", async ({ client }) => {
@@ -21,7 +26,9 @@ test("Import wallet using 24 words Seed Phrase", async ({ client }) => {
     OnboardingType.SEED_PHRASE,
     SEED_PHRASE_24_USER.phrase,
   );
-  expect(await onboardingPage.isDashboardVisible()).toBe(true);
+  await expect(
+    client.locator(onboardingPage.dashboardTextSelector),
+  ).toBeVisible({ timeout: ELEMENT_TIMEOUT });
 });
 
 test("Entering non-dictionary word in seed phrase should show invalid key error", async ({
@@ -33,11 +40,7 @@ test("Entering non-dictionary word in seed phrase should show invalid key error"
     OnboardingType.SEED_PHRASE,
     INVALID_KEY,
   );
-  expect(
-    await isElementVisibleWithinTimeout(
-      client,
-      onboardingPage.invalidImportPhraseSelector,
-      {},
-    ),
-  ).toBe(true);
+  await expect(
+    client.locator(onboardingPage.invalidImportPhraseSelector),
+  ).toBeVisible({ timeout: ELEMENT_TIMEOUT });
 });

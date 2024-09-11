@@ -1,43 +1,37 @@
-import { Client } from "webdriver";
-import {
-  waitAndClick,
-  isElementVisibleWithinTimeout,
-  fill,
-  tapAndroidElement,
-} from "../../utils/actions";
-import test, { expect } from "@playwright/test";
 import { ELEMENT_TIMEOUT, OnboardingType, pin } from "./constants";
+import { AppwrightDriver } from "../../src/providers/driver";
+import { expect } from "../../src/fixture";
 
 export class OnboardingPage {
-  readonly client: Client;
-  enterPinSelector: string;
-  choosePinSelector: string;
-  newWalletButtonSelector: string;
-  importWalletButtonSelector: string;
-  copyButtonSelector: string;
-  recoveryPhraseButtonSelector: string;
-  confirmButtonSelector: string;
-  recoveryPhraseComponentSelector: string;
-  inputAt4Selector: string;
-  inputAt7Selector: string;
-  inputAt11Selector: string;
-  invalidPhraseSelector: string;
-  dashboardTextSelector: string;
-  seedPhraseButtonSelector: string;
-  keplrButtonSelector: string;
-  invalidImportPhraseSelector: string;
-  textFieldSelector: string;
-  importUsingKeplrButton: string;
-  importKeplrWalletButtonSelector: string;
-  importWalletSeedPhraseButtonSelector: string;
-  enableNotificationsSelector: string;
-  constructor(client: Client) {
+  readonly client: AppwrightDriver;
+  enterPinSelector: string = "";
+  choosePinSelector: string = "";
+  newWalletButtonSelector: string = "";
+  importWalletButtonSelector: string = "";
+  copyButtonSelector: string = "";
+  recoveryPhraseButtonSelector: string = "";
+  confirmButtonSelector: string = "";
+  recoveryPhraseComponentSelector: string = "";
+  inputAt4Selector: string = "";
+  inputAt7Selector: string = "";
+  inputAt11Selector: string = "";
+  invalidPhraseSelector: string = "";
+  dashboardTextSelector: string = "";
+  seedPhraseButtonSelector: string = "";
+  keplrButtonSelector: string = "";
+  invalidImportPhraseSelector: string = "";
+  textFieldSelector: string = "";
+  importUsingKeplrButton: string = "";
+  importKeplrWalletButtonSelector: string = "";
+  importWalletSeedPhraseButtonSelector: string = "";
+  enableNotificationsSelector: string = "";
+  constructor(client: AppwrightDriver) {
     this.client = client;
     this.setSelector();
   }
 
   setSelector() {
-    if (this.client.isAndroid) {
+    if (this.client.isAndroid()) {
       this.enterPinSelector = `//android.widget.TextView[@text="Enter your PIN"]`;
       this.choosePinSelector = `//android.widget.TextView[@text="Choose Your PIN"]`;
       this.newWalletButtonSelector = `//android.view.ViewGroup[@resource-id="create_wallet_button"]/android.view.ViewGroup`;
@@ -68,134 +62,86 @@ export class OnboardingPage {
   }
 
   async enterPin() {
-    await isElementVisibleWithinTimeout(
-      this.client,
+    await this.client.isElementVisibleWithinTimeout(
       '//android.widget.TextView[@text="1"]',
       { timeout: 20_000 },
     );
-    const isEnterPinVisible = await isElementVisibleWithinTimeout(
-      this.client,
+    const isEnterPinVisible = await this.client.isElementVisibleWithinTimeout(
       this.enterPinSelector,
-      {},
     );
     if (!isEnterPinVisible) {
-      await test.step("Choose your pin", async () => {
-        await this.inputPin();
-      });
-    }
-    await test.step("Enter your pin", async () => {
       await this.inputPin();
-    });
+    }
+    await this.inputPin();
   }
 
   async importWalletWithPhrase(type: OnboardingType, phrase: string) {
-    await test.step("Import wallet", async () => {
-      await waitAndClick(this.client, this.importWalletButtonSelector);
-      await this.importWalletBasedOnType(type, phrase);
-    });
+    await this.client.click(this.importWalletButtonSelector);
+    await this.importWalletBasedOnType(type, phrase);
   }
 
   async createWalletWithCorrectRecoveryPhrase() {
-    await test.step("Create new wallet", async () => {
-      await waitAndClick(
-        this.client,
-        this.newWalletButtonSelector,
-        ELEMENT_TIMEOUT,
-      );
-      await this.copyAndPastePhrase(12);
-    });
+    await this.client.click(this.newWalletButtonSelector);
+    await this.copyAndPastePhrase(12);
   }
 
   async createWalletWithIncorrectRecoveryPhrase() {
-    await test.step("Create new wallet", async () => {
-      await waitAndClick(
-        this.client,
-        this.newWalletButtonSelector,
-        ELEMENT_TIMEOUT,
-      );
-      await waitAndClick(
-        this.client,
-        this.recoveryPhraseButtonSelector,
-        ELEMENT_TIMEOUT,
-      );
-    });
+    await this.client.click(this.newWalletButtonSelector);
+    await this.client.click(this.recoveryPhraseButtonSelector);
 
-    await test.step("Enter incorrect phrase", async () => {
-      await fill(this.client, this.inputAt4Selector, "wrong");
-      await fill(this.client, this.inputAt7Selector, "recovery");
-      await fill(this.client, this.inputAt11Selector, "phrase");
-      await waitAndClick(this.client, this.confirmButtonSelector);
-    });
+    await this.client.fill(this.inputAt4Selector, "wrong");
+    await this.client.fill(this.inputAt7Selector, "recovery");
+    await this.client.fill(this.inputAt11Selector, "phrase");
+    await this.client.click(this.confirmButtonSelector);
   }
 
   private async copyAndPastePhrase(seedPhraseLength: number) {
     let words: string[] = [];
-    await test.step("Copy the phrase", async () => {
-      await waitAndClick(this.client, this.copyButtonSelector, ELEMENT_TIMEOUT);
-      const clipboardBase64 = await this.client.getClipboard();
-      console.log("Clipboard text Base64:", clipboardBase64);
-      const clipboardText = Buffer.from(clipboardBase64, "base64").toString(
-        "utf-8",
-      );
-      words = clipboardText.split(" ");
-      console.log("Words:", words);
-      expect(words.length).toBe(seedPhraseLength);
-    });
-    await test.step("Paste the phrase", async () => {
-      await waitAndClick(
-        this.client,
-        this.recoveryPhraseButtonSelector,
-        ELEMENT_TIMEOUT,
-      );
-      await fill(this.client, this.inputAt4Selector, words[3]);
-      await fill(this.client, this.inputAt7Selector, words[6]);
-      await fill(this.client, this.inputAt11Selector, words[10]);
-      await waitAndClick(this.client, this.confirmButtonSelector);
-    });
+    await this.client.click(this.copyButtonSelector);
+    const clipboardBase64 = await this.client.getClipboard();
+    console.log("Clipboard text Base64:", clipboardBase64);
+    const clipboardText = Buffer.from(clipboardBase64, "base64").toString(
+      "utf-8",
+    );
+    words = clipboardText.split(" ");
+    console.log("Words:", words);
+    expect(words.length).toBe(seedPhraseLength);
+    await this.client.click(this.recoveryPhraseButtonSelector);
+    await this.client.fill(this.inputAt4Selector, words[3]!);
+    await this.client.fill(this.inputAt7Selector, words[6]!);
+    await this.client.fill(this.inputAt11Selector, words[10]!);
+    await this.client.click(this.confirmButtonSelector);
   }
 
   async isDashboardVisible(): Promise<boolean> {
-    test.step("Enable notifications", async () => {
-      if (
-        await isElementVisibleWithinTimeout(
-          this.client,
-          this.enableNotificationsSelector,
-          { timeout: ELEMENT_TIMEOUT },
-        )
-      ) {
-        await waitAndClick(this.client, this.enableNotificationsSelector);
-        await tapAndroidElement(this.client, { x: 129, y: 996 });
-      }
-    });
-    return test.step("Check if dashboard is visible", async () => {
-      return await isElementVisibleWithinTimeout(
-        this.client,
-        this.dashboardTextSelector,
-        { timeout: ELEMENT_TIMEOUT },
-      );
-    });
+    if (
+      await this.client.isElementVisibleWithinTimeout(
+        this.enableNotificationsSelector,
+      )
+    ) {
+      await this.client.click(this.enableNotificationsSelector);
+      await this.client.tapAtGivenCoordinates({ x: 129, y: 996 });
+    }
+    return await this.client.isElementVisibleWithinTimeout(
+      this.dashboardTextSelector,
+    );
   }
 
   async IsInvalidPhraseTextVisible() {
-    return test.step("Check if invalid phrase error is visible", async () => {
-      return await isElementVisibleWithinTimeout(
-        this.client,
-        this.invalidPhraseSelector,
-        { timeout: ELEMENT_TIMEOUT },
-      );
-    });
+    return await this.client.isElementVisibleWithinTimeout(
+      this.invalidPhraseSelector,
+      { timeout: ELEMENT_TIMEOUT },
+    );
   }
 
   private async inputPin() {
     for (const digit of pin) {
-      await test.step(`Clicking button ${digit}`, async () => {
-        await waitAndClick(this.client, this.getKeySelector(digit));
-      });
+      await this.client.click(this.getKeySelector(digit));
     }
   }
 
-  private getKeySelector(digit: string) {
-    if (this.client.isAndroid) {
+  private getKeySelector(digit: string): string {
+    if (this.client.isAndroid()) {
       return `//android.widget.TextView[@text="${digit}"]`;
     } else {
       return "";
@@ -203,20 +149,16 @@ export class OnboardingPage {
   }
 
   async importWalletBasedOnType(type: OnboardingType, phrase: string) {
-    await waitAndClick(
-      this.client,
+    await this.client.click(
       OnboardingType.SEED_PHRASE
         ? this.seedPhraseButtonSelector
         : this.importUsingKeplrButton,
-      ELEMENT_TIMEOUT,
     );
-    await fill(this.client, this.textFieldSelector, phrase);
-    await waitAndClick(
-      this.client,
+    await this.client.fill(this.textFieldSelector, phrase);
+    await this.client.click(
       OnboardingType.SEED_PHRASE
         ? this.importWalletSeedPhraseButtonSelector
         : this.importKeplrWalletButtonSelector,
-      ELEMENT_TIMEOUT,
     );
   }
 }
