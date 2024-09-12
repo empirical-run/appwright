@@ -1,4 +1,4 @@
-// @ts-ignore ts not able to identify the import is just an inerface
+// @ts-ignore ts not able to identify the import is just an interface
 import type { Client } from "webdriver";
 import { test } from "./../../../fixture";
 import { IAppwrightDriver, WaitUntilOptions } from "../types/base";
