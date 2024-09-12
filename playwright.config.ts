@@ -1,15 +1,10 @@
 import { defineConfig } from "@playwright/test";
-import { baseConfig } from "@empiricalrun/playwright-utils";
+import { appwrightConfig } from "./src/appwright.config";
 import { Config, Platform } from "./src/providers/device/types";
 
 export default defineConfig<Config>({
-  ...baseConfig,
+  ...appwrightConfig,
   testDir: "leap-tests/tests",
-  fullyParallel: true,
-  workers: 2,
-  use: {
-    projectName: "Leap Wallet",
-  },
   projects: [
     {
       use: {

@@ -40,7 +40,6 @@ export type Config = {
   deviceName: string;
   osVersion: string;
   buildURL: string;
-  projectName: string;
 };
 
 export enum Platform {

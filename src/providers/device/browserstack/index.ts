@@ -164,7 +164,7 @@ class BrowserstackDevice implements Device {
 
   private createConfig() {
     const platformName = (this.testInfo.project.use as Config).platform;
-    const projectName = (this.testInfo.project.use as Config).projectName;
+    const projectName = path.basename(process.cwd());
     this.config = {
       port: 443,
       path: "/wd/hub",
