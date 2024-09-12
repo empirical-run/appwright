@@ -35,7 +35,7 @@ export type BrowserstackSessionDetails = {
   };
 };
 
-export type DeviceSessionConfig = {
+export type Config = {
   platform: Platform;
   deviceName: string;
   osVersion: string;
@@ -44,6 +44,6 @@ export type DeviceSessionConfig = {
 };
 
 export enum Platform {
-  ANDROID = "Android",
-  IOS = "iOS",
+  ANDROID = "android",
+  IOS = "ios",
 }

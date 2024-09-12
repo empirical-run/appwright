@@ -1,8 +1,8 @@
 import { defineConfig } from "@playwright/test";
 import { baseConfig } from "@empiricalrun/playwright-utils";
-import { DeviceSessionConfig, Platform } from "./src/providers/device/types";
+import { Config, Platform } from "./src/providers/device/types";
 
-export default defineConfig<DeviceSessionConfig>({
+export default defineConfig<Config>({
   ...baseConfig,
   testDir: "leap-tests/tests",
   fullyParallel: true,

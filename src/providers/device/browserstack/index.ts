@@ -1,11 +1,7 @@
 import fs from "fs";
 import path from "path";
 import retry from "async-retry";
-import {
-  BrowserstackSessionDetails,
-  Device,
-  DeviceSessionConfig,
-} from "../types";
+import { BrowserstackSessionDetails, Device, Config } from "../types";
 import { TestInfo } from "@playwright/test";
 import { AppwrightDriver } from "../../driver/webdriver";
 
@@ -167,10 +163,8 @@ class BrowserstackDevice implements Device {
   }
 
   private createConfig() {
-    const platformName = (this.testInfo.project.use as DeviceSessionConfig)
-      .platform;
-    const projectName = (this.testInfo.project.use as DeviceSessionConfig)
-      .projectName;
+    const platformName = (this.testInfo.project.use as Config).platform;
+    const projectName = (this.testInfo.project.use as Config).projectName;
     this.config = {
       port: 443,
       path: "/wd/hub",
@@ -186,10 +180,8 @@ class BrowserstackDevice implements Device {
           networkLogs: true,
           appiumVersion: "2.6.0",
           enableCameraImageInjection: true,
-          deviceName: (this.testInfo.project.use as DeviceSessionConfig)
-            .deviceName,
-          osVersion: (this.testInfo.project.use as DeviceSessionConfig)
-            .osVersion,
+          deviceName: (this.testInfo.project.use as Config).deviceName,
+          osVersion: (this.testInfo.project.use as Config).osVersion,
           platformName: platformName,
           buildName: `${projectName} ${platformName}`,
           sessionName: `${projectName} ${platformName} Test`,
@@ -199,8 +191,7 @@ class BrowserstackDevice implements Device {
               : process.env.USER,
         },
         "appium:autoGrantPermissions": true,
-        "appium:app": (this.testInfo.project.use as DeviceSessionConfig)
-          .buildURL,
+        "appium:app": (this.testInfo.project.use as Config).buildURL,
       },
     };
   }
