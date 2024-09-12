@@ -184,7 +184,7 @@ class BrowserstackDevice implements Device {
           osVersion: (this.testInfo.project.use as Config).osVersion,
           platformName: platformName,
           buildName: `${projectName} ${platformName}`,
-          sessionName: `${projectName} ${platformName} Test`,
+          sessionName: `${projectName} ${platformName} test`,
           buildIdentifier:
             process.env.GITHUB_ACTIONS === "true"
               ? `CI ${process.env.GITHUB_RUN_ID}`
