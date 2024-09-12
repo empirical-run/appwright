@@ -1,9 +1,7 @@
-import { defineConfig } from "@playwright/test";
-import { appwrightConfig } from "./src/appwright.config";
-import { Config, Platform } from "./src/providers/device/types";
+import { defineConfig } from "./src/appwright.config";
+import { Platform } from "./src/providers/device/types";
 
-export default defineConfig<Config>({
-  ...appwrightConfig,
+export default defineConfig({
   testDir: "leap-tests/tests",
   projects: [
     {
