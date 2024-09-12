@@ -43,6 +43,15 @@ class BrowserstackDevice implements Device {
     const dir = path.dirname(pathToTestVideo);
     fs.mkdirSync(dir, { recursive: true });
     console.log(`Video URL: ${videoURL}`);
+    /**
+     * The BrowserStack video URL initially returns a 200 status,
+     * but the video file may still be empty. To avoid downloading
+     * an incomplete file, we introduce a delay before attempting the download.
+     * After the wait, BrowserStack may return a 403 error if the video is not
+     * yet available. We handle this by retrying the download until we either
+     * receive a 200 response (indicating the video is ready) or reach a maximum
+     * of 10 retries, whichever comes first.
+     */
     await new Promise((resolve) => setTimeout(resolve, 10_000));
     const fileStream = fs.createWriteStream(pathToTestVideo);
     if (videoURL) {

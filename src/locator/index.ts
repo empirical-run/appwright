@@ -1,31 +1,11 @@
 // @ts-ignore
 import { Client } from "webdriver";
-import { test } from "../fixture";
 import {
   WaitUntilOptions,
   webdriverErrors,
 } from "../providers/driver/types/base";
 import retry from "async-retry";
-
-function boxedStep(target: Function, context: ClassMethodDecoratorContext) {
-  return function replacementMethod(...args: any) {
-    const name =
-      (context.name as string) +
-      "(" +
-      Array.from(args)
-        .map((a) => JSON.stringify(a))
-        .join(" , ") +
-      ")";
-    return test.step(
-      name,
-      async () => {
-        // @ts-ignore
-        return await target.call(this, ...args);
-      },
-      { box: true },
-    ); // Note the "box" option here.
-  };
-}
+import { boxedStep } from "../providers/driver/webdriver";
 
 export interface AppwrightLocator {
   getPath(): string;
@@ -120,7 +100,9 @@ export class Locator {
           const result = await fn();
 
           if (result === false) {
-            throw new Error("Element not found yet, Retrying...");
+            throw new Error(
+              `Element corresponding to xpath ${this.xpath} not found yet, Retrying...`,
+            );
           }
 
           return result as Exclude<ReturnValue, boolean>; // Return the result if valid
@@ -152,20 +134,7 @@ export class Locator {
 
   async click(options?: WaitUntilOptions) {
     try {
-      await this.waitUntil(
-        async () => {
-          const element = await this.driver.findElement("xpath", this.xpath);
-          return await this.driver.isElementDisplayed(
-            element["element-6066-11e4-a52e-4f735466cecf"],
-          );
-        },
-        {
-          timeout: options?.timeout,
-          interval: options?.interval,
-          timeoutMsg: `Element with XPath "${this.xpath}" not visible within ${options?.timeout}ms`,
-        },
-      );
-
+      await this.isElementVisibleWithinTimeout(options);
       const button = await this.driver.findElement("xpath", this.xpath);
       await this.driver.elementClick(
         button["element-6066-11e4-a52e-4f735466cecf"],

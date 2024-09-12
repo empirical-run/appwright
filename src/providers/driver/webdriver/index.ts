@@ -4,7 +4,10 @@ import { test } from "./../../../fixture";
 import { IAppwrightDriver, WaitUntilOptions } from "../types/base";
 import { AppwrightLocator, Locator } from "../../../locator";
 
-function boxedStep(target: Function, context: ClassMethodDecoratorContext) {
+export function boxedStep(
+  target: Function,
+  context: ClassMethodDecoratorContext,
+) {
   return function replacementMethod(...args: any) {
     const name =
       (context.name as string) +
