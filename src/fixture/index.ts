@@ -1,5 +1,4 @@
 import { test as base } from "@playwright/test";
-import { config } from "../../bs-config/webdriver_config";
 
 import { DeviceProvider } from "../providers/device/browserstack";
 import { Device } from "../providers/device/types";
@@ -16,7 +15,7 @@ export const test = base.extend<{
     await use(device);
   },
   client: async ({ device }, use) => {
-    const driver = await device.createDriver(config);
+    const driver = await device.createDriver();
     await use(driver);
     await driver.close();
   },
@@ -25,11 +24,9 @@ export const test = base.extend<{
       await use();
       await device.setSessionStatus(testInfo.status, testInfo.error?.message);
 
-      // // Download the video
       const videoData = await device.downloadVideo();
       console.log(`Video saved to: ${JSON.stringify(videoData)}`);
 
-      // // Attach the video to the test report
       if (videoData) {
         await testInfo.attach("video", videoData);
       }

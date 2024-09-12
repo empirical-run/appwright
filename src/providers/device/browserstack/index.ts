@@ -1,10 +1,13 @@
 import fs from "fs";
 import path from "path";
 import retry from "async-retry";
-import { BrowserstackSessionDetails, Device } from "../types";
+import {
+  BrowserstackSessionDetails,
+  Device,
+  DeviceSessionConfig,
+} from "../types";
 import { TestInfo } from "@playwright/test";
 import { AppwrightDriver } from "../../driver/webdriver";
-import { config } from "../../../../bs-config/webdriver_config";
 
 class BrowserstackDevice implements Device {
   private sessionDetails?: BrowserstackSessionDetails;
@@ -15,13 +18,13 @@ class BrowserstackDevice implements Device {
   private sessionBaseURL =
     "https://api-cloud.browserstack.com/app-automate/sessions";
   private config: any;
+
   constructor(testInfo: TestInfo) {
     this.testInfo = testInfo;
   }
 
   async init() {
-    // TODO: Get config details from appwright config using [testInfo]
-    this.config = this.updateBuildIdentifierInConfig(config);
+    this.createConfig();
   }
 
   async createDriver(): Promise<AppwrightDriver> {
@@ -163,18 +166,43 @@ class BrowserstackDevice implements Device {
     return responseData;
   }
 
-  ///TODO: Remove any type
-  private updateBuildIdentifierInConfig(config: any): any {
-    const env = process.env;
-    const newBuildNumber =
-      env.GITHUB_ACTIONS === "true" ? `CI ${env.GITHUB_RUN_ID}` : env.USER;
-
-    if (newBuildNumber) {
-      if (config.capabilities && config.capabilities["bstack:options"]) {
-        config.capabilities["bstack:options"].buildIdentifier = newBuildNumber;
-      }
-    }
-    return config;
+  private createConfig() {
+    const platformName = (this.testInfo.project.use as DeviceSessionConfig)
+      .platform;
+    const projectName = (this.testInfo.project.use as DeviceSessionConfig)
+      .projectName;
+    this.config = {
+      port: 443,
+      path: "/wd/hub",
+      protocol: "https",
+      logLevel: "warn",
+      user: process.env.BROWSERSTACK_USERNAME,
+      key: process.env.BROWSERSTACK_ACCESS_KEY,
+      hostname: "hub.browserstack.com",
+      capabilities: {
+        "bstack:options": {
+          debug: true,
+          interactiveDebugging: true,
+          networkLogs: true,
+          appiumVersion: "2.6.0",
+          enableCameraImageInjection: true,
+          deviceName: (this.testInfo.project.use as DeviceSessionConfig)
+            .deviceName,
+          osVersion: (this.testInfo.project.use as DeviceSessionConfig)
+            .osVersion,
+          platformName: platformName,
+          buildName: `${projectName} ${platformName}`,
+          sessionName: `${projectName} ${platformName} Test`,
+          buildIdentifier:
+            process.env.GITHUB_ACTIONS === "true"
+              ? `CI ${process.env.GITHUB_RUN_ID}`
+              : process.env.USER,
+        },
+        "appium:autoGrantPermissions": true,
+        "appium:app": (this.testInfo.project.use as DeviceSessionConfig)
+          .buildURL,
+      },
+    };
   }
 
   private async getSessionDetails() {
