@@ -18,7 +18,6 @@ export const test = base.extend<{
   client: async ({ device }, use) => {
     const driver = await device.createDriver(config);
     await use(driver);
-    console.log("==========Driver getting closed===========");
     await driver.close();
   },
   saveVideo: [
@@ -44,9 +43,7 @@ export const expect = test.expect.extend({
     locator: AppwrightLocator,
     options?: { timeout: number },
   ) => {
-    console.log("toBeVisible", locator.getPath());
     const isVisible = await locator.isElementVisibleWithinTimeout(options);
-    console.log("=====> isVisible", isVisible);
     return {
       message: () =>
         isVisible

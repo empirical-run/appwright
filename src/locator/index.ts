@@ -5,7 +5,6 @@ import {
   webdriverErrors,
 } from "../providers/driver/types/base";
 import retry from "async-retry";
-import { boxedStep } from "../providers/driver/webdriver";
 
 export interface AppwrightLocator {
   getPath(): string;
@@ -17,26 +16,25 @@ export interface AppwrightLocator {
 export class Locator {
   constructor(
     private driver: Client,
-    private xpath: string,
+    private path: string,
   ) {}
 
   getPath() {
-    return this.xpath;
+    return this.path;
   }
 
-  @boxedStep
   async fill(value: string, options?: { timeout?: number }): Promise<void> {
     const isElementDisplayed = await this.isElementVisibleWithinTimeout({
       timeout: options?.timeout,
     });
     if (isElementDisplayed) {
-      const element = await this.driver.findElement("xpath", this.xpath);
+      const element = await this.driver.findElement("xpath", this.path);
       await this.driver.elementSendKeys(
         element["element-6066-11e4-a52e-4f735466cecf"],
         value,
       );
     } else {
-      throw new Error(`Element with XPath "${this.xpath}" not visible`);
+      throw new Error(`Element with path "${this.path}" not visible`);
     }
   }
 
@@ -47,7 +45,7 @@ export class Locator {
       const isVisible = await this.waitUntil(
         async () => {
           try {
-            const element = await this.driver.findElement("xpath", this.xpath);
+            const element = await this.driver.findElement("xpath", this.path);
             if (element && element["element-6066-11e4-a52e-4f735466cecf"]) {
               const isDisplayed = await this.driver.isElementDisplayed(
                 element["element-6066-11e4-a52e-4f735466cecf"],
@@ -63,7 +61,7 @@ export class Locator {
               throw error;
             }
             console.log(
-              `Error while checking visibility of element with XPath "${this.xpath}": ${error}`,
+              `Error while checking visibility of element with path "${this.path}": ${error}`,
             );
             return false;
           }
@@ -101,14 +99,14 @@ export class Locator {
 
           if (result === false) {
             throw new Error(
-              `Element corresponding to xpath ${this.xpath} not found yet, Retrying...`,
+              `Element corresponding to path ${this.path} not found yet, Retrying...`,
             );
           }
 
           return result as Exclude<ReturnValue, boolean>; // Return the result if valid
         },
         {
-          maxTimeout: 20_000,
+          maxTimeout: options?.timeout,
           factor: 1,
           onRetry: (err, attempt) => {
             console.log(`Attempt ${attempt} failed: ${err.message}`);
@@ -135,13 +133,13 @@ export class Locator {
   async click(options?: WaitUntilOptions) {
     try {
       await this.isElementVisibleWithinTimeout(options);
-      const button = await this.driver.findElement("xpath", this.xpath);
+      const button = await this.driver.findElement("xpath", this.path);
       await this.driver.elementClick(
         button["element-6066-11e4-a52e-4f735466cecf"],
       );
     } catch (error) {
       throw new Error(
-        `Failed to click on the element with XPath "${this.xpath}": ${error}`,
+        `Failed to click on the element with path "${this.path}": ${error}`,
       );
     }
   }

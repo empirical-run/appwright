@@ -1,18 +1,18 @@
 export interface IAppwrightDriver {
   fill: (
-    xpath: string,
+    path: string,
     value: string,
     options: { timeout?: number },
   ) => Promise<void>;
 
   isElementVisibleWithinTimeout: (
-    xpath: string,
+    path: string,
     options?: WaitUntilOptions,
   ) => Promise<boolean>;
 
   close: () => Promise<void>;
 
-  click: (xpath: string, options?: WaitUntilOptions) => Promise<void>;
+  click: (path: string, options?: WaitUntilOptions) => Promise<void>;
 
   tapAtGivenCoordinates: ({ x, y }: { x: number; y: number }) => Promise<void>;
 

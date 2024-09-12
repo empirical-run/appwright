@@ -35,34 +35,23 @@ export class AppwrightDriver implements IAppwrightDriver {
 
   @boxedStep
   async fill(
-    xpath: string,
+    path: string,
     value: string,
     options?: { timeout?: number },
   ): Promise<void> {
-    const isElementDisplayed = await this.isElementVisibleWithinTimeout(xpath, {
-      timeout: options?.timeout,
-    });
-    if (isElementDisplayed) {
-      const element = await this.client.findElement("xpath", xpath);
-      await this.client.elementSendKeys(
-        element["element-6066-11e4-a52e-4f735466cecf"],
-        value,
-      );
-    } else {
-      throw new Error(`Element with XPath "${xpath}" not visible`);
-    }
+    await new Locator(this.client, path).fill(value, options);
   }
 
   // TODO: need to check if we need boxedStep
-  locator(xpath: string): AppwrightLocator {
-    return new Locator(this.client, xpath);
+  locator(path: string): AppwrightLocator {
+    return new Locator(this.client, path);
   }
 
   async isElementVisibleWithinTimeout(
-    xpath: string,
+    path: string,
     options?: WaitUntilOptions,
   ): Promise<boolean> {
-    return new Locator(this.client, xpath).isElementVisibleWithinTimeout(
+    return new Locator(this.client, path).isElementVisibleWithinTimeout(
       options,
     );
   }
@@ -74,8 +63,8 @@ export class AppwrightDriver implements IAppwrightDriver {
   }
 
   @boxedStep
-  async click(xpath: string, options?: WaitUntilOptions) {
-    await new Locator(this.client, xpath).click(options);
+  async click(path: string, options?: WaitUntilOptions) {
+    await new Locator(this.client, path).click(options);
   }
 
   @boxedStep
