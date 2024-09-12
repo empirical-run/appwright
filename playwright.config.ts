@@ -1,15 +1,16 @@
-import { defineConfig } from "@playwright/test";
-import { baseConfig } from "@empiricalrun/playwright-utils";
+import { defineConfig } from "./src/appwright.config";
+import { Platform } from "./src/providers/device/types";
 
 export default defineConfig({
-  ...baseConfig,
   testDir: "leap-tests/tests",
-  fullyParallel: true,
-  forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: 2,
-  timeout: 0,
-  use: {
-    trace: "on-first-retry",
-  },
+  projects: [
+    {
+      use: {
+        platform: Platform.ANDROID,
+        deviceName: "Google Pixel 8",
+        osVersion: "14.0",
+        buildURL: process.env.BROWSERSTACK_APP_URL,
+      },
+    },
+  ],
 });

@@ -3,7 +3,7 @@ import { AppwrightDriver } from "../../driver";
 export interface Device {
   init: () => Promise<void>;
 
-  createDriver: (config: any) => Promise<AppwrightDriver>;
+  createDriver: () => Promise<AppwrightDriver>;
 
   // TODO: Return error type
   downloadVideo: () => Promise<{ path: string; contentType: string } | null>;
@@ -34,3 +34,15 @@ export type BrowserstackSessionDetails = {
     uploaded_at: string;
   };
 };
+
+export type Config = {
+  platform: Platform;
+  deviceName: string;
+  osVersion: string;
+  buildURL: string;
+};
+
+export enum Platform {
+  ANDROID = "android",
+  IOS = "ios",
+}
