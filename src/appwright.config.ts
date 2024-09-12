@@ -16,6 +16,9 @@ const appwrightConfig: PlaywrightTestConfig = {
     ["json", { outputFile: "playwright-report/summary.json" }],
     ["./node_modules/@empiricalrun/playwright-utils/dist/reporter/custom.js"],
   ],
+  use: {
+    actionTimeout: 20_000,
+  },
   expect: {
     timeout: 20_000,
   },

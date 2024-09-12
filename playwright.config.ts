@@ -9,7 +9,7 @@ export default defineConfig({
         platform: Platform.ANDROID,
         deviceName: "Google Pixel 8",
         osVersion: "14.0",
-        buildURL: process.env.BROWSERSTACK_APP_URL || "",
+        buildURL: process.env.BROWSERSTACK_APP_URL,
       },
     },
   ],
