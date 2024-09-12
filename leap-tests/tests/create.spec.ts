@@ -1,6 +1,5 @@
 import { OnboardingPage } from "../pages/onboarding";
 import { expect, test } from "../../src/index";
-import { ELEMENT_TIMEOUT } from "../pages/constants";
 
 test("Create new wallet by entering the recovery phrase", async ({
   client,
@@ -10,7 +9,7 @@ test("Create new wallet by entering the recovery phrase", async ({
   await onboardingPage.createWalletWithCorrectRecoveryPhrase();
   await expect(
     client.locator(onboardingPage.dashboardTextSelector),
-  ).toBeVisible({ timeout: ELEMENT_TIMEOUT });
+  ).toBeVisible();
 });
 
 test("Create new wallet by entering invalid word throws an error", async ({
@@ -21,5 +20,5 @@ test("Create new wallet by entering invalid word throws an error", async ({
   await onboardingPage.createWalletWithIncorrectRecoveryPhrase();
   await expect(
     client.locator(onboardingPage.invalidPhraseSelector),
-  ).toBeVisible({ timeout: ELEMENT_TIMEOUT });
+  ).toBeVisible();
 });

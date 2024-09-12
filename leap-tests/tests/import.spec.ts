@@ -1,8 +1,4 @@
-import {
-  ELEMENT_TIMEOUT,
-  INVALID_KEY,
-  OnboardingType,
-} from "../pages/constants";
+import { INVALID_KEY, OnboardingType } from "../pages/constants";
 import { OnboardingPage } from "../pages/onboarding";
 import { SEED_PHRASE_12_USER, SEED_PHRASE_24_USER } from "../test-data";
 import { expect, test } from "../../src/index";
@@ -16,7 +12,7 @@ test("Import wallet using 12 words Seed Phrase", async ({ client }) => {
   );
   await expect(
     client.locator(onboardingPage.dashboardTextSelector),
-  ).toBeVisible({ timeout: ELEMENT_TIMEOUT });
+  ).toBeVisible();
 });
 
 test("Import wallet using 24 words Seed Phrase", async ({ client }) => {
@@ -28,7 +24,7 @@ test("Import wallet using 24 words Seed Phrase", async ({ client }) => {
   );
   await expect(
     client.locator(onboardingPage.dashboardTextSelector),
-  ).toBeVisible({ timeout: ELEMENT_TIMEOUT });
+  ).toBeVisible();
 });
 
 test("Entering non-dictionary word in seed phrase should show invalid key error", async ({
@@ -42,5 +38,5 @@ test("Entering non-dictionary word in seed phrase should show invalid key error"
   );
   await expect(
     client.locator(onboardingPage.invalidImportPhraseSelector),
-  ).toBeVisible({ timeout: ELEMENT_TIMEOUT });
+  ).toBeVisible();
 });

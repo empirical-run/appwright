@@ -3,6 +3,7 @@ import type { Client } from "webdriver";
 import { test } from "./../../../fixture";
 import { IAppwrightDriver, WaitUntilOptions } from "../types/base";
 import { AppwrightLocator, Locator } from "../../../locator";
+import { TestInfo } from "@playwright/test";
 
 export function boxedStep(
   target: Function,
@@ -29,31 +30,31 @@ export function boxedStep(
 
 export class AppwrightDriver implements IAppwrightDriver {
   private client: Client;
-  constructor(webdriverClient: Client) {
+  private testInfo: TestInfo;
+  constructor(webdriverClient: Client, testInfo: TestInfo) {
     this.client = webdriverClient;
+    this.testInfo = testInfo;
   }
 
   @boxedStep
   async fill(
     path: string,
     value: string,
-    options?: { timeout?: number },
+    options?: WaitUntilOptions,
   ): Promise<void> {
-    await new Locator(this.client, path).fill(value, options);
+    await this.locator(path).fill(value, options);
   }
 
   // TODO: need to check if we need boxedStep
   locator(path: string): AppwrightLocator {
-    return new Locator(this.client, path);
+    return new Locator(this.client, path, this.testInfo);
   }
 
   async isElementVisibleWithinTimeout(
     path: string,
     options?: WaitUntilOptions,
   ): Promise<boolean> {
-    return new Locator(this.client, path).isElementVisibleWithinTimeout(
-      options,
-    );
+    return await this.locator(path).isElementVisibleWithinTimeout(options);
   }
 
   @boxedStep
@@ -64,7 +65,7 @@ export class AppwrightDriver implements IAppwrightDriver {
 
   @boxedStep
   async click(path: string, options?: WaitUntilOptions) {
-    await new Locator(this.client, path).click(options);
+    await this.locator(path).click(options);
   }
 
   @boxedStep

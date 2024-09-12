@@ -1,6 +1,6 @@
-import { ELEMENT_TIMEOUT, OnboardingType, pin } from "./constants";
 import { AppwrightDriver } from "../../src/providers/driver";
 import { expect } from "../../src/fixture";
+import { OnboardingType, pin } from "./constants";
 
 export class OnboardingPage {
   readonly client: AppwrightDriver;
@@ -130,7 +130,6 @@ export class OnboardingPage {
   async IsInvalidPhraseTextVisible() {
     return await this.client.isElementVisibleWithinTimeout(
       this.invalidPhraseSelector,
-      { timeout: ELEMENT_TIMEOUT },
     );
   }
 

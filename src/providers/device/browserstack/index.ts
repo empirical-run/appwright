@@ -28,7 +28,7 @@ class BrowserstackDevice implements Device {
     const webdriverClient = await WebDriver.newSession(this.config as any);
     this.sessionId = webdriverClient.sessionId;
     await this.setSessionName(webdriverClient.sessionId, this.testInfo.title);
-    return new AppwrightDriver(webdriverClient);
+    return new AppwrightDriver(webdriverClient, this.testInfo);
   }
 
   async downloadVideo(): Promise<{ path: string; contentType: string } | null> {
@@ -45,7 +45,7 @@ class BrowserstackDevice implements Device {
     /**
      * The BrowserStack video URL initially returns a 200 status,
      * but the video file may still be empty. To avoid downloading
-     * an incomplete file, we introduce a delay before attempting the download.
+     * an incomplete file, we introduce a delay of 10_000 ms before attempting the download.
      * After the wait, BrowserStack may return a 403 error if the video is not
      * yet available. We handle this by retrying the download until we either
      * receive a 200 response (indicating the video is ready) or reach a maximum

@@ -4,6 +4,7 @@ import { DeviceProvider } from "../providers/device/browserstack";
 import { Device } from "../providers/device/types";
 import { AppwrightDriver } from "../providers/driver";
 import { AppwrightLocator } from "../locator";
+import { WaitUntilOptions } from "../providers/driver/types/base";
 
 export const test = base.extend<{
   device: Device;
@@ -38,7 +39,7 @@ export const test = base.extend<{
 export const expect = test.expect.extend({
   toBeVisible: async (
     locator: AppwrightLocator,
-    options?: { timeout: number },
+    options?: WaitUntilOptions,
   ) => {
     const isVisible = await locator.isElementVisibleWithinTimeout(options);
     return {

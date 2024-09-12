@@ -2,7 +2,7 @@ export interface IAppwrightDriver {
   fill: (
     path: string,
     value: string,
-    options: { timeout?: number },
+    options: WaitUntilOptions,
   ) => Promise<void>;
 
   isElementVisibleWithinTimeout: (
@@ -22,9 +22,7 @@ export interface IAppwrightDriver {
 }
 
 export type WaitUntilOptions = {
-  timeout?: number;
-  timeoutMsg?: string;
-  interval?: number;
+  timeout: number;
 };
 
 export enum webdriverErrors {
