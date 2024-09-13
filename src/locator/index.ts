@@ -21,7 +21,8 @@ export class Locator {
     private path: string,
     private testInfo: TestInfo,
   ) {
-    this.timeout = this.testInfo.project.use.actionTimeout ?? 10_000;
+    // Setting the default timeout to 20 seconds
+    this.timeout = this.testInfo.project.use.actionTimeout ?? 20_000;
   }
 
   getPath() {
