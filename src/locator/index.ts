@@ -1,11 +1,8 @@
 // @ts-ignore
 import { Client } from "webdriver";
-import {
-  WaitUntilOptions,
-  webdriverErrors,
-} from "../providers/driver/types/base";
+import { webdriverErrors } from "../providers/driver/types/base";
 import retry from "async-retry";
-import { TestInfo } from "@playwright/test";
+import { TestInfoOptions, WaitUntilOptions } from "../types";
 
 export interface AppwrightLocator {
   getPath(): string;
@@ -15,15 +12,11 @@ export interface AppwrightLocator {
 }
 
 export class Locator {
-  private timeout: number;
   constructor(
     private driver: Client,
     private path: string,
-    private testInfo: TestInfo,
-  ) {
-    // Setting the default timeout to 20 seconds
-    this.timeout = this.testInfo.project.use.actionTimeout ?? 20_000;
-  }
+    private testOptions: TestInfoOptions,
+  ) {}
 
   getPath() {
     return this.path;
@@ -71,8 +64,9 @@ export class Locator {
             return false;
           }
         },
-        options ?? {
-          timeout: this.timeout,
+        {
+          timeout: this.testOptions.expectTimeout,
+          ...options,
         },
       );
 

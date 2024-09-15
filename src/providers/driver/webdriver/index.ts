@@ -1,9 +1,9 @@
 // @ts-ignore ts not able to identify the import is just an interface
 import type { Client } from "webdriver";
 import { test } from "./../../../fixture";
-import { IAppwrightDriver, WaitUntilOptions } from "../types/base";
+import { IAppwrightDriver } from "../types/base";
 import { AppwrightLocator, Locator } from "../../../locator";
-import { TestInfo } from "@playwright/test";
+import { TestInfoOptions, WaitUntilOptions } from "../../../types";
 
 export function boxedStep(
   target: Function,
@@ -30,10 +30,10 @@ export function boxedStep(
 
 export class AppwrightDriver implements IAppwrightDriver {
   private client: Client;
-  private testInfo: TestInfo;
-  constructor(webdriverClient: Client, testInfo: TestInfo) {
+  private testOptions: TestInfoOptions;
+  constructor(webdriverClient: Client, testOptions: TestInfoOptions) {
     this.client = webdriverClient;
-    this.testInfo = testInfo;
+    this.testOptions = testOptions;
   }
 
   @boxedStep
@@ -47,7 +47,7 @@ export class AppwrightDriver implements IAppwrightDriver {
 
   // TODO: need to check if we need boxedStep
   locator(path: string): AppwrightLocator {
-    return new Locator(this.client, path, this.testInfo);
+    return new Locator(this.client, path, this.testOptions);
   }
 
   async isElementVisibleWithinTimeout(

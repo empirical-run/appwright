@@ -28,7 +28,12 @@ class BrowserstackDevice implements Device {
     const webdriverClient = await WebDriver.newSession(this.config as any);
     this.sessionId = webdriverClient.sessionId;
     await this.setSessionName(webdriverClient.sessionId, this.testInfo.title);
-    return new AppwrightDriver(webdriverClient, this.testInfo);
+    console.log("Test info: ", this.testInfo);
+    console.log("Project Test info: ", this.testInfo.project);
+    console.log("Expect Test info: ", this.testInfo.expect);
+    return new AppwrightDriver(webdriverClient, {
+      expectTimeout: test,
+    });
   }
 
   async downloadVideo(): Promise<{ path: string; contentType: string } | null> {

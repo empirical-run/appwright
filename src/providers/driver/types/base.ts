@@ -1,3 +1,5 @@
+import { WaitUntilOptions } from "../../../types";
+
 export interface IAppwrightDriver {
   fill: (
     path: string,
@@ -20,10 +22,6 @@ export interface IAppwrightDriver {
 
   isAndroid: () => boolean;
 }
-
-export type WaitUntilOptions = {
-  timeout: number;
-};
 
 export enum webdriverErrors {
   StaleElementReferenceError = "stale element reference",

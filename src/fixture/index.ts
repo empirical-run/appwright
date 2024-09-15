@@ -4,7 +4,7 @@ import { DeviceProvider } from "../providers/device/browserstack";
 import { Device } from "../providers/device/types";
 import { AppwrightDriver } from "../providers/driver";
 import { AppwrightLocator } from "../locator";
-import { WaitUntilOptions } from "../providers/driver/types/base";
+import { WaitUntilOptions } from "../types";
 
 export const test = base.extend<{
   device: Device;
