@@ -11,30 +11,6 @@ export interface Device {
   setSessionStatus: (status?: string, reason?: string) => Promise<void>;
 }
 
-export type BrowserstackSessionDetails = {
-  name: string;
-  duration: number;
-  os: string;
-  os_version: string;
-  device: string;
-  status: string;
-  reason: string;
-  build_name: string;
-  project_name: string;
-  logs: string;
-  public_url: string;
-  appium_logs_url: string;
-  video_url: string;
-  device_logs_url: string;
-  app_details: {
-    app_url: string;
-    app_name: string;
-    app_version: string;
-    app_custom_id: string;
-    uploaded_at: string;
-  };
-};
-
 export type Config = {
   platform: Platform;
   deviceName: string;

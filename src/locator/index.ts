@@ -2,7 +2,7 @@
 import { Client } from "webdriver";
 import {
   WaitUntilOptions,
-  webdriverErrors,
+  WebdriverErrors,
 } from "../providers/driver/types/base";
 import retry from "async-retry";
 
@@ -56,7 +56,7 @@ export class Locator {
             }
           } catch (error) {
             //@ts-ignore
-            if (error.includes(webdriverErrors.StaleElementReferenceError)) {
+            if (error.includes(WebdriverErrors.StaleElementReferenceError)) {
               console.log(`Stale element detected. Retrying...`);
               throw error;
             }
