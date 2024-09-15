@@ -27,6 +27,6 @@ export type WaitUntilOptions = {
   interval?: number;
 };
 
-export enum webdriverErrors {
+export enum WebdriverErrors {
   StaleElementReferenceError = "stale element reference",
 }
