@@ -55,9 +55,11 @@ export class Locator {
               return false;
             }
           } catch (error) {
-            //@ts-ignore
-            if (error.includes(WebdriverErrors.StaleElementReferenceError)) {
-              console.log(`Stale element detected. Retrying...`);
+            if (
+              //@ts-ignore
+              error.name.includes(WebdriverErrors.StaleElementReferenceError)
+            ) {
+              console.log(`Stale element detected. Error: ${error}`);
               throw error;
             }
             console.log(
