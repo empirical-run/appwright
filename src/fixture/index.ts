@@ -40,7 +40,7 @@ export const expect = test.expect.extend({
     locator: AppwrightLocator,
     options?: { timeout: number },
   ) => {
-    const isVisible = await locator.isElementVisibleWithinTimeout(options);
+    const isVisible = await locator.isVisible(options);
     return {
       message: () =>
         isVisible

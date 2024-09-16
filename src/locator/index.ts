@@ -9,7 +9,7 @@ import retry from "async-retry";
 export interface AppwrightLocator {
   getPath(): string;
   fill(value: string, options?: { timeout?: number }): Promise<void>;
-  isElementVisibleWithinTimeout(options?: WaitUntilOptions): Promise<boolean>;
+  isVisible(options?: WaitUntilOptions): Promise<boolean>;
   click(options?: WaitUntilOptions): Promise<void>;
 }
 
@@ -24,7 +24,7 @@ export class Locator {
   }
 
   async fill(value: string, options?: { timeout?: number }): Promise<void> {
-    const isElementDisplayed = await this.isElementVisibleWithinTimeout({
+    const isElementDisplayed = await this.isVisible({
       timeout: options?.timeout,
     });
     if (isElementDisplayed) {
@@ -38,9 +38,7 @@ export class Locator {
     }
   }
 
-  async isElementVisibleWithinTimeout(
-    options?: WaitUntilOptions,
-  ): Promise<boolean> {
+  async isVisible(options?: WaitUntilOptions): Promise<boolean> {
     try {
       const isVisible = await this.waitUntil(
         async () => {
@@ -134,7 +132,7 @@ export class Locator {
 
   async click(options?: WaitUntilOptions) {
     try {
-      await this.isElementVisibleWithinTimeout(options);
+      await this.isVisible(options);
       const button = await this.driver.findElement("xpath", this.path);
       await this.driver.elementClick(
         button["element-6066-11e4-a52e-4f735466cecf"],

@@ -113,7 +113,7 @@ class BrowserstackDevice implements Device {
         {
           retries: 10,
           factor: 2,
-          minTimeout: 5_000,
+          minTimeout: 3_000,
           onRetry: (err, i) => {
             console.log(`Retry attempt ${i} failed: ${err.message}`);
           },

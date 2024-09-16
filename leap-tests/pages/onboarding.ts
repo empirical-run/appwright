@@ -62,12 +62,10 @@ export class OnboardingPage {
   }
 
   async enterPin() {
-    await this.client.isElementVisibleWithinTimeout(
-      '//android.widget.TextView[@text="1"]',
-      { timeout: 20_000 },
-    );
-    const isEnterPinVisible = await this.client.isElementVisibleWithinTimeout(
+    await this.client.isVisible('//android.widget.TextView[@text="1"]');
+    const isEnterPinVisible = await this.client.isVisible(
       this.enterPinSelector,
+      { timeout: 20_000 },
     );
     if (!isEnterPinVisible) {
       await this.inputPin();
@@ -114,24 +112,17 @@ export class OnboardingPage {
   }
 
   async isDashboardVisible(): Promise<boolean> {
-    if (
-      await this.client.isElementVisibleWithinTimeout(
-        this.enableNotificationsSelector,
-      )
-    ) {
+    if (await this.client.isVisible(this.enableNotificationsSelector)) {
       await this.client.click(this.enableNotificationsSelector);
       await this.client.tapAtGivenCoordinates({ x: 129, y: 996 });
     }
-    return await this.client.isElementVisibleWithinTimeout(
-      this.dashboardTextSelector,
-    );
+    return await this.client.isVisible(this.dashboardTextSelector);
   }
 
   async IsInvalidPhraseTextVisible() {
-    return await this.client.isElementVisibleWithinTimeout(
-      this.invalidPhraseSelector,
-      { timeout: ELEMENT_TIMEOUT },
-    );
+    return await this.client.isVisible(this.invalidPhraseSelector, {
+      timeout: ELEMENT_TIMEOUT,
+    });
   }
 
   private async inputPin() {

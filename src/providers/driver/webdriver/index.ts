@@ -47,13 +47,8 @@ export class AppwrightDriver implements IAppwrightDriver {
     return new Locator(this.client, path);
   }
 
-  async isElementVisibleWithinTimeout(
-    path: string,
-    options?: WaitUntilOptions,
-  ): Promise<boolean> {
-    return new Locator(this.client, path).isElementVisibleWithinTimeout(
-      options,
-    );
+  async isVisible(path: string, options?: WaitUntilOptions): Promise<boolean> {
+    return new Locator(this.client, path).isVisible(options);
   }
 
   @boxedStep
