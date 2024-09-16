@@ -5,10 +5,7 @@ export interface IAppwrightDriver {
     options: { timeout?: number },
   ) => Promise<void>;
 
-  isElementVisibleWithinTimeout: (
-    path: string,
-    options?: WaitUntilOptions,
-  ) => Promise<boolean>;
+  isVisible: (path: string, options?: WaitUntilOptions) => Promise<boolean>;
 
   close: () => Promise<void>;
 
