@@ -19,6 +19,7 @@
   "license": "Apache-2.0",
   "description": "E2E mobile app testing done right, with the Playwright test runner",
   "dependencies": {
+    "@changesets/cli": "^2.27.8",
     "@empiricalrun/playwright-utils": "^0.13.3",
     "@playwright/test": "^1.46.1",
     "async-retry": "^1.3.3",
