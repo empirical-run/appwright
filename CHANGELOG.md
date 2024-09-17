@@ -1,8 +1,8 @@
 # appwright
 
-## 0.1.0
+## 0.0.8
 
-### Minor Changes
+### Patch Changes
 
 - c6910dc: feat: added method getByXpath to get elements by xpath
 
