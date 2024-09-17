@@ -3,7 +3,7 @@ import type { Client } from "webdriver";
 import { test } from "./../../../fixture";
 import { IAppwrightDriver } from "../types/base";
 import { AppwrightLocator, Locator } from "../../../locator";
-import { TestInfoOptions, WaitUntilOptions } from "../../../types";
+import { TestInfoOptions } from "../../../types";
 
 export function boxedStep(
   target: Function,
@@ -38,38 +38,15 @@ export class AppwrightDriver implements IAppwrightDriver {
     this.client = webdriverClient;
   }
 
-  @boxedStep
-  async fill(
-    path: string,
-    value: string,
-    options?: WaitUntilOptions,
-  ): Promise<void> {
-    await this.locator(path).fill(value, options);
-  }
-
   // TODO: need to check if we need boxedStep
-  locator(path: string): AppwrightLocator {
-    return new Locator(
-      this.client,
-      path,
-      this.isAndroid() ? "-android uiautomator" : "-ios predicate string",
-      this.testOptions,
-    );
-  }
-
-  async isVisible(path: string, options?: WaitUntilOptions): Promise<boolean> {
-    return this.locator(path).isVisible(options);
+  locator(path: string, findStrategy: string): AppwrightLocator {
+    return new Locator(this.client, path, findStrategy, this.testOptions);
   }
 
   @boxedStep
   async close() {
     ///Remove this later or move it inside device
     await this.client.deleteSession();
-  }
-
-  @boxedStep
-  async click(path: string, options?: WaitUntilOptions) {
-    await this.locator(path).click(options);
   }
 
   @boxedStep
@@ -97,7 +74,10 @@ export class AppwrightDriver implements IAppwrightDriver {
     } else {
       selector = exact ? `label == "${text}"` : `label CONTAINS "${text}"`;
     }
-    return this.locator(selector);
+    return this.locator(
+      selector,
+      isAndroid ? "-android uiautomator" : "-ios predicate string",
+    );
   }
 
   getById(
@@ -113,7 +93,14 @@ export class AppwrightDriver implements IAppwrightDriver {
     } else {
       selector = exact ? `name == "${text}"` : `name CONTAINS "${text}"`;
     }
-    return this.locator(selector);
+    return this.locator(
+      selector,
+      isAndroid ? "-android uiautomator" : "-ios predicate string",
+    );
+  }
+
+  getByXpath(xpath: string): AppwrightLocator {
+    return this.locator(xpath, "xpath");
   }
 
   isAndroid() {
