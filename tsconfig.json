@@ -1,3 +1,15 @@
 {
-    "extends": "@empiricalrun/typescript-config/base",
+  "extends": "@empiricalrun/typescript-config/base",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src"
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/**/*.test.ts"
+  ]
 }
