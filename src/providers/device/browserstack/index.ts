@@ -53,6 +53,7 @@ class BrowserstackDevice implements Device {
     this.sessionId = webdriverClient.sessionId;
     await this.setSessionName(webdriverClient.sessionId, this.testInfo.title);
     const bundleId = await this.getAppBundleId();
+    //TODO: pass expect timeout here
     return new AppwrightDriver(webdriverClient, bundleId);
   }
 
