@@ -33,7 +33,7 @@ export default defineConfig({
 
 ### Run tests
 
-Appwright currently runs tests on BrowerStack only.
+Appwright currently runs tests on BrowserStack only.
 
 ```sh
 npx playwright test --config appwright.config.ts --project android
