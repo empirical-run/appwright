@@ -1,25 +1,33 @@
 {
   "name": "appwright",
-  "version": "0.0.2",
-  "main": "index.js",
+  "version": "0.0.4",
+  "main": "dist/index.js",
   "engines": {
     "node": ">=18.20.4"
   },
   "scripts": {
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "build": "tsc --build",
+    "clean": "tsc --build --clean"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/empirical-run/appwright.git"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "author": "Empirical Team <hey@empirical.run>",
+  "license": "Apache-2.0",
+  "description": "E2E mobile app testing done right, with the Playwright test runner",
+  "dependencies": {
+    "@empiricalrun/playwright-utils": "^0.13.3",
+    "@playwright/test": "^1.46.1",
+    "async-retry": "^1.3.3",
+    "webdriver": "^8.36.1"
+  },
   "devDependencies": {
     "@empiricalrun/eslint-config": "^0.4.1",
-    "@empiricalrun/playwright-utils": "^0.13.3",
     "@empiricalrun/typescript-config": "^0.3.0",
-    "@playwright/test": "^1.46.1",
     "@types/node": "^22.5.2",
-    "async-retry": "^1.3.3",
-    "eslint": "8.57.0",
-    "webdriver": "^8.36.1"
+    "eslint": "8.57.0"
   }
 }

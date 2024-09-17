@@ -1,4 +1,4 @@
-import { defineConfig } from "./src/appwright.config";
+import { defineConfig } from "./src/config";
 import { Platform } from "./src/providers/device/types";
 
 export default defineConfig({
