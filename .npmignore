@@ -2,3 +2,4 @@ src/
 leap-tests
 playwright-report
 .github
+playwright.config.ts
