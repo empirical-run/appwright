@@ -160,7 +160,7 @@ export class Locator {
   @boxedStep
   async click(options?: WaitUntilOptions) {
     try {
-      await this.isVisible(options ?? { timeout: 10_000 });
+      await this.isVisible(options);
       const button = await this.driver.findElement(
         this.findStrategy,
         this.path,
