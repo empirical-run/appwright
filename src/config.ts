@@ -29,5 +29,12 @@ export function defineConfig(config: PlaywrightTestConfig<Config>) {
   return defineConfigPlaywright<Config>({
     ...appwrightConfig,
     ...config,
+    expect: {
+      ...appwrightConfig.expect,
+      timeout:
+        appwrightConfig.expect?.timeout === undefined
+          ? 20_000
+          : appwrightConfig.expect.timeout,
+    },
   });
 }

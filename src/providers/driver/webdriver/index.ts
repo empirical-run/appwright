@@ -1,8 +1,9 @@
 // @ts-ignore ts not able to identify the import is just an interface
 import type { Client } from "webdriver";
 import { test } from "./../../../fixture";
-import { IAppwrightDriver, WaitUntilOptions } from "../types/base";
+import { IAppwrightDriver } from "../types/base";
 import { AppwrightLocator, Locator } from "../../../locator";
+import { TestInfoOptions, WaitUntilOptions } from "../../../types";
 
 export function boxedStep(
   target: Function,
@@ -32,6 +33,7 @@ export class AppwrightDriver implements IAppwrightDriver {
   constructor(
     webdriverClient: Client,
     private bundleId: string,
+    private testOptions: TestInfoOptions,
   ) {
     this.client = webdriverClient;
   }
@@ -40,7 +42,7 @@ export class AppwrightDriver implements IAppwrightDriver {
   async fill(
     path: string,
     value: string,
-    options?: { timeout?: number },
+    options?: WaitUntilOptions,
   ): Promise<void> {
     await this.locator(path).fill(value, options);
   }
@@ -51,6 +53,7 @@ export class AppwrightDriver implements IAppwrightDriver {
       this.client,
       path,
       this.isAndroid() ? "-android uiautomator" : "-ios predicate string",
+      this.testOptions,
     );
   }
 

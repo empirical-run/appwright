@@ -1,10 +1,11 @@
 import { AppwrightLocator } from "../../../locator";
+import { WaitUntilOptions } from "../../../types";
 
 export interface IAppwrightDriver {
   fill: (
     path: string,
     value: string,
-    options: { timeout?: number },
+    options: WaitUntilOptions,
   ) => Promise<void>;
 
   isVisible: (path: string, options?: WaitUntilOptions) => Promise<boolean>;
@@ -23,12 +24,6 @@ export interface IAppwrightDriver {
 
   isAndroid: () => boolean;
 }
-
-export type WaitUntilOptions = {
-  timeout?: number;
-  timeoutMsg?: string;
-  interval?: number;
-};
 
 export enum WebdriverErrors {
   StaleElementReferenceError = "stale element reference",
