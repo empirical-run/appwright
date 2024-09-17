@@ -1,8 +1,4 @@
-import {
-  ELEMENT_TIMEOUT,
-  INVALID_KEY,
-  OnboardingType,
-} from "../pages/constants";
+import { INVALID_KEY, OnboardingType } from "../pages/constants";
 import { OnboardingPage } from "../pages/onboarding";
 import {
   PRIVATE_KEY_SMALL_USER,
@@ -18,9 +14,7 @@ test("Import wallet using 12 words Seed Phrase", async ({ client }) => {
     OnboardingType.SEED_PHRASE,
     SEED_PHRASE_12_USER.phrase,
   );
-  await expect(client.getByText("YOUR PORTFOLIO")).toBeVisible({
-    timeout: ELEMENT_TIMEOUT,
-  });
+  await expect(client.getByText("YOUR PORTFOLIO")).toBeVisible();
 });
 
 test("Import wallet using 24 words Seed Phrase", async ({ client }) => {
@@ -30,9 +24,7 @@ test("Import wallet using 24 words Seed Phrase", async ({ client }) => {
     OnboardingType.SEED_PHRASE,
     SEED_PHRASE_24_USER.phrase,
   );
-  await expect(client.getByText("YOUR PORTFOLIO")).toBeVisible({
-    timeout: ELEMENT_TIMEOUT,
-  });
+  await expect(client.getByText("YOUR PORTFOLIO")).toBeVisible();
 });
 
 test("Import wallet using Private Key", async ({ client }) => {
@@ -42,9 +34,7 @@ test("Import wallet using Private Key", async ({ client }) => {
     OnboardingType.SEED_PHRASE,
     PRIVATE_KEY_SMALL_USER.privateKey,
   );
-  await expect(client.getByText("YOUR PORTFOLIO")).toBeVisible({
-    timeout: ELEMENT_TIMEOUT,
-  });
+  await expect(client.getByText("YOUR PORTFOLIO")).toBeVisible();
 });
 
 test("Entering non-dictionary word in seed phrase should show invalid key error", async ({
@@ -66,9 +56,7 @@ test("Import wallet using Keplr 12 words seed phrase", async ({ client }) => {
     OnboardingType.KEPLR,
     SEED_PHRASE_12_USER.phrase,
   );
-  await expect(client.getByText("YOUR PORTFOLIO")).toBeVisible({
-    timeout: ELEMENT_TIMEOUT,
-  });
+  await expect(client.getByText("YOUR PORTFOLIO")).toBeVisible();
 });
 
 test("Import wallet using Keplr 24 words seed phrase", async ({ client }) => {
@@ -78,9 +66,7 @@ test("Import wallet using Keplr 24 words seed phrase", async ({ client }) => {
     OnboardingType.KEPLR,
     SEED_PHRASE_24_USER.phrase,
   );
-  await expect(client.getByText("YOUR PORTFOLIO")).toBeVisible({
-    timeout: ELEMENT_TIMEOUT,
-  });
+  await expect(client.getByText("YOUR PORTFOLIO")).toBeVisible();
 });
 
 test("Entering non-dictionary word in Keplr should show invalid key error", async ({

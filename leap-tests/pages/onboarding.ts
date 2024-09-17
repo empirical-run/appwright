@@ -48,6 +48,7 @@ export class OnboardingPage {
     await this.client.getById("inputAt4").fill(words[3]!);
     await this.client.getById("inputAt7").fill(words[6]!);
     await this.client.getById("inputAt11").fill(words[10]!);
+    // To handle keyboard on iOS
     if (!this.client.isAndroid()) {
       await this.client.getByText("return").click();
     }

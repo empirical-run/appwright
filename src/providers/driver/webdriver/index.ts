@@ -50,7 +50,7 @@ export class AppwrightDriver implements IAppwrightDriver {
     return new Locator(
       this.client,
       path,
-      this.client.isAndroid ? "-android uiautomator" : "-ios predicate string",
+      this.isAndroid() ? "-android uiautomator" : "-ios predicate string",
     );
   }
 
@@ -71,7 +71,7 @@ export class AppwrightDriver implements IAppwrightDriver {
 
   @boxedStep
   async tapAtGivenCoordinates({ x, y }: { x: number; y: number }) {
-    if (this.client.isAndroid) {
+    if (this.isAndroid()) {
       await this.client.executeScript("mobile: clickGesture", [
         {
           x: x,
@@ -87,7 +87,7 @@ export class AppwrightDriver implements IAppwrightDriver {
     text: string,
     { exact = false }: { exact?: boolean } = {},
   ): AppwrightLocator {
-    const isAndroid = this.client.isAndroid;
+    const isAndroid = this.isAndroid();
     let selector: string;
     if (isAndroid) {
       selector = exact ? `text("${text}")` : `textContains("${text}")`;
@@ -101,7 +101,7 @@ export class AppwrightDriver implements IAppwrightDriver {
     text: string,
     { exact = false }: { exact?: boolean } = {},
   ): AppwrightLocator {
-    const isAndroid = this.client.isAndroid;
+    const isAndroid = this.isAndroid();
     let selector: string;
     if (isAndroid) {
       selector = exact
