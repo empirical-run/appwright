@@ -1,9 +1,6 @@
 name: Android Tests
 
-on:
-  pull_request:
-    branches:
-      - main
+on: workflow_dispatch
 
 jobs:
   Android-Tests:
