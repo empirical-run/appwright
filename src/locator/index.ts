@@ -5,9 +5,36 @@ import {
   WebdriverErrors,
 } from "../providers/driver/types/base";
 import retry from "async-retry";
+import test from "@playwright/test";
+
+export function boxedStep(
+  target: Function,
+  context: ClassMethodDecoratorContext,
+) {
+  return function replacementMethod(...args: any) {
+    //@ts-ignore
+    const path = this.path;
+    const argsString = args.length
+      ? "(" +
+        Array.from(args)
+          .map((a) => JSON.stringify(a))
+          .join(" , ") +
+        ")"
+      : "";
+    const name = `${context.name as string}("${path}")${argsString}`;
+    return test.step(
+      name,
+      async () => {
+        // @ts-ignore
+        return await target.call(this, ...args);
+      },
+      { box: true },
+    ); // Note the "box" option here.
+  };
+}
 
 export interface AppwrightLocator {
-  getPath(): string;
+  getSelector(): string;
   fill(value: string, options?: { timeout?: number }): Promise<void>;
   isVisible(options?: WaitUntilOptions): Promise<boolean>;
   click(options?: WaitUntilOptions): Promise<void>;
@@ -17,18 +44,23 @@ export class Locator {
   constructor(
     private driver: Client,
     private path: string,
+    private findStrategy: string,
   ) {}
 
-  getPath() {
+  getSelector() {
     return this.path;
   }
 
+  @boxedStep
   async fill(value: string, options?: { timeout?: number }): Promise<void> {
     const isElementDisplayed = await this.isVisible({
       timeout: options?.timeout,
     });
     if (isElementDisplayed) {
-      const element = await this.driver.findElement("xpath", this.path);
+      const element = await this.driver.findElement(
+        this.findStrategy,
+        this.path,
+      );
       await this.driver.elementSendKeys(
         element["element-6066-11e4-a52e-4f735466cecf"],
         value,
@@ -43,7 +75,10 @@ export class Locator {
       const isVisible = await this.waitUntil(
         async () => {
           try {
-            const element = await this.driver.findElement("xpath", this.path);
+            const element = await this.driver.findElement(
+              this.findStrategy,
+              this.path,
+            );
             if (element && element["element-6066-11e4-a52e-4f735466cecf"]) {
               const isDisplayed = await this.driver.isElementDisplayed(
                 element["element-6066-11e4-a52e-4f735466cecf"],
@@ -130,10 +165,14 @@ export class Locator {
     }
   }
 
+  @boxedStep
   async click(options?: WaitUntilOptions) {
     try {
-      await this.isVisible(options);
-      const button = await this.driver.findElement("xpath", this.path);
+      await this.isVisible(options ?? { timeout: 10_000 });
+      const button = await this.driver.findElement(
+        this.findStrategy,
+        this.path,
+      );
       await this.driver.elementClick(
         button["element-6066-11e4-a52e-4f735466cecf"],
       );

@@ -5,6 +5,16 @@ export default defineConfig({
   testDir: "leap-tests/tests",
   projects: [
     {
+      name: "ios",
+      use: {
+        platform: Platform.IOS,
+        deviceName: "iPhone 14 Pro",
+        osVersion: "16",
+        buildURL: process.env.BROWSERSTACK_APP_URL,
+      },
+    },
+    {
+      name: "android",
       use: {
         platform: Platform.ANDROID,
         deviceName: "Google Pixel 8",
