@@ -45,7 +45,7 @@ export const expect = test.expect.extend({
       message: () =>
         isVisible
           ? ""
-          : `Element ${locator.getPath()} was not found on the screen`,
+          : `Element ${locator.getSelector()} was not found on the screen`,
       pass: isVisible,
       name: "toBeVisible",
       expected: true,

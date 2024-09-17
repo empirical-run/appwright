@@ -52,7 +52,8 @@ class BrowserstackDevice implements Device {
     const webdriverClient = await WebDriver.newSession(this.config as any);
     this.sessionId = webdriverClient.sessionId;
     await this.setSessionName(webdriverClient.sessionId, this.testInfo.title);
-    return new AppwrightDriver(webdriverClient);
+    const bundleId = await this.getAppBundleId();
+    return new AppwrightDriver(webdriverClient, bundleId);
   }
 
   async downloadVideo(): Promise<{ path: string; contentType: string } | null> {
@@ -216,6 +217,8 @@ class BrowserstackDevice implements Device {
         },
         "appium:autoGrantPermissions": true,
         "appium:app": (this.testInfo.project.use as Config).buildURL,
+        "appium:autoAcceptAlerts": true,
+        "appium:fullReset": true,
       },
     };
   }
@@ -241,6 +244,11 @@ class BrowserstackDevice implements Device {
 
     const data = await response.json();
     this.sessionDetails = data.automation_session;
+  }
+
+  private async getAppBundleId(): Promise<string> {
+    await this.getSessionDetails();
+    return this.sessionDetails?.app_details.app_name ?? "";
   }
 }
 

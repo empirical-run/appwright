@@ -29,7 +29,10 @@ export function boxedStep(
 
 export class AppwrightDriver implements IAppwrightDriver {
   private client: Client;
-  constructor(webdriverClient: Client) {
+  constructor(
+    webdriverClient: Client,
+    private bundleId: string,
+  ) {
     this.client = webdriverClient;
   }
 
@@ -39,16 +42,20 @@ export class AppwrightDriver implements IAppwrightDriver {
     value: string,
     options?: { timeout?: number },
   ): Promise<void> {
-    await new Locator(this.client, path).fill(value, options);
+    await this.locator(path).fill(value, options);
   }
 
   // TODO: need to check if we need boxedStep
   locator(path: string): AppwrightLocator {
-    return new Locator(this.client, path);
+    return new Locator(
+      this.client,
+      path,
+      this.isAndroid() ? "-android uiautomator" : "-ios predicate string",
+    );
   }
 
   async isVisible(path: string, options?: WaitUntilOptions): Promise<boolean> {
-    return new Locator(this.client, path).isVisible(options);
+    return this.locator(path).isVisible(options);
   }
 
   @boxedStep
@@ -59,12 +66,12 @@ export class AppwrightDriver implements IAppwrightDriver {
 
   @boxedStep
   async click(path: string, options?: WaitUntilOptions) {
-    await new Locator(this.client, path).click(options);
+    await this.locator(path).click(options);
   }
 
   @boxedStep
   async tapAtGivenCoordinates({ x, y }: { x: number; y: number }) {
-    if (this.client.isAndroid) {
+    if (this.isAndroid()) {
       await this.client.executeScript("mobile: clickGesture", [
         {
           x: x,
@@ -76,11 +83,56 @@ export class AppwrightDriver implements IAppwrightDriver {
     }
   }
 
+  getByText(
+    text: string,
+    { exact = false }: { exact?: boolean } = {},
+  ): AppwrightLocator {
+    const isAndroid = this.isAndroid();
+    let selector: string;
+    if (isAndroid) {
+      selector = exact ? `text("${text}")` : `textContains("${text}")`;
+    } else {
+      selector = exact ? `label == "${text}"` : `label CONTAINS "${text}"`;
+    }
+    return this.locator(selector);
+  }
+
+  getById(
+    text: string,
+    { exact = false }: { exact?: boolean } = {},
+  ): AppwrightLocator {
+    const isAndroid = this.isAndroid();
+    let selector: string;
+    if (isAndroid) {
+      selector = exact
+        ? `resourceId("${text}")`
+        : `resourceIdMatches(".*${text}.*")`;
+    } else {
+      selector = exact ? `name == "${text}"` : `name CONTAINS "${text}"`;
+    }
+    return this.locator(selector);
+  }
+
   isAndroid() {
     return this.client.isAndroid;
   }
 
   async getClipboard(): Promise<string> {
-    return await this.client.getClipboard();
+    if (this.isAndroid()) {
+      return await this.client.getClipboard();
+    } else {
+      await this.client.executeScript("mobile: activateApp", [
+        {
+          bundleId: "com.facebook.WebDriverAgentRunner.xctrunner",
+        },
+      ]);
+      const clipboardDataBase64 = await this.client.getClipboard();
+      await this.client.executeScript("mobile: activateApp", [
+        {
+          bundleId: this.bundleId,
+        },
+      ]);
+      return clipboardDataBase64;
+    }
   }
 }

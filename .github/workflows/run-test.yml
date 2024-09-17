@@ -34,7 +34,7 @@ jobs:
           RUN_TRIGGER_TYPE: ${{ github.event_name }}
 
       - name: Run Android Test
-        run: npx playwright test
+        run: npx playwright test --project android
         env:
           BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
           BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
