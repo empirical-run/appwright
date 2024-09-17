@@ -25,6 +25,7 @@
     "webdriver": "^8.36.1"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.27.8",
     "@empiricalrun/eslint-config": "^0.4.1",
     "@empiricalrun/typescript-config": "^0.3.0",
     "@types/node": "^22.5.2",
