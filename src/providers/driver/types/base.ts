@@ -1,23 +1,15 @@
 import { AppwrightLocator } from "../../../locator";
 
 export interface IAppwrightDriver {
-  fill: (
-    path: string,
-    value: string,
-    options: { timeout?: number },
-  ) => Promise<void>;
-
-  isVisible: (path: string, options?: WaitUntilOptions) => Promise<boolean>;
-
   close: () => Promise<void>;
-
-  click: (path: string, options?: WaitUntilOptions) => Promise<void>;
 
   tapAtGivenCoordinates: ({ x, y }: { x: number; y: number }) => Promise<void>;
 
   getByText: (text: string, options?: { exact?: boolean }) => AppwrightLocator;
 
   getById: (text: string, options?: { exact?: boolean }) => AppwrightLocator;
+
+  getByXpath: (xpath: string) => AppwrightLocator;
 
   getClipboard: () => Promise<string>;
 
