@@ -1,2 +1,4 @@
-/src/
-/leap-tests/
+src/
+leap-tests
+playwright-report
+.github
