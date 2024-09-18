@@ -3,6 +3,7 @@ import type { Client } from "webdriver";
 import { test } from "./../../../fixture";
 import { AppwrightLocator, Locator } from "../../../locator";
 import { IAppwrightDriver, TestInfoOptions } from "../../../types";
+import { AppwrightVision, VisionProvider } from "../../vision";
 
 export function boxedStep(
   target: Function,
@@ -42,6 +43,18 @@ export class AppwrightDriver implements IAppwrightDriver {
     return new Locator(this.client, path, findStrategy, this.testOptions);
   }
 
+  private vision(): AppwrightVision {
+    return new VisionProvider(this.client, this);
+  }
+
+  async tapWithPrompt(prompt: string): Promise<void> {
+    await this.vision().tapWithPrompt(prompt);
+  }
+
+  async extractTextWithPrompt(prompt: string): Promise<string> {
+    return await this.vision().extractTextWithPrompt(prompt);
+  }
+
   @boxedStep
   async close() {
     ///Remove this later or move it inside device
@@ -57,6 +70,13 @@ export class AppwrightDriver implements IAppwrightDriver {
           y: y,
           duration: 100,
           tapCount: 1,
+        },
+      ]);
+    } else {
+      await this.client.executeScript("mobile: tap", [
+        {
+          x: x,
+          y: y,
         },
       ]);
     }
