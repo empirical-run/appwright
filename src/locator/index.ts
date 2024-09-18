@@ -2,8 +2,7 @@
 import { Client } from "webdriver";
 import retry from "async-retry";
 import test from "@playwright/test";
-import { TestInfoOptions, WaitUntilOptions } from "../types";
-import { WebdriverErrors } from "../providers/driver/types/base";
+import { TestInfoOptions, WaitUntilOptions, WebdriverErrors } from "../types";
 
 export function boxedStep(
   target: Function,

@@ -1,9 +1,8 @@
 // @ts-ignore ts not able to identify the import is just an interface
 import type { Client } from "webdriver";
 import { test } from "./../../../fixture";
-import { IAppwrightDriver } from "../types/base";
 import { AppwrightLocator, Locator } from "../../../locator";
-import { TestInfoOptions } from "../../../types";
+import { IAppwrightDriver, TestInfoOptions } from "../../../types";
 
 export function boxedStep(
   target: Function,

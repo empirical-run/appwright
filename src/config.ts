@@ -2,7 +2,7 @@ import {
   defineConfig as defineConfigPlaywright,
   PlaywrightTestConfig,
 } from "@playwright/test";
-import { AppwrightConfig } from "./providers/device/types";
+import { AppwrightConfig } from "./types";
 
 const defaultConfig: PlaywrightTestConfig<AppwrightConfig> = {
   testDir: "./tests",
@@ -32,12 +32,9 @@ export function defineConfig(config: PlaywrightTestConfig<AppwrightConfig>) {
     ...config,
     use: {
       ...defaultConfig.use,
-      expectTimeout:
-        //@ts-ignore
-        config.expectTimeout === undefined
-          ? defaultConfig.use?.expectTimeout
-          : //@ts-ignore
-            config.expectTimeout,
+      expectTimeout: config.use?.expectTimeout
+        ? config.use!.expectTimeout
+        : defaultConfig.use?.expectTimeout,
     },
   });
 }
