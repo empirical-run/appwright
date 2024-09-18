@@ -2,9 +2,9 @@ import {
   defineConfig as defineConfigPlaywright,
   PlaywrightTestConfig,
 } from "@playwright/test";
-import { AppWrightConfig } from "./providers/device/types";
+import { AppwrightConfig } from "./providers/device/types";
 
-const defaultConfig: PlaywrightTestConfig<AppWrightConfig> = {
+const defaultConfig: PlaywrightTestConfig<AppwrightConfig> = {
   testDir: "./tests",
   outputDir: "./playwright-report/data", // to store default playwright artifacts (during and post test run)
   fullyParallel: true,
@@ -26,8 +26,8 @@ const defaultConfig: PlaywrightTestConfig<AppWrightConfig> = {
   timeout: 0,
 };
 
-export function defineConfig(config: PlaywrightTestConfig<AppWrightConfig>) {
-  return defineConfigPlaywright<AppWrightConfig>({
+export function defineConfig(config: PlaywrightTestConfig<AppwrightConfig>) {
+  return defineConfigPlaywright<AppwrightConfig>({
     ...defaultConfig,
     ...config,
     use: {

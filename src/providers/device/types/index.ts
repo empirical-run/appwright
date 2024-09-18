@@ -8,7 +8,7 @@ export interface Device {
   setSessionStatus: (status?: string, reason?: string) => Promise<void>;
 }
 
-export type AppWrightConfig = {
+export type AppwrightConfig = {
   platform: Platform;
   deviceName: string;
   osVersion: string;

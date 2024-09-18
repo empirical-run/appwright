@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import retry from "async-retry";
-import { Device, AppWrightConfig } from "../types";
+import { Device, AppwrightConfig } from "../types";
 import { TestInfo } from "@playwright/test";
 import { AppwrightDriver } from "../../driver/webdriver";
 import { TestInfoOptions } from "../../../types";
@@ -194,7 +194,7 @@ class BrowserstackDevice implements Device {
   }
 
   private createConfig() {
-    const platformName = (this.testInfo.project.use as AppWrightConfig)
+    const platformName = (this.testInfo.project.use as AppwrightConfig)
       .platform;
     const projectName = path.basename(process.cwd());
     this.config = {
@@ -212,8 +212,8 @@ class BrowserstackDevice implements Device {
           networkLogs: true,
           appiumVersion: "2.6.0",
           enableCameraImageInjection: true,
-          deviceName: (this.testInfo.project.use as AppWrightConfig).deviceName,
-          osVersion: (this.testInfo.project.use as AppWrightConfig).osVersion,
+          deviceName: (this.testInfo.project.use as AppwrightConfig).deviceName,
+          osVersion: (this.testInfo.project.use as AppwrightConfig).osVersion,
           platformName: platformName,
           buildName: `${projectName} ${platformName}`,
           sessionName: `${projectName} ${platformName} test`,
@@ -223,7 +223,7 @@ class BrowserstackDevice implements Device {
               : process.env.USER,
         },
         "appium:autoGrantPermissions": true,
-        "appium:app": (this.testInfo.project.use as AppWrightConfig).buildURL,
+        "appium:app": (this.testInfo.project.use as AppwrightConfig).buildURL,
         "appium:autoAcceptAlerts": true,
         "appium:fullReset": true,
       },
