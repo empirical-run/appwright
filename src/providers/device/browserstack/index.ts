@@ -1,9 +1,9 @@
 import fs from "fs";
 import path from "path";
 import retry from "async-retry";
-import { Device, Config } from "../types";
 import { TestInfo } from "@playwright/test";
 import { AppwrightDriver } from "../../driver/webdriver";
+import { AppwrightConfig, Device, TestInfoOptions } from "../../../types";
 
 export type BrowserstackSessionDetails = {
   name: string;
@@ -53,7 +53,12 @@ class BrowserstackDevice implements Device {
     this.sessionId = webdriverClient.sessionId;
     await this.setSessionName(webdriverClient.sessionId, this.testInfo.title);
     const bundleId = await this.getAppBundleId();
-    return new AppwrightDriver(webdriverClient, bundleId);
+    //@ts-ignore
+    const expectTimeout = this.testInfo.project.use.expectTimeout;
+    const testOptions: TestInfoOptions = {
+      expectTimeout,
+    };
+    return new AppwrightDriver(webdriverClient, bundleId, testOptions);
   }
 
   async downloadVideo(): Promise<{ path: string; contentType: string } | null> {
@@ -70,7 +75,7 @@ class BrowserstackDevice implements Device {
     /**
      * The BrowserStack video URL initially returns a 200 status,
      * but the video file may still be empty. To avoid downloading
-     * an incomplete file, we introduce a delay before attempting the download.
+     * an incomplete file, we introduce a delay of 10_000 ms before attempting the download.
      * After the wait, BrowserStack may return a 403 error if the video is not
      * yet available. We handle this by retrying the download until we either
      * receive a 200 response (indicating the video is ready) or reach a maximum
@@ -188,7 +193,8 @@ class BrowserstackDevice implements Device {
   }
 
   private createConfig() {
-    const platformName = (this.testInfo.project.use as Config).platform;
+    const platformName = (this.testInfo.project.use as AppwrightConfig)
+      .platform;
     const projectName = path.basename(process.cwd());
     this.config = {
       port: 443,
@@ -205,8 +211,8 @@ class BrowserstackDevice implements Device {
           networkLogs: true,
           appiumVersion: "2.6.0",
           enableCameraImageInjection: true,
-          deviceName: (this.testInfo.project.use as Config).deviceName,
-          osVersion: (this.testInfo.project.use as Config).osVersion,
+          deviceName: (this.testInfo.project.use as AppwrightConfig).deviceName,
+          osVersion: (this.testInfo.project.use as AppwrightConfig).osVersion,
           platformName: platformName,
           buildName: `${projectName} ${platformName}`,
           sessionName: `${projectName} ${platformName} test`,
@@ -216,7 +222,7 @@ class BrowserstackDevice implements Device {
               : process.env.USER,
         },
         "appium:autoGrantPermissions": true,
-        "appium:app": (this.testInfo.project.use as Config).buildURL,
+        "appium:app": (this.testInfo.project.use as AppwrightConfig).buildURL,
         "appium:autoAcceptAlerts": true,
         "appium:fullReset": true,
       },

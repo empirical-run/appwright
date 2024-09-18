@@ -1,11 +1,8 @@
 // @ts-ignore
 import { Client } from "webdriver";
-import {
-  WaitUntilOptions,
-  WebdriverErrors,
-} from "../providers/driver/types/base";
 import retry from "async-retry";
 import test from "@playwright/test";
+import { TestInfoOptions, WaitUntilOptions, WebdriverErrors } from "../types";
 
 export function boxedStep(
   target: Function,
@@ -45,6 +42,7 @@ export class Locator {
     private driver: Client,
     private path: string,
     private findStrategy: string,
+    private testOptions: TestInfoOptions,
   ) {}
 
   getSelector() {
@@ -52,10 +50,8 @@ export class Locator {
   }
 
   @boxedStep
-  async fill(value: string, options?: { timeout?: number }): Promise<void> {
-    const isElementDisplayed = await this.isVisible({
-      timeout: options?.timeout,
-    });
+  async fill(value: string, options?: WaitUntilOptions): Promise<void> {
+    const isElementDisplayed = await this.isVisible(options);
     if (isElementDisplayed) {
       const element = await this.driver.findElement(
         this.findStrategy,
@@ -71,6 +67,7 @@ export class Locator {
   }
 
   async isVisible(options?: WaitUntilOptions): Promise<boolean> {
+    const timeout = this.testOptions.expectTimeout;
     try {
       const isVisible = await this.waitUntil(
         async () => {
@@ -102,9 +99,8 @@ export class Locator {
           }
         },
         {
-          timeout: options?.timeout,
-          interval: options?.interval,
-          timeoutMsg: options?.timeoutMsg,
+          timeout: timeout,
+          ...options,
         },
       );
 
@@ -119,7 +115,7 @@ export class Locator {
 
   private async waitUntil<ReturnValue>(
     condition: () => ReturnValue | Promise<ReturnValue>,
-    options?: WaitUntilOptions,
+    options: WaitUntilOptions,
   ): Promise<Exclude<ReturnValue, boolean>> {
     if (typeof condition !== "function") {
       throw new Error("Condition is not a function");
@@ -141,7 +137,7 @@ export class Locator {
           return result as Exclude<ReturnValue, boolean>; // Return the result if valid
         },
         {
-          maxTimeout: options?.timeout,
+          maxRetryTime: options.timeout,
           factor: 1,
           onRetry: (err, attempt) => {
             console.log(`Attempt ${attempt} failed: ${err.message}`);
@@ -151,14 +147,10 @@ export class Locator {
       //@ts-ignore
     } catch (e: Error) {
       if (e.message === "timeout") {
-        if (typeof options?.timeoutMsg === "string") {
-          throw new Error(`Timeout Error: ${options.timeoutMsg}`);
-        }
         throw new Error(
-          `waitUntil condition timed out after ${options?.timeout}ms`,
+          `waitUntil condition timed out after ${options.timeout}ms`,
         );
       }
-
       throw new Error(
         `waitUntil condition failed with the following reason: ${(e && e.message) || e}`,
       );
@@ -168,7 +160,7 @@ export class Locator {
   @boxedStep
   async click(options?: WaitUntilOptions) {
     try {
-      await this.isVisible(options ?? { timeout: 10_000 });
+      await this.isVisible(options);
       const button = await this.driver.findElement(
         this.findStrategy,
         this.path,
