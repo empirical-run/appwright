@@ -1,5 +1,11 @@
 # appwright
 
+## 0.0.11
+
+### Patch Changes
+
+- 38fd3a3: fix: retry counts in waitUntil
+
 ## 0.0.10
 
 ### Patch Changes
