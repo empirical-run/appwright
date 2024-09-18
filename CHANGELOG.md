@@ -1,5 +1,11 @@
 # appwright
 
+## 0.0.10
+
+### Patch Changes
+
+- f22bdfb: feat: added llm vision in appwright
+
 ## 0.0.9
 
 ### Patch Changes
