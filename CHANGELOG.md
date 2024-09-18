@@ -1,5 +1,11 @@
 # appwright
 
+## 0.0.9
+
+### Patch Changes
+
+- e6989c9: fix: pick expect timeout from appwright config
+
 ## 0.0.8
 
 ### Patch Changes
