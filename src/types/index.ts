@@ -44,6 +44,10 @@ export interface IAppwrightDriver {
 
   getClipboard: () => Promise<string>;
 
+  tapWithPrompt: (prompt: string) => Promise<void>;
+
+  extractTextWithPrompt: (prompt: string) => Promise<string>;
+
   isAndroid: () => boolean;
 }
 
