@@ -68,6 +68,7 @@ export class Locator {
   }
 
   async isVisible(options?: WaitUntilOptions): Promise<boolean> {
+    const timeout = this.testOptions.expectTimeout;
     try {
       const isVisible = await this.waitUntil(
         async () => {
@@ -99,7 +100,7 @@ export class Locator {
           }
         },
         {
-          timeout: this.testOptions.expectTimeout,
+          timeout: timeout,
           ...options,
         },
       );

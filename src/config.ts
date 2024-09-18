@@ -2,9 +2,9 @@ import {
   defineConfig as defineConfigPlaywright,
   PlaywrightTestConfig,
 } from "@playwright/test";
-import { Config } from "./providers/device/types";
+import { AppWrightConfig } from "./providers/device/types";
 
-const appwrightConfig: PlaywrightTestConfig = {
+const defaultConfig: PlaywrightTestConfig<AppWrightConfig> = {
   testDir: "./tests",
   outputDir: "./playwright-report/data", // to store default playwright artifacts (during and post test run)
   fullyParallel: true,
@@ -18,6 +18,7 @@ const appwrightConfig: PlaywrightTestConfig = {
   ],
   use: {
     actionTimeout: 20_000,
+    expectTimeout: 20_000,
   },
   expect: {
     timeout: 20_000,
@@ -25,16 +26,18 @@ const appwrightConfig: PlaywrightTestConfig = {
   timeout: 0,
 };
 
-export function defineConfig(config: PlaywrightTestConfig<Config>) {
-  return defineConfigPlaywright<Config>({
-    ...appwrightConfig,
+export function defineConfig(config: PlaywrightTestConfig<AppWrightConfig>) {
+  return defineConfigPlaywright<AppWrightConfig>({
+    ...defaultConfig,
     ...config,
-    expect: {
-      ...appwrightConfig.expect,
-      timeout:
-        appwrightConfig.expect?.timeout === undefined
-          ? 20_000
-          : appwrightConfig.expect.timeout,
+    use: {
+      ...defaultConfig.use,
+      expectTimeout:
+        //@ts-ignore
+        config.expectTimeout === undefined
+          ? defaultConfig.use?.expectTimeout
+          : //@ts-ignore
+            config.expectTimeout,
     },
   });
 }

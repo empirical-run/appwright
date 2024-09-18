@@ -1,9 +1,10 @@
 import fs from "fs";
 import path from "path";
 import retry from "async-retry";
-import { Device, Config } from "../types";
+import { Device, AppWrightConfig } from "../types";
 import { TestInfo } from "@playwright/test";
 import { AppwrightDriver } from "../../driver/webdriver";
+import { TestInfoOptions } from "../../../types";
 
 export type BrowserstackSessionDetails = {
   name: string;
@@ -53,8 +54,12 @@ class BrowserstackDevice implements Device {
     this.sessionId = webdriverClient.sessionId;
     await this.setSessionName(webdriverClient.sessionId, this.testInfo.title);
     const bundleId = await this.getAppBundleId();
-    //TODO: pass expect timeout here
-    return new AppwrightDriver(webdriverClient, bundleId);
+    //@ts-ignore
+    const expectTimeout = this.testInfo.project.use.expectTimeout;
+    const testOptions: TestInfoOptions = {
+      expectTimeout,
+    };
+    return new AppwrightDriver(webdriverClient, bundleId, testOptions);
   }
 
   async downloadVideo(): Promise<{ path: string; contentType: string } | null> {
@@ -189,7 +194,8 @@ class BrowserstackDevice implements Device {
   }
 
   private createConfig() {
-    const platformName = (this.testInfo.project.use as Config).platform;
+    const platformName = (this.testInfo.project.use as AppWrightConfig)
+      .platform;
     const projectName = path.basename(process.cwd());
     this.config = {
       port: 443,
@@ -206,8 +212,8 @@ class BrowserstackDevice implements Device {
           networkLogs: true,
           appiumVersion: "2.6.0",
           enableCameraImageInjection: true,
-          deviceName: (this.testInfo.project.use as Config).deviceName,
-          osVersion: (this.testInfo.project.use as Config).osVersion,
+          deviceName: (this.testInfo.project.use as AppWrightConfig).deviceName,
+          osVersion: (this.testInfo.project.use as AppWrightConfig).osVersion,
           platformName: platformName,
           buildName: `${projectName} ${platformName}`,
           sessionName: `${projectName} ${platformName} test`,
@@ -217,7 +223,7 @@ class BrowserstackDevice implements Device {
               : process.env.USER,
         },
         "appium:autoGrantPermissions": true,
-        "appium:app": (this.testInfo.project.use as Config).buildURL,
+        "appium:app": (this.testInfo.project.use as AppWrightConfig).buildURL,
         "appium:autoAcceptAlerts": true,
         "appium:fullReset": true,
       },

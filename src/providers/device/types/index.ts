@@ -8,11 +8,13 @@ export interface Device {
   setSessionStatus: (status?: string, reason?: string) => Promise<void>;
 }
 
-export type Config = {
+export type AppWrightConfig = {
   platform: Platform;
   deviceName: string;
   osVersion: string;
   buildURL: string;
+  //TODO: use expect timeout from playwright config
+  expectTimeout?: number;
 };
 
 export enum Platform {
