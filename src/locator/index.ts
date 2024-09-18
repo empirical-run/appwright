@@ -138,6 +138,7 @@ export class Locator {
         },
         {
           maxRetryTime: options.timeout,
+          retries: Math.ceil(options.timeout / 1000),
           factor: 1,
           onRetry: (err, attempt) => {
             console.log(`Attempt ${attempt} failed: ${err.message}`);
