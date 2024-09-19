@@ -126,6 +126,10 @@ export class AppwrightDriver implements IAppwrightDriver {
     return this.client.isAndroid;
   }
 
+  async hideKeyboard() {
+    await this.client.hideKeyboard();
+  }
+
   async getClipboard(): Promise<string> {
     if (this.isAndroid()) {
       return await this.client.getClipboard();

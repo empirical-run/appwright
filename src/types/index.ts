@@ -49,6 +49,8 @@ export interface IAppwrightDriver {
   extractTextWithPrompt: (prompt: string) => Promise<string>;
 
   isAndroid: () => boolean;
+
+  hideKeyboard: () => Promise<void>;
 }
 
 export enum WebdriverErrors {
