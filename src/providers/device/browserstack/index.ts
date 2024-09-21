@@ -1,10 +1,10 @@
 import fs from "fs";
-import path from "path";
+import path, { join } from "path";
 import retry from "async-retry";
 import { TestInfo } from "@playwright/test";
 import { AppwrightDriver } from "../../driver/webdriver";
 import { AppwrightConfig, Device, TestInfoOptions } from "../../../types";
-
+import { Client } from "webdriver";
 export type BrowserstackSessionDetails = {
   name: string;
   duration: number;
@@ -169,6 +169,59 @@ class BrowserstackDevice implements Device {
     // Parse and print the response
     const responseData = await response.json();
     return responseData;
+  }
+
+  async readStreamToBuffer(stream: fs.ReadStream): Promise<Buffer> {
+    return new Promise((resolve, reject) => {
+      const chunks: Buffer[] = [];
+      stream.on("data", (chunk) => {
+        if (chunk instanceof Buffer) {
+          chunks.push(chunk);
+        }
+      });
+      stream.on("end", () => resolve(Buffer.concat(chunks)));
+      stream.on("error", reject);
+    });
+  }
+
+  // Function to convert ReadStream to Blob
+  async convertReadStreamToBlob(filePath: string): Promise<Blob> {
+    const readStream = fs.createReadStream(filePath);
+
+    // Convert ReadStream to Buffer
+    const buffer = await this.readStreamToBuffer(readStream);
+
+    // Convert Buffer to Blob
+    const blob = new Blob([buffer]);
+
+    return blob;
+  }
+
+  async cameraImageInjection(driver: Client): Promise<void> {
+    const filePath = join(process.cwd(), "screenshot.png");
+    const formData = new FormData();
+    const blob = await this.convertReadStreamToBlob(filePath);
+    formData.append("file", blob);
+    formData.append("custom_id", "SampleMedia");
+    const response = await fetch(
+      "https://api-cloud.browserstack.com/app-automate/upload-media",
+      {
+        method: "POST",
+        headers: {
+          Authorization:
+            "Basic " +
+            Buffer.from(`${this.userName}:${this.accessKey}`).toString(
+              "base64",
+            ),
+        },
+        body: formData,
+      },
+    );
+
+    const data: any = await response.json();
+    await driver.execute(
+      `browserstack_executor: {"action":"cameraImageInjection", "arguments": {"imageUrl" : "${data.media_url.trim()}"}}`,
+    );
   }
 
   private async setSessionName(sessionId: string, data: any) {

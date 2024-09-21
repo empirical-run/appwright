@@ -15,6 +15,7 @@ export interface Device {
   // TODO: Return error type
   downloadVideo: () => Promise<{ path: string; contentType: string } | null>;
   setSessionStatus: (status?: string, reason?: string) => Promise<void>;
+  cameraImageInjection: (client: AppwrightDriver) => Promise<void>;
 }
 
 export type AppwrightConfig = {
