@@ -32,7 +32,8 @@ export function boxedStep(
 
 export interface AppwrightLocator {
   getSelector(): string;
-  fill(value: string, options?: { timeout?: number }): Promise<void>;
+  fill(value: string, options?: WaitUntilOptions): Promise<void>;
+  sendKeyStrokes(value: string, options?: WaitUntilOptions): Promise<void>;
   isVisible(options?: WaitUntilOptions): Promise<boolean>;
   click(options?: WaitUntilOptions): Promise<void>;
 }
@@ -61,6 +62,41 @@ export class Locator {
         element["element-6066-11e4-a52e-4f735466cecf"],
         value,
       );
+    } else {
+      throw new Error(`Element with path "${this.path}" not visible`);
+    }
+  }
+
+  async sendKeyStrokes(
+    value: string,
+    options?: WaitUntilOptions,
+  ): Promise<void> {
+    const isElementDisplayed = await this.isVisible(options);
+    if (isElementDisplayed) {
+      const element = await this.driver.findElement(
+        this.findStrategy,
+        this.path,
+      );
+      await this.driver.elementClick(
+        element["element-6066-11e4-a52e-4f735466cecf"],
+      );
+      const actions = value
+        .split("")
+        .map((char) => [
+          { type: "keyDown", value: char },
+          { type: "keyUp", value: char },
+        ])
+        .flat();
+
+      await this.driver.performActions([
+        {
+          type: "key",
+          id: "keyboard",
+          actions: actions,
+        },
+      ]);
+
+      await this.driver.releaseActions();
     } else {
       throw new Error(`Element with path "${this.path}" not visible`);
     }
