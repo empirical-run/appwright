@@ -1,5 +1,11 @@
 # appwright
 
+## 0.0.12
+
+### Patch Changes
+
+- 984a468: feat: added method to send keyboard key events
+
 ## 0.0.11
 
 ### Patch Changes
