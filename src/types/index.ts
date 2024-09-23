@@ -36,9 +36,15 @@ export interface IAppwrightDriver {
 
   tapAtGivenCoordinates: ({ x, y }: { x: number; y: number }) => Promise<void>;
 
-  getByText: (text: string, options?: { exact?: boolean }) => AppwrightLocator;
+  getByText: (
+    text: string | RegExp,
+    options?: { exact?: boolean },
+  ) => AppwrightLocator;
 
-  getById: (text: string, options?: { exact?: boolean }) => AppwrightLocator;
+  getById: (
+    text: string | RegExp,
+    options?: { exact?: boolean },
+  ) => AppwrightLocator;
 
   getByXpath: (xpath: string) => AppwrightLocator;
 

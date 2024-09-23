@@ -42,10 +42,7 @@ export const expect = test.expect.extend({
   ) => {
     const isVisible = await locator.isVisible(options);
     return {
-      message: () =>
-        isVisible
-          ? ""
-          : `Element ${locator.getSelector()} was not found on the screen`,
+      message: () => (isVisible ? "" : `Element was not found on the screen`),
       pass: isVisible,
       name: "toBeVisible",
       expected: true,

@@ -39,8 +39,18 @@ export class AppwrightDriver implements IAppwrightDriver {
   }
 
   // TODO: need to check if we need boxedStep
-  locator(path: string, findStrategy: string): AppwrightLocator {
-    return new Locator(this.client, path, findStrategy, this.testOptions);
+  locator(
+    path: string | RegExp,
+    findStrategy: string,
+    textToMatch?: string,
+  ): AppwrightLocator {
+    return new Locator(
+      this.client,
+      path,
+      findStrategy,
+      this.testOptions,
+      textToMatch,
+    );
   }
 
   private vision(): AppwrightVision {
@@ -83,38 +93,52 @@ export class AppwrightDriver implements IAppwrightDriver {
   }
 
   getByText(
-    text: string,
+    text: string | RegExp,
     { exact = false }: { exact?: boolean } = {},
   ): AppwrightLocator {
     const isAndroid = this.isAndroid();
-    let selector: string;
+    if (text instanceof RegExp) {
+      return this.locator(
+        text,
+        isAndroid ? "-android uiautomator" : "-ios predicate string",
+      );
+    }
+    let path: string;
     if (isAndroid) {
-      selector = exact ? `text("${text}")` : `textContains("${text}")`;
+      path = exact ? `text("${text}")` : `textContains("${text}")`;
     } else {
-      selector = exact ? `label == "${text}"` : `label CONTAINS "${text}"`;
+      path = exact ? `label == "${text}"` : `label CONTAINS "${text}"`;
     }
     return this.locator(
-      selector,
+      path,
       isAndroid ? "-android uiautomator" : "-ios predicate string",
+      text,
     );
   }
 
   getById(
-    text: string,
+    text: string | RegExp,
     { exact = false }: { exact?: boolean } = {},
   ): AppwrightLocator {
     const isAndroid = this.isAndroid();
-    let selector: string;
+    if (text instanceof RegExp) {
+      return this.locator(
+        text,
+        isAndroid ? "-android uiautomator" : "-ios predicate string",
+      );
+    }
+    let path: string;
     if (isAndroid) {
-      selector = exact
+      path = exact
         ? `resourceId("${text}")`
         : `resourceIdMatches(".*${text}.*")`;
     } else {
-      selector = exact ? `name == "${text}"` : `name CONTAINS "${text}"`;
+      path = exact ? `name == "${text}"` : `name CONTAINS "${text}"`;
     }
     return this.locator(
-      selector,
+      path,
       isAndroid ? "-android uiautomator" : "-ios predicate string",
+      text,
     );
   }
 
