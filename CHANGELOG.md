@@ -1,5 +1,11 @@
 # appwright
 
+## 0.0.14
+
+### Patch Changes
+
+- ebfb243: feat: added capability to search element using regex
+
 ## 0.0.13
 
 ### Patch Changes

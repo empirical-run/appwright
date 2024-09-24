@@ -1,6 +1,6 @@
 {
   "name": "appwright",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "main": "dist/index.js",
   "engines": {
     "node": ">=18.20.4"
