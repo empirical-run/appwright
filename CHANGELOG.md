@@ -1,5 +1,11 @@
 # appwright
 
+## 0.0.13
+
+### Patch Changes
+
+- 4cb2069: feat: expose npx appwright bin
+
 ## 0.0.12
 
 ### Patch Changes
