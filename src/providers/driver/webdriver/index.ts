@@ -129,9 +129,7 @@ export class AppwrightDriver implements IAppwrightDriver {
     }
     let path: string;
     if (isAndroid) {
-      path = exact
-        ? `resourceId("${text}")`
-        : `resourceIdMatches(".*${text}.*")`;
+      path = exact ? `resourceId("${text}")` : `resourceIdMatches("${text}")`;
     } else {
       path = exact ? `name == "${text}"` : `name CONTAINS "${text}"`;
     }

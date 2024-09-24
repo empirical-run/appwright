@@ -1,8 +1,13 @@
 // @ts-ignore
-import { Client, ElementReference } from "webdriver";
+import { Client } from "webdriver";
 import retry from "async-retry";
 import test from "@playwright/test";
-import { TestInfoOptions, WaitUntilOptions, WebdriverErrors } from "../types";
+import {
+  ElementReference,
+  TestInfoOptions,
+  WaitUntilOptions,
+  WebdriverErrors,
+} from "../types";
 
 export function boxedStep(
   target: Function,
@@ -52,10 +57,14 @@ export class Locator {
     const isElementDisplayed = await this.isVisible(options);
     if (isElementDisplayed) {
       const element = await this.getElement();
-      await this.driver.elementSendKeys(
-        element["element-6066-11e4-a52e-4f735466cecf"],
-        value,
-      );
+      if (element) {
+        await this.driver.elementSendKeys(
+          element["element-6066-11e4-a52e-4f735466cecf"],
+          value,
+        );
+      } else {
+        throw new Error(`Element with path "${this.path}" is not found`);
+      }
     } else {
       throw new Error(`Element with path "${this.path}" not visible`);
     }
@@ -68,26 +77,30 @@ export class Locator {
     const isElementDisplayed = await this.isVisible(options);
     if (isElementDisplayed) {
       const element = await this.getElement();
-      await this.driver.elementClick(
-        element["element-6066-11e4-a52e-4f735466cecf"],
-      );
-      const actions = value
-        .split("")
-        .map((char) => [
-          { type: "keyDown", value: char },
-          { type: "keyUp", value: char },
-        ])
-        .flat();
+      if (element) {
+        await this.driver.elementClick(
+          element["element-6066-11e4-a52e-4f735466cecf"],
+        );
+        const actions = value
+          .split("")
+          .map((char) => [
+            { type: "keyDown", value: char },
+            { type: "keyUp", value: char },
+          ])
+          .flat();
 
-      await this.driver.performActions([
-        {
-          type: "key",
-          id: "keyboard",
-          actions: actions,
-        },
-      ]);
+        await this.driver.performActions([
+          {
+            type: "key",
+            id: "keyboard",
+            actions: actions,
+          },
+        ]);
 
-      await this.driver.releaseActions();
+        await this.driver.releaseActions();
+      } else {
+        throw new Error(`Element with path "${this.path}" isnot found`);
+      }
     } else {
       throw new Error(`Element with path "${this.path}" not visible`);
     }
@@ -239,6 +252,13 @@ export class Locator {
       elements = await this.driver.findElements("xpath", "//*"); // Get all elements
     }
 
+    // If there is only one element, return it
+    if (elements.length === 1) {
+      return elements[0]!;
+    }
+
+    //If there are multiple elements, we reverse the order since the probability
+    //of finding the element is higher at higher depth
     const reversedElements = elements.reverse();
     for (const element of reversedElements) {
       let text = await this.driver.getElementText(

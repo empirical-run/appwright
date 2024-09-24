@@ -60,3 +60,6 @@ export interface IAppwrightDriver {
 export enum WebdriverErrors {
   StaleElementReferenceError = "stale element reference",
 }
+
+export type ElementReference = Record<ElementReferenceId, string>;
+export type ElementReferenceId = "element-6066-11e4-a52e-4f735466cecf";
