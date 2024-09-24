@@ -11,7 +11,8 @@
   "scripts": {
     "lint": "eslint .",
     "build": "tsc --build",
-    "clean": "tsc --build --clean"
+    "clean": "tsc --build --clean",
+    "release": "changeset publish"
   },
   "repository": {
     "type": "git",
