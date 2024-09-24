@@ -1,6 +1,10 @@
 {
   "name": "appwright",
   "version": "0.0.14",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
   "main": "dist/index.js",
   "engines": {
     "node": ">=18.20.4"
