@@ -2,7 +2,12 @@
 import { Client } from "webdriver";
 import retry from "async-retry";
 import test from "@playwright/test";
-import { TestInfoOptions, WaitUntilOptions, WebdriverErrors } from "../types";
+import {
+  ElementReference,
+  TestInfoOptions,
+  WaitUntilOptions,
+  WebdriverErrors,
+} from "../types";
 
 export function boxedStep(
   target: Function,
@@ -31,37 +36,35 @@ export function boxedStep(
 }
 
 export interface AppwrightLocator {
-  getSelector(): string;
   fill(value: string, options?: WaitUntilOptions): Promise<void>;
   sendKeyStrokes(value: string, options?: WaitUntilOptions): Promise<void>;
   isVisible(options?: WaitUntilOptions): Promise<boolean>;
   click(options?: WaitUntilOptions): Promise<void>;
+  getText(options?: WaitUntilOptions): Promise<string>;
 }
 
 export class Locator {
   constructor(
     private driver: Client,
-    private path: string,
+    private path: string | RegExp,
     private findStrategy: string,
     private testOptions: TestInfoOptions,
+    private textToMatch?: string,
   ) {}
-
-  getSelector() {
-    return this.path;
-  }
 
   @boxedStep
   async fill(value: string, options?: WaitUntilOptions): Promise<void> {
     const isElementDisplayed = await this.isVisible(options);
     if (isElementDisplayed) {
-      const element = await this.driver.findElement(
-        this.findStrategy,
-        this.path,
-      );
-      await this.driver.elementSendKeys(
-        element["element-6066-11e4-a52e-4f735466cecf"],
-        value,
-      );
+      const element = await this.getElement();
+      if (element) {
+        await this.driver.elementSendKeys(
+          element["element-6066-11e4-a52e-4f735466cecf"],
+          value,
+        );
+      } else {
+        throw new Error(`Element with path "${this.path}" is not found`);
+      }
     } else {
       throw new Error(`Element with path "${this.path}" not visible`);
     }
@@ -73,30 +76,31 @@ export class Locator {
   ): Promise<void> {
     const isElementDisplayed = await this.isVisible(options);
     if (isElementDisplayed) {
-      const element = await this.driver.findElement(
-        this.findStrategy,
-        this.path,
-      );
-      await this.driver.elementClick(
-        element["element-6066-11e4-a52e-4f735466cecf"],
-      );
-      const actions = value
-        .split("")
-        .map((char) => [
-          { type: "keyDown", value: char },
-          { type: "keyUp", value: char },
-        ])
-        .flat();
+      const element = await this.getElement();
+      if (element) {
+        await this.driver.elementClick(
+          element["element-6066-11e4-a52e-4f735466cecf"],
+        );
+        const actions = value
+          .split("")
+          .map((char) => [
+            { type: "keyDown", value: char },
+            { type: "keyUp", value: char },
+          ])
+          .flat();
 
-      await this.driver.performActions([
-        {
-          type: "key",
-          id: "keyboard",
-          actions: actions,
-        },
-      ]);
+        await this.driver.performActions([
+          {
+            type: "key",
+            id: "keyboard",
+            actions: actions,
+          },
+        ]);
 
-      await this.driver.releaseActions();
+        await this.driver.releaseActions();
+      } else {
+        throw new Error(`Element with path "${this.path}" isnot found`);
+      }
     } else {
       throw new Error(`Element with path "${this.path}" not visible`);
     }
@@ -108,10 +112,7 @@ export class Locator {
       const isVisible = await this.waitUntil(
         async () => {
           try {
-            const element = await this.driver.findElement(
-              this.findStrategy,
-              this.path,
-            );
+            const element = await this.getElement();
             if (element && element["element-6066-11e4-a52e-4f735466cecf"]) {
               const isDisplayed = await this.driver.isElementDisplayed(
                 element["element-6066-11e4-a52e-4f735466cecf"],
@@ -198,17 +199,84 @@ export class Locator {
   async click(options?: WaitUntilOptions) {
     try {
       await this.isVisible(options);
-      const button = await this.driver.findElement(
-        this.findStrategy,
-        this.path,
-      );
-      await this.driver.elementClick(
-        button["element-6066-11e4-a52e-4f735466cecf"],
-      );
+      const element = await this.getElement();
+      if (element) {
+        await this.driver.elementClick(
+          element!["element-6066-11e4-a52e-4f735466cecf"],
+        );
+      } else {
+        throw new Error(`Element with path "${this.path}" not found`);
+      }
     } catch (error) {
       throw new Error(
         `Failed to click on the element with path "${this.path}": ${error}`,
       );
     }
+  }
+
+  async getText(options?: WaitUntilOptions): Promise<string> {
+    const isElementDisplayed = await this.isVisible(options);
+    if (isElementDisplayed) {
+      const element = await this.getElement();
+      if (element) {
+        return await this.driver.getElementText(
+          element!["element-6066-11e4-a52e-4f735466cecf"],
+        );
+      } else {
+        throw new Error(`Element with path "${this.path}" not found`);
+      }
+    } else {
+      throw new Error(`Element with path "${this.path}" not visible`);
+    }
+  }
+
+  async getElement(): Promise<ElementReference | null> {
+    /**
+     * Determine whether `path` is a regex or string, and find elements accordingly.
+     *
+     * If `path` is a regex:
+     * - Iterate through all the elements on the page
+     * - Extract text content of each element
+     * - Return the first matching element
+     *
+     * If `path` is a string:
+     * - Use `findStrategy` (either XPath, Android UIAutomator, or iOS predicate string) to find elements
+     * - Apply regex to clean extra characters from the matched element’s text
+     * - Return the first element that matches
+     */
+
+    let elements: ElementReference[] = [];
+    if (typeof this.path === "string") {
+      elements = await this.driver.findElements(this.findStrategy, this.path);
+    } else if (this.path instanceof RegExp) {
+      elements = await this.driver.findElements("xpath", "//*"); // Get all elements
+    }
+
+    // If there is only one element, return it
+    if (elements.length === 1) {
+      return elements[0]!;
+    }
+
+    //If there are multiple elements, we reverse the order since the probability
+    //of finding the element is higher at higher depth
+    const reversedElements = elements.reverse();
+    for (const element of reversedElements) {
+      let text = await this.driver.getElementText(
+        element["element-6066-11e4-a52e-4f735466cecf"],
+      );
+
+      if (this.findStrategy == "xpath") {
+        return element;
+      }
+
+      if (this.path instanceof RegExp && this.path.test(text)) {
+        return element;
+      }
+      if (typeof this.path === "string" && text.includes(this.textToMatch!)) {
+        return element;
+      }
+    }
+
+    return null;
   }
 }

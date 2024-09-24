@@ -36,9 +36,15 @@ export interface IAppwrightDriver {
 
   tapAtGivenCoordinates: ({ x, y }: { x: number; y: number }) => Promise<void>;
 
-  getByText: (text: string, options?: { exact?: boolean }) => AppwrightLocator;
+  getByText: (
+    text: string | RegExp,
+    options?: { exact?: boolean },
+  ) => AppwrightLocator;
 
-  getById: (text: string, options?: { exact?: boolean }) => AppwrightLocator;
+  getById: (
+    text: string | RegExp,
+    options?: { exact?: boolean },
+  ) => AppwrightLocator;
 
   getByXpath: (xpath: string) => AppwrightLocator;
 
@@ -54,3 +60,6 @@ export interface IAppwrightDriver {
 export enum WebdriverErrors {
   StaleElementReferenceError = "stale element reference",
 }
+
+export type ElementReference = Record<ElementReferenceId, string>;
+export type ElementReferenceId = "element-6066-11e4-a52e-4f735466cecf";
