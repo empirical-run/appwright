@@ -224,7 +224,6 @@ export class Locator {
      * If `path` is a regex:
      * - Iterate through all the elements on the page
      * - Extract text content of each element
-     * - Apply regex to remove unwanted characters and match against `path`
      * - Return the first matching element
      *
      * If `path` is a string:
