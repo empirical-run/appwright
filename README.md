@@ -36,8 +36,8 @@ export default defineConfig({
 Appwright currently runs tests on BrowserStack only.
 
 ```sh
-npx playwright test --config appwright.config.ts --project android
-npx playwright test --config appwright.config.ts --project ios
+npx appwright test --project android
+npx appwright test --project ios
 ```
 
 These environment variables are required:
