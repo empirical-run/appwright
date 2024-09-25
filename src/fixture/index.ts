@@ -5,28 +5,28 @@ import { AppwrightLocator, IDeviceProvider, WaitUntilOptions } from "../types";
 import { Device } from "../device";
 
 export const test = base.extend<{
-  provider: IDeviceProvider;
+  deviceProvider: IDeviceProvider;
   device: Device;
   saveVideo: void;
 }>({
-  provider: async ({}, use, testInfo) => {
+  deviceProvider: async ({}, use, testInfo) => {
     const provider = DeviceProvider.getInstance(testInfo);
     await use(provider);
   },
-  device: async ({ provider }, use) => {
-    const device = await provider.getDevice();
+  device: async ({ deviceProvider }, use) => {
+    const device = await deviceProvider.getDevice();
     await use(device);
     await device.close();
   },
   saveVideo: [
-    async ({ provider }, use, testInfo) => {
+    async ({ deviceProvider }, use, testInfo) => {
       await use();
-      await provider.syncTestDetails({
+      await deviceProvider.syncTestDetails({
         status: testInfo.status,
         reason: testInfo.error?.message,
       });
 
-      const videoData = await provider.downloadVideo();
+      const videoData = await deviceProvider.downloadVideo();
       console.log(`Video saved to: ${JSON.stringify(videoData)}`);
 
       if (videoData) {
