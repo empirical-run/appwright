@@ -1,5 +1,11 @@
 # appwright
 
+## 0.0.16
+
+### Patch Changes
+
+- 8c04904: fix: remove custom reporter
+
 ## 0.0.15
 
 ### Patch Changes
