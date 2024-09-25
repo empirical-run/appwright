@@ -8,7 +8,7 @@ import {
 // @ts-ignore ts not able to identify the import is just an interface
 import { Device } from "../../device";
 import { FullProject } from "@playwright/test";
-import { startAppiumServer } from "../appium";
+import { getAppBundleId, startAppiumServer } from "../appium";
 
 export class LocalDeviceProvider implements DeviceProvider {
   private config: any;
@@ -35,8 +35,7 @@ export class LocalDeviceProvider implements DeviceProvider {
     await startAppiumServer(this.project.use.device?.provider!);
     const WebDriver = (await import("webdriver")).default;
     const webDriverClient = await WebDriver.newSession(this.config as any);
-    //TODO: Add bundle id implementation
-    const bundleId = "";
+    const bundleId = await getAppBundleId(this.project.use.buildPath!);
     const expectTimeout = this.project.use.expectTimeout!;
     const testOptions: TestInfoOptions = {
       expectTimeout,

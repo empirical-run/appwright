@@ -101,3 +101,29 @@ async function startAndroidEmulator(deviceName?: string): Promise<void> {
     });
   });
 }
+
+export function getAppBundleId(path: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const command = `osascript -e 'id of app "${path}"'`;
+
+    exec(command, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`Error executing osascript: ${error.message}`);
+        return reject(error);
+      }
+
+      if (stderr) {
+        console.error(`Error: ${stderr}`);
+        return reject(new Error(stderr));
+      }
+
+      const bundleId = stdout.trim();
+      if (bundleId) {
+        console.log(`Bundle ID: ${bundleId}`);
+        resolve(bundleId);
+      } else {
+        reject(new Error("Bundle ID not found"));
+      }
+    });
+  });
+}

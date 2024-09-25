@@ -9,6 +9,7 @@ import {
 } from "../../types";
 import { FullProject } from "@playwright/test";
 import { Device } from "../../device";
+import { getAppBundleId } from "../appium";
 
 type BrowserStackSessionDetails = {
   name: string;
@@ -116,7 +117,7 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
     const WebDriver = (await import("webdriver")).default;
     const webDriverClient = await WebDriver.newSession(config);
     this.sessionId = webDriverClient.sessionId;
-    const bundleId = await this.getAppBundleId();
+    const bundleId = await getAppBundleId(this.project.use.buildPath!);
     const testOptions = {
       expectTimeout: this.project.use.expectTimeout!,
     };
@@ -145,11 +146,6 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
 
     const data = await response.json();
     this.sessionDetails = data.automation_session;
-  }
-
-  private async getAppBundleId(): Promise<string> {
-    await this.getSessionDetails();
-    return this.sessionDetails?.app_details.app_name ?? "";
   }
 
   async downloadVideo(
