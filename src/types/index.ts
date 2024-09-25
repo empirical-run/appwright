@@ -13,7 +13,7 @@ export interface DeviceProvider {
   getDevice(): Promise<Device>;
   downloadVideo: (
     outputDir: string,
-    testId: string,
+    fileName: string,
   ) => Promise<{ path: string; contentType: string } | null>;
   syncTestDetails: (details: {
     status?: string;
@@ -24,11 +24,33 @@ export interface DeviceProvider {
 
 export type AppwrightConfig = {
   platform: Platform;
-  deviceName: string;
-  osVersion: string;
+  device: DeviceConfig;
   buildPath: string;
   // TODO: use expect timeout from playwright config
   expectTimeout: number;
+};
+
+export type DeviceConfig =
+  | BrowserstackConfig
+  | LocalDeviceConfig
+  | EmulatorConfig;
+
+export type BrowserstackConfig = {
+  provider: "browserstack";
+  name: string;
+  osVersion: string;
+};
+
+export type LocalDeviceConfig = {
+  provider: "local-device";
+  name?: string;
+  udid?: string;
+};
+
+export type EmulatorConfig = {
+  provider: "emulator";
+  name?: string;
+  osVersion?: string;
 };
 
 export enum Platform {

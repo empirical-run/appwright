@@ -2,8 +2,13 @@ import retry from "async-retry";
 import FormData from "form-data";
 import fs from "fs";
 import path from "path";
-import { AppwrightConfig, DeviceProvider } from "../../types";
+import {
+  AppwrightConfig,
+  DeviceProvider,
+  BrowserstackConfig,
+} from "../../types";
 import { FullProject } from "@playwright/test";
+// @ts-ignore ts not able to identify the import is just an interface
 import { Device } from "../../device";
 
 type BrowserStackSessionDetails = {
@@ -94,8 +99,18 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
   }
 
   async getDevice(): Promise<Device> {
+    this.validateConfig();
     const config = this.createConfig();
     return await this.createDriver(config);
+  }
+
+  private validateConfig() {
+    const device = this.project.use.device as BrowserstackConfig;
+    if (!device.name || !device.osVersion) {
+      throw new Error(
+        "Device name and osVersion are required for running tests on browserstack",
+      );
+    }
   }
 
   private async createDriver(config: any): Promise<Device> {
@@ -261,8 +276,8 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
           networkLogs: true,
           appiumVersion: "2.6.0",
           enableCameraImageInjection: true,
-          deviceName: this.project.use.deviceName,
-          osVersion: this.project.use.osVersion,
+          deviceName: this.project.use.device?.name,
+          osVersion: (this.project.use.device as BrowserstackConfig).osVersion,
           platformName: platformName,
           buildName: `${projectName} ${platformName}`,
           sessionName: `${projectName} ${platformName} test`,
@@ -272,7 +287,7 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
               : process.env.USER,
         },
         "appium:autoGrantPermissions": true,
-        "appium:app": process.env.BROWSERSTACK_APP_URL,
+        "appium:app": process.env[APP_URL_KEY(this.project.name)],
         "appium:autoAcceptAlerts": true,
         "appium:fullReset": true,
       },
