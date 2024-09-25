@@ -272,7 +272,7 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
               : process.env.USER,
         },
         "appium:autoGrantPermissions": true,
-        "appium:app": process.env.BROWSERSTACK_APP_URL,
+        "appium:app": process.env[APP_URL_KEY(this.project.name)],
         "appium:autoAcceptAlerts": true,
         "appium:fullReset": true,
       },
