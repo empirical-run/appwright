@@ -1,5 +1,12 @@
 # appwright
 
+## 0.0.19
+
+### Patch Changes
+
+- b8e6947: feat: support buildPath and build uploads with globalSetup
+- 10c7397: fix: pick correct browserstack build url
+
 ## 0.0.18
 
 ### Patch Changes
