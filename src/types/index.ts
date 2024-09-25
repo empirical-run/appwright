@@ -22,7 +22,7 @@ export type AppwrightConfig = {
   deviceName: string;
   osVersion: string;
   buildURL: string;
-  //TODO: use expect timeout from playwright config
+  // TODO: use expect timeout from playwright config
   expectTimeout?: number;
 };
 

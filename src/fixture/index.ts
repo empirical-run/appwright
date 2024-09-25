@@ -1,6 +1,6 @@
 import { test as base } from "@playwright/test";
 
-import { DeviceProvider } from "../providers/device/browserstack";
+import { DeviceProvider } from "../providers/device";
 import { AppwrightDriver } from "../providers/driver";
 import { AppwrightLocator } from "../locator";
 import { Device, WaitUntilOptions } from "../types";
