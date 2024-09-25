@@ -1,6 +1,11 @@
 import { test as base } from "@playwright/test";
 
-import { AppwrightLocator, DeviceProvider, WaitUntilOptions } from "../types";
+import {
+  AppwrightConfig,
+  AppwrightLocator,
+  DeviceProvider,
+  WaitUntilOptions,
+} from "../types";
 import { Device } from "../device";
 import { createDeviceProvider } from "../providers";
 
@@ -9,12 +14,14 @@ export const test = base.extend<{
   device: Device;
   saveVideo: void;
 }>({
-  deviceProvider: async ({}, use, testInfo) => {
-    const deviceProvider = createDeviceProvider(testInfo);
+  deviceProvider: async ({ }, use, testInfo) => {
+    const config = testInfo.project.use as AppwrightConfig;
+    const deviceProvider = createDeviceProvider(config);
     await use(deviceProvider);
   },
-  device: async ({ deviceProvider }, use) => {
+  device: async ({ deviceProvider }, use, testInfo) => {
     const device = await deviceProvider.getDevice();
+    await deviceProvider.syncTestDetails({ name: testInfo.title });
     await use(device);
     await device.close();
   },
@@ -25,8 +32,11 @@ export const test = base.extend<{
         status: testInfo.status,
         reason: testInfo.error?.message,
       });
-
-      const videoData = await deviceProvider.downloadVideo();
+      const outputDir = testInfo.project.outputDir;
+      const videoData = await deviceProvider.downloadVideo(
+        outputDir,
+        testInfo.testId,
+      );
       console.log(`Video saved to: ${JSON.stringify(videoData)}`);
 
       if (videoData) {

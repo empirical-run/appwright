@@ -1,8 +1,13 @@
 import fs from "fs";
 import path from "path";
 import retry from "async-retry";
-import { TestInfo } from "@playwright/test";
-import { AppwrightConfig, DeviceProvider, TestInfoOptions } from "../../types";
+import {
+  AppwrightConfig,
+  DeviceProvider,
+  Platform,
+  TestInfoOptions,
+} from "../../types";
+import FormData from "form-data";
 // @ts-ignore ts not able to identify the import is just an interface
 import { Device } from "../../device";
 
@@ -41,14 +46,24 @@ function getAuthHeader() {
 
 export class BrowserStackDeviceProvider implements DeviceProvider {
   private sessionDetails?: BrowserStackSessionDetails;
-  private testInfo: TestInfo;
   private sessionId?: string;
+  private platform: Platform;
+  private deviceName: string;
+  private osVersion: string;
+  private buildPath: string;
+  private testOptions: TestInfoOptions;
 
-  constructor(testInfo: TestInfo) {
-    this.testInfo = testInfo;
+  constructor(config: AppwrightConfig) {
+    this.platform = config.platform;
+    this.deviceName = config.deviceName;
+    this.osVersion = config.osVersion;
+    this.buildPath = config.buildPath;
+    this.testOptions = {
+      expectTimeout: config.expectTimeout,
+    };
   }
 
-  static async globalSetup(appwrightConfig: AppwrightConfig) {
+  async globalSetup() {
     if (
       !(
         process.env.BROWSERSTACK_USERNAME && process.env.BROWSERSTACK_ACCESS_KEY
@@ -58,35 +73,38 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
         "BROWSERSTACK_USERNAME and BROWSERSTACK_ACCESS_KEY are required environment variables for this device provider.",
       );
     }
-    const { buildPath } = appwrightConfig;
-    const isUrl = buildPath.startsWith("http");
-    console.log(`Uploading: ${buildPath}`);
-    if (!isUrl) {
-      throw new Error("Only URL uploads are supported");
-    }
-    console.log(1, getAuthHeader());
-    try {
-      const response = await fetch(`${API_BASE_URL}/upload`, {
-        method: "POST",
-        headers: {
-          Authorization: getAuthHeader(),
-        },
-        body: new URLSearchParams({
-          url: buildPath,
-        }),
+    console.log(`Uploading: ${this.buildPath}`);
+    const isUrl = this.buildPath.startsWith("http");
+    let body;
+    let headers = {
+      Authorization: getAuthHeader(),
+    };
+    if (isUrl) {
+      body = new URLSearchParams({
+        url: this.buildPath,
       });
-      console.log(2);
-      const data = await response.json();
-      console.log("Finished", data);
-      const appUrl = data.app_url;
-      if (process.env.BROWSERSTACK_APP_URL) {
-        console.warn("Overriding BROWSERSTACK_APP_URL after build upload.");
+    } else {
+      if (!fs.existsSync(this.buildPath)) {
+        throw new Error(`Build file not found: ${this.buildPath}`);
       }
-      process.env.BROWSERSTACK_APP_URL = appUrl;
-    } catch (e) {
-      console.log("fat gaya");
-      console.error(e);
+      const form = new FormData();
+      form.append("file", fs.createReadStream(this.buildPath));
+      headers = { ...headers, ...form.getHeaders() };
+      body = form;
     }
+    const fetch = (await import("node-fetch")).default;
+    const response = await fetch(`${API_BASE_URL}/upload`, {
+      method: "POST",
+      headers,
+      body,
+    });
+    const data = await response.json();
+    console.log("Upload response:", data);
+    const appUrl = (data as any).app_url;
+    if (process.env.BROWSERSTACK_APP_URL) {
+      console.warn("Overriding BROWSERSTACK_APP_URL after build upload.");
+    }
+    process.env.BROWSERSTACK_APP_URL = appUrl;
   }
 
   async getDevice(): Promise<Device> {
@@ -98,14 +116,8 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
     const WebDriver = (await import("webdriver")).default;
     const webDriverClient = await WebDriver.newSession(config);
     this.sessionId = webDriverClient.sessionId;
-    await this.syncTestDetails({ name: this.testInfo.title });
     const bundleId = await this.getAppBundleId();
-    //@ts-ignore
-    const expectTimeout = this.testInfo.project.use.expectTimeout;
-    const testOptions: TestInfoOptions = {
-      expectTimeout,
-    };
-    return new Device(webDriverClient, bundleId, testOptions);
+    return new Device(webDriverClient, bundleId, this.testOptions);
   }
 
   private async getSessionDetails() {
@@ -132,13 +144,16 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
     return this.sessionDetails?.app_details.app_name ?? "";
   }
 
-  async downloadVideo(): Promise<{ path: string; contentType: string } | null> {
+  async downloadVideo(
+    outputDir: string,
+    testId: string,
+  ): Promise<{ path: string; contentType: string } | null> {
     await this.getSessionDetails();
     const videoURL = this.sessionDetails?.video_url;
     const pathToTestVideo = path.join(
-      this.testInfo.project.outputDir,
+      outputDir,
       "videos-store",
-      `${this.testInfo.testId}.mp4`,
+      `${testId}.mp4`,
     );
     const dir = path.dirname(pathToTestVideo);
     fs.mkdirSync(dir, { recursive: true });
@@ -238,9 +253,13 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
   }
 
   private createConfig() {
-    const platformName = (this.testInfo.project.use as AppwrightConfig)
-      .platform;
+    const platformName = this.platform;
     const projectName = path.basename(process.cwd());
+    if (!process.env.BROWSERSTACK_APP_URL) {
+      throw new Error(
+        "BROWSERSTACK_APP_URL is not set. Did the file upload work?",
+      );
+    }
     return {
       port: 443,
       path: "/wd/hub",
@@ -256,8 +275,8 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
           networkLogs: true,
           appiumVersion: "2.6.0",
           enableCameraImageInjection: true,
-          deviceName: (this.testInfo.project.use as AppwrightConfig).deviceName,
-          osVersion: (this.testInfo.project.use as AppwrightConfig).osVersion,
+          deviceName: this.deviceName,
+          osVersion: this.osVersion,
           platformName: platformName,
           buildName: `${projectName} ${platformName}`,
           sessionName: `${projectName} ${platformName} test`,

@@ -3,13 +3,16 @@ import {
   PlaywrightTestConfig,
 } from "@playwright/test";
 import { AppwrightConfig } from "./types";
+import path from "path";
 
-// eslint-disable-next-line unused-imports/no-unused-imports
+// This import ensures global-setup is built by TypeScript
+// eslint-disable-next-line unused-imports/no-unused-imports, no-unused-vars
 import globalSetup from "./global-setup";
 
 const resolveGlobalSetup = () => {
-  const self = require.resolve(".");
-  return self.replace("index.js", "global-setup.js");
+  const pathToInstalledAppwright = require.resolve(".");
+  const directory = path.dirname(pathToInstalledAppwright);
+  return path.join(directory, "global-setup.js");
 };
 
 const defaultConfig: PlaywrightTestConfig<AppwrightConfig> = {

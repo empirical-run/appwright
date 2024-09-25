@@ -1,7 +1,8 @@
-import { TestInfo } from "@playwright/test";
 import { BrowserStackDeviceProvider } from "./browserstack";
-import { DeviceProvider } from "../types";
+import { AppwrightConfig, DeviceProvider } from "../types";
 
-export function createDeviceProvider(testInfo: TestInfo): DeviceProvider {
-  return new BrowserStackDeviceProvider(testInfo);
+export function createDeviceProvider(
+  projectConfig: AppwrightConfig,
+): DeviceProvider {
+  return new BrowserStackDeviceProvider(projectConfig);
 }

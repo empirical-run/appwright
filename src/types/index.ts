@@ -9,8 +9,12 @@ export type TestInfoOptions = {
 };
 
 export interface DeviceProvider {
+  globalSetup(): Promise<void>;
   getDevice(): Promise<Device>;
-  downloadVideo: () => Promise<{ path: string; contentType: string } | null>;
+  downloadVideo: (
+    outputDir: string,
+    testId: string,
+  ) => Promise<{ path: string; contentType: string } | null>;
   syncTestDetails: (details: {
     status?: string;
     reason?: string;
@@ -24,7 +28,7 @@ export type AppwrightConfig = {
   osVersion: string;
   buildPath: string;
   // TODO: use expect timeout from playwright config
-  expectTimeout?: number;
+  expectTimeout: number;
 };
 
 export enum Platform {
