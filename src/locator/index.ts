@@ -70,6 +70,7 @@ export class Locator {
     }
   }
 
+  @boxedStep
   async sendKeyStrokes(
     value: string,
     options?: WaitUntilOptions,
@@ -99,7 +100,7 @@ export class Locator {
 
         await this.driver.releaseActions();
       } else {
-        throw new Error(`Element with path "${this.path}" isnot found`);
+        throw new Error(`Element with path "${this.path}" is not found`);
       }
     } else {
       throw new Error(`Element with path "${this.path}" not visible`);
@@ -198,14 +199,18 @@ export class Locator {
   @boxedStep
   async click(options?: WaitUntilOptions) {
     try {
-      await this.isVisible(options);
-      const element = await this.getElement();
-      if (element) {
-        await this.driver.elementClick(
-          element!["element-6066-11e4-a52e-4f735466cecf"],
-        );
+      const isElementDisplayed = await this.isVisible(options);
+      if (isElementDisplayed) {
+        const element = await this.getElement();
+        if (element) {
+          await this.driver.elementClick(
+            element!["element-6066-11e4-a52e-4f735466cecf"],
+          );
+        } else {
+          throw new Error(`Element with path "${this.path}" not found`);
+        }
       } else {
-        throw new Error(`Element with path "${this.path}" not found`);
+        throw new Error(`Element with path "${this.path}" not visible`);
       }
     } catch (error) {
       throw new Error(
@@ -214,6 +219,7 @@ export class Locator {
     }
   }
 
+  @boxedStep
   async getText(options?: WaitUntilOptions): Promise<string> {
     const isElementDisplayed = await this.isVisible(options);
     if (isElementDisplayed) {
@@ -223,7 +229,7 @@ export class Locator {
           element!["element-6066-11e4-a52e-4f735466cecf"],
         );
       } else {
-        throw new Error(`Element with path "${this.path}" not found`);
+        throw new Error(`Element with path "${this.path}" is not found`);
       }
     } else {
       throw new Error(`Element with path "${this.path}" not visible`);
