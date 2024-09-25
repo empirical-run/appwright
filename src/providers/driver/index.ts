@@ -49,7 +49,7 @@ export class AppwrightDriver implements IAppwrightDriver {
   }
 
   @boxedStep
-  async tapAtGivenCoordinates({ x, y }: { x: number; y: number }) {
+  async tap({ x, y }: { x: number; y: number }) {
     if (this.isAndroid()) {
       await this.client.executeScript("mobile: clickGesture", [
         {

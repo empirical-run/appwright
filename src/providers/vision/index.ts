@@ -34,7 +34,7 @@ export class VisionProvider {
         `Scale factors are different: ${scaleFactorWidth} vs ${scaleFactorHeight}`,
       );
     }
-    await this.appwrightDriver.tapAtGivenCoordinates({
+    await this.appwrightDriver.tap({
       x: center.x / scaleFactorWidth,
       y: center.y / scaleFactorWidth,
     });
