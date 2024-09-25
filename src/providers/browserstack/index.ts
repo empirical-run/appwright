@@ -2,10 +2,12 @@ import fs from "fs";
 import path from "path";
 import retry from "async-retry";
 import { TestInfo } from "@playwright/test";
-import { AppwrightDriver } from "../../driver";
-import { AppwrightConfig, Device, TestInfoOptions } from "../../../types";
+import { AppwrightConfig, IDeviceProvider, TestInfoOptions } from "../../types";
+// @ts-ignore ts not able to identify the import is just an interface
+import { Client as WebDriverClient } from "webdriver";
+import { Device } from "../../device";
 
-export type BrowserStackSessionDetails = {
+type BrowserStackSessionDetails = {
   name: string;
   duration: number;
   os: string;
@@ -29,7 +31,7 @@ export type BrowserStackSessionDetails = {
   };
 };
 
-export class BrowserStackDevice implements Device {
+export class BrowserStackDeviceProvider implements IDeviceProvider {
   private sessionDetails?: BrowserStackSessionDetails;
   private testInfo: TestInfo;
   private userName = process.env.BROWSERSTACK_USERNAME;
@@ -38,27 +40,57 @@ export class BrowserStackDevice implements Device {
   private sessionBaseURL =
     "https://api-cloud.browserstack.com/app-automate/sessions";
   private config: any;
+  private webDriverClient!: WebDriverClient;
 
   constructor(testInfo: TestInfo) {
     this.testInfo = testInfo;
   }
 
-  async init() {
+  async getDevice(): Promise<Device> {
     this.createConfig();
+    return await this.createDriver();
   }
 
-  async createDriver(): Promise<AppwrightDriver> {
+  private async createDriver(): Promise<Device> {
     const WebDriver = (await import("webdriver")).default;
     const webdriverClient = await WebDriver.newSession(this.config as any);
     this.sessionId = webdriverClient.sessionId;
-    await this.setSessionName(webdriverClient.sessionId, this.testInfo.title);
+    await this.syncTestDetails({ name: this.testInfo.title });
     const bundleId = await this.getAppBundleId();
     //@ts-ignore
     const expectTimeout = this.testInfo.project.use.expectTimeout;
     const testOptions: TestInfoOptions = {
       expectTimeout,
     };
-    return new AppwrightDriver(webdriverClient, bundleId, testOptions);
+    return new Device(this.webDriverClient, bundleId, testOptions);
+  }
+
+  private async getSessionDetails() {
+    const response = await fetch(
+      `${this.sessionBaseURL}/${this.sessionId}.json`,
+      {
+        method: "GET",
+        headers: {
+          Authorization:
+            "Basic " +
+            Buffer.from(`${this.userName}:${this.accessKey}`).toString(
+              "base64",
+            ),
+        },
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(`Error fetching session details: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    this.sessionDetails = data.automation_session;
+  }
+
+  private async getAppBundleId(): Promise<string> {
+    await this.getSessionDetails();
+    return this.sessionDetails?.app_details.app_name ?? "";
   }
 
   async downloadVideo(): Promise<{ path: string; contentType: string } | null> {
@@ -142,7 +174,11 @@ export class BrowserStackDevice implements Device {
     }
   }
 
-  async setSessionStatus(status?: string, reason?: string) {
+  async syncTestDetails(details: {
+    status?: string;
+    reason?: string;
+    name?: string;
+  }) {
     const response = await fetch(
       `${this.sessionBaseURL}/${this.sessionId}.json`,
       {
@@ -155,30 +191,16 @@ export class BrowserStackDevice implements Device {
             ),
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          status: status,
-          reason: reason,
-        }),
+        body: details.name
+          ? JSON.stringify({
+              name: details.name,
+            })
+          : JSON.stringify({
+              status: details.status,
+              reason: details.reason,
+            }),
       },
     );
-    if (!response.ok) {
-      throw new Error(`Error setting session details: ${response.statusText}`);
-    }
-    const responseData = await response.json();
-    return responseData;
-  }
-
-  private async setSessionName(sessionId: string, data: any) {
-    const response = await fetch(`${this.sessionBaseURL}/${sessionId}.json`, {
-      method: "PUT",
-      headers: {
-        Authorization:
-          "Basic " +
-          Buffer.from(`${this.userName}:${this.accessKey}`).toString("base64"),
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name: `${data}` }),
-    });
     if (!response.ok) {
       throw new Error(`Error setting session details: ${response.statusText}`);
     }
@@ -221,33 +243,5 @@ export class BrowserStackDevice implements Device {
         "appium:fullReset": true,
       },
     };
-  }
-
-  private async getSessionDetails() {
-    const response = await fetch(
-      `${this.sessionBaseURL}/${this.sessionId}.json`,
-      {
-        method: "GET",
-        headers: {
-          Authorization:
-            "Basic " +
-            Buffer.from(`${this.userName}:${this.accessKey}`).toString(
-              "base64",
-            ),
-        },
-      },
-    );
-
-    if (!response.ok) {
-      throw new Error(`Error fetching session details: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    this.sessionDetails = data.automation_session;
-  }
-
-  private async getAppBundleId(): Promise<string> {
-    await this.getSessionDetails();
-    return this.sessionDetails?.app_details.app_name ?? "";
   }
 }

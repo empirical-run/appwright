@@ -1,28 +1,29 @@
 // @ts-ignore ts not able to identify the import is just an interface
 import type { Client as WebDriverClient } from "webdriver";
-import { AppwrightLocator, Locator } from "../../locator";
-import { IAppwrightDriver, TestInfoOptions } from "../../types";
+import { Locator } from "../locator";
+import {
+  AppwrightLocator,
+  IDevice as IDevice,
+  Platform,
+  TestInfoOptions,
+} from "../types";
 import { AppwrightVision, VisionProvider } from "../vision";
-import { boxedStep } from "../../utils";
+import { boxedStep } from "../utils";
 
-export class AppwrightDriver implements IAppwrightDriver {
-  private client: WebDriverClient;
+export class Device implements IDevice {
   constructor(
-    webdriverClient: WebDriverClient,
+    private webdriverClient: WebDriverClient,
     private bundleId: string,
     private testOptions: TestInfoOptions,
-  ) {
-    this.client = webdriverClient;
-  }
+  ) {}
 
-  // TODO: need to check if we need boxedStep
   locator(
     path: string | RegExp,
     findStrategy: string,
     textToMatch?: string,
   ): AppwrightLocator {
     return new Locator(
-      this.client,
+      this.webdriverClient,
       path,
       findStrategy,
       this.testOptions,
@@ -31,27 +32,27 @@ export class AppwrightDriver implements IAppwrightDriver {
   }
 
   private vision(): AppwrightVision {
-    return new VisionProvider(this.client, this);
+    return new VisionProvider(this, this.webdriverClient);
   }
 
-  async tapWithPrompt(prompt: string): Promise<void> {
-    await this.vision().tapWithPrompt(prompt);
-  }
+  beta = {
+    tap: async (prompt: string): Promise<void> => {
+      await this.vision().tap(prompt);
+    },
 
-  async extractTextWithPrompt(prompt: string): Promise<string> {
-    return await this.vision().extractTextWithPrompt(prompt);
-  }
-
+    extractText: async (prompt: string): Promise<string> => {
+      return await this.vision().extractText(prompt);
+    },
+  };
   @boxedStep
   async close() {
-    // TODO: Remove this later or move it inside device
-    await this.client.deleteSession();
+    await this.webdriverClient.deleteSession();
   }
 
   @boxedStep
   async tap({ x, y }: { x: number; y: number }) {
-    if (this.isAndroid()) {
-      await this.client.executeScript("mobile: clickGesture", [
+    if (this.getPlatform() == Platform.ANDROID) {
+      await this.webdriverClient.executeScript("mobile: clickGesture", [
         {
           x: x,
           y: y,
@@ -60,7 +61,7 @@ export class AppwrightDriver implements IAppwrightDriver {
         },
       ]);
     } else {
-      await this.client.executeScript("mobile: tap", [
+      await this.webdriverClient.executeScript("mobile: tap", [
         {
           x: x,
           y: y,
@@ -73,7 +74,7 @@ export class AppwrightDriver implements IAppwrightDriver {
     text: string | RegExp,
     { exact = false }: { exact?: boolean } = {},
   ): AppwrightLocator {
-    const isAndroid = this.isAndroid();
+    const isAndroid = this.getPlatform() == Platform.ANDROID;
     if (text instanceof RegExp) {
       return this.locator(
         text,
@@ -97,7 +98,7 @@ export class AppwrightDriver implements IAppwrightDriver {
     text: string | RegExp,
     { exact = false }: { exact?: boolean } = {},
   ): AppwrightLocator {
-    const isAndroid = this.isAndroid();
+    const isAndroid = this.getPlatform() == Platform.ANDROID;
     if (text instanceof RegExp) {
       return this.locator(
         text,
@@ -121,21 +122,22 @@ export class AppwrightDriver implements IAppwrightDriver {
     return this.locator(xpath, "xpath");
   }
 
-  isAndroid() {
-    return this.client.isAndroid;
+  getPlatform(): Platform {
+    const isAndroid = this.webdriverClient.isAndroid;
+    return isAndroid ? Platform.ANDROID : Platform.IOS;
   }
 
-  async getClipboard(): Promise<string> {
-    if (this.isAndroid()) {
-      return await this.client.getClipboard();
+  async getClipboardText(): Promise<string> {
+    if (this.getPlatform() == Platform.ANDROID) {
+      return await this.webdriverClient.getClipboard();
     } else {
-      await this.client.executeScript("mobile: activateApp", [
+      await this.webdriverClient.executeScript("mobile: activateApp", [
         {
           bundleId: "com.facebook.WebDriverAgentRunner.xctrunner",
         },
       ]);
-      const clipboardDataBase64 = await this.client.getClipboard();
-      await this.client.executeScript("mobile: activateApp", [
+      const clipboardDataBase64 = await this.webdriverClient.getClipboard();
+      await this.webdriverClient.executeScript("mobile: activateApp", [
         {
           bundleId: this.bundleId,
         },

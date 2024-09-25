@@ -1,5 +1,4 @@
-import { AppwrightLocator } from "../locator";
-import { AppwrightDriver } from "../providers/driver";
+import { Device } from "../device";
 
 export type WaitUntilOptions = {
   timeout: number;
@@ -9,12 +8,14 @@ export type TestInfoOptions = {
   expectTimeout: number;
 };
 
-export interface Device {
-  init: () => Promise<void>;
-  createDriver: () => Promise<AppwrightDriver>;
-  // TODO: Return error type
+export interface IDeviceProvider {
+  getDevice(): Promise<Device>;
   downloadVideo: () => Promise<{ path: string; contentType: string } | null>;
-  setSessionStatus: (status?: string, reason?: string) => Promise<void>;
+  syncTestDetails: (details: {
+    status?: string;
+    reason?: string;
+    name?: string;
+  }) => Promise<void>;
 }
 
 export type AppwrightConfig = {
@@ -31,7 +32,7 @@ export enum Platform {
   IOS = "ios",
 }
 
-export interface IAppwrightDriver {
+export interface IDevice {
   close: () => Promise<void>;
 
   tap: ({ x, y }: { x: number; y: number }) => Promise<void>;
@@ -48,13 +49,78 @@ export interface IAppwrightDriver {
 
   getByXpath: (xpath: string) => AppwrightLocator;
 
-  getClipboard: () => Promise<string>;
+  getClipboardText: () => Promise<string>;
 
-  tapWithPrompt: (prompt: string) => Promise<void>;
+  beta: {
+    tap: (prompt: string) => Promise<void>;
+    extractText: (prompt: string) => Promise<string>;
+  };
 
-  extractTextWithPrompt: (prompt: string) => Promise<string>;
+  getPlatform: () => Platform;
+}
 
-  isAndroid: () => boolean;
+export interface AppwrightLocator {
+  /**
+   * Clicks (taps) on the element. This method waits for the element to be visible before clicking it.
+   *
+   * **Usage:**
+   * ```js
+   * await device.getByText("Submit").click();
+   * ```
+   *
+   * @param options Use this to override the timeout for this action
+   */
+  tap(options?: WaitUntilOptions): Promise<void>;
+
+  /**
+   * Fills the input element with the given value. This method waits for the element to be visible before filling it.
+   *
+   * **Usage:**
+   * ```js
+   * await device.getByText("Search").fill("My query");
+   * ```
+   *
+   * @param value The value to fill in the input field
+   * @param options Use this to override the timeout for this action
+   */
+  fill(value: string, optionasds?: WaitUntilOptions): Promise<void>;
+
+  /**
+   * Sends key strokes to the element. This method waits for the element to be visible before sending the key strokes.
+   *
+   * **Usage:**
+   * ```js
+   * await device.getByText("Search").sendKeyStrokes("My query");
+   * ```
+   *
+   * @param value The string to send as key strokes.
+   * @param options Use this to override the timeout for this action
+   */
+  sendKeyStrokes(value: string, options?: WaitUntilOptions): Promise<void>;
+
+  /**
+   * Checks if the element is visible on the page, while attempting for the `timeout` duration. Returns `true` if the element is visible, `false` otherwise.
+   *
+   * **Usage:**
+   * ```js
+   * const isVisible = await device.getByText("Search").isVisible();
+   * ```
+   *
+   * @param options Use this to override the timeout for this action
+   */
+  isVisible(options?: WaitUntilOptions): Promise<boolean>;
+
+  /**
+   * Returns the text content of the element. This method waits for the element to be visible before getting the text.
+   *
+   * **Usage:**
+   * ```js
+   * const textContent = await device.getByText("Search").getText();
+   * ```
+   *
+   * @param options Use this to override the timeout for this action
+   */
+  getText(options?: WaitUntilOptions): Promise<string>;
 }
 
 export enum WebdriverErrors {

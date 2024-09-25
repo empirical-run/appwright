@@ -1,4 +1,4 @@
-// @ts-ignore
+// @ts-ignore ts not able to identify the import is just an interface
 import { Client as WebDriverClient } from "webdriver";
 import retry from "async-retry";
 import {
@@ -9,74 +9,10 @@ import {
 } from "../types";
 import { boxedStep } from "../utils";
 
-export interface AppwrightLocator {
-  /**
-   * Clicks (taps) on the element. This method waits for the element to be visible before clicking it.
-   *
-   * **Usage:**
-   * ```js
-   * await client.getByText("Submit").click();
-   * ```
-   *
-   * @param options Use this to override the timeout for this action
-   */
-  click(options?: WaitUntilOptions): Promise<void>;
-
-  /**
-   * Fills the input element with the given value. This method waits for the element to be visible before filling it.
-   *
-   * **Usage:**
-   * ```js
-   * await client.getByText("Search").fill("My query");
-   * ```
-   *
-   * @param value The value to fill in the input field
-   * @param options Use this to override the timeout for this action
-   */
-  fill(value: string, optionasds?: WaitUntilOptions): Promise<void>;
-
-  /**
-   * Sends key strokes to the element. This method waits for the element to be visible before sending the key strokes.
-   *
-   * **Usage:**
-   * ```js
-   * await client.getByText("Search").sendKeyStrokes("My query");
-   * ```
-   *
-   * @param value The string to send as key strokes.
-   * @param options Use this to override the timeout for this action
-   */
-  sendKeyStrokes(value: string, options?: WaitUntilOptions): Promise<void>;
-
-  /**
-   * Checks if the element is visible on the page, while attempting for the `timeout` duration. Returns `true` if the element is visible, `false` otherwise.
-   *
-   * **Usage:**
-   * ```js
-   * const isVisible = await client.getByText("Search").isVisible();
-   * ```
-   *
-   * @param options Use this to override the timeout for this action
-   */
-  isVisible(options?: WaitUntilOptions): Promise<boolean>;
-
-  /**
-   * Returns the text content of the element. This method waits for the element to be visible before getting the text.
-   *
-   * **Usage:**
-   * ```js
-   * const textContent = await client.getByText("Search").getText();
-   * ```
-   *
-   * @param options Use this to override the timeout for this action
-   */
-  getText(options?: WaitUntilOptions): Promise<string>;
-}
-
 export class Locator {
   constructor(
-    private driver: WebDriverClient,
-    private path: string | RegExp,
+    private webDriverClient: WebDriverClient,
+    private selector: string | RegExp,
     private findStrategy: string,
     private testOptions: TestInfoOptions,
     private textToMatch?: string,
@@ -88,15 +24,15 @@ export class Locator {
     if (isElementDisplayed) {
       const element = await this.getElement();
       if (element) {
-        await this.driver.elementSendKeys(
+        await this.webDriverClient.elementSendKeys(
           element["element-6066-11e4-a52e-4f735466cecf"],
           value,
         );
       } else {
-        throw new Error(`Element with path "${this.path}" is not found`);
+        throw new Error(`Element with path "${this.selector}" is not found`);
       }
     } else {
-      throw new Error(`Element with path "${this.path}" not visible`);
+      throw new Error(`Element with path "${this.selector}" not visible`);
     }
   }
 
@@ -109,7 +45,7 @@ export class Locator {
     if (isElementDisplayed) {
       const element = await this.getElement();
       if (element) {
-        await this.driver.elementClick(
+        await this.webDriverClient.elementClick(
           element["element-6066-11e4-a52e-4f735466cecf"],
         );
         const actions = value
@@ -120,7 +56,7 @@ export class Locator {
           ])
           .flat();
 
-        await this.driver.performActions([
+        await this.webDriverClient.performActions([
           {
             type: "key",
             id: "keyboard",
@@ -128,12 +64,12 @@ export class Locator {
           },
         ]);
 
-        await this.driver.releaseActions();
+        await this.webDriverClient.releaseActions();
       } else {
-        throw new Error(`Element with path "${this.path}" is not found`);
+        throw new Error(`Element with path "${this.selector}" is not found`);
       }
     } else {
-      throw new Error(`Element with path "${this.path}" not visible`);
+      throw new Error(`Element with path "${this.selector}" not visible`);
     }
   }
 
@@ -145,7 +81,7 @@ export class Locator {
           try {
             const element = await this.getElement();
             if (element && element["element-6066-11e4-a52e-4f735466cecf"]) {
-              const isDisplayed = await this.driver.isElementDisplayed(
+              const isDisplayed = await this.webDriverClient.isElementDisplayed(
                 element["element-6066-11e4-a52e-4f735466cecf"],
               );
               return isDisplayed;
@@ -161,7 +97,7 @@ export class Locator {
               throw error;
             }
             console.log(
-              `Error while checking visibility of element with path "${this.path}": ${error}`,
+              `Error while checking visibility of element with path "${this.selector}": ${error}`,
             );
             return false;
           }
@@ -189,7 +125,7 @@ export class Locator {
       throw new Error("Condition is not a function");
     }
 
-    const fn = condition.bind(this.driver);
+    const fn = condition.bind(this.webDriverClient);
 
     try {
       return await retry(
@@ -198,7 +134,7 @@ export class Locator {
 
           if (result === false) {
             throw new Error(
-              `Element corresponding to path ${this.path} not found yet, Retrying...`,
+              `Element corresponding to path ${this.selector} not found yet, Retrying...`,
             );
           }
 
@@ -227,24 +163,24 @@ export class Locator {
   }
 
   @boxedStep
-  async click(options?: WaitUntilOptions) {
+  async tap(options?: WaitUntilOptions) {
     try {
       const isElementDisplayed = await this.isVisible(options);
       if (isElementDisplayed) {
         const element = await this.getElement();
         if (element) {
-          await this.driver.elementClick(
+          await this.webDriverClient.elementClick(
             element!["element-6066-11e4-a52e-4f735466cecf"],
           );
         } else {
-          throw new Error(`Element with path "${this.path}" not found`);
+          throw new Error(`Element with path "${this.selector}" not found`);
         }
       } else {
-        throw new Error(`Element with path "${this.path}" not visible`);
+        throw new Error(`Element with path "${this.selector}" not visible`);
       }
     } catch (error) {
       throw new Error(
-        `Failed to click on the element with path "${this.path}": ${error}`,
+        `Failed to click on the element with path "${this.selector}": ${error}`,
       );
     }
   }
@@ -255,14 +191,14 @@ export class Locator {
     if (isElementDisplayed) {
       const element = await this.getElement();
       if (element) {
-        return await this.driver.getElementText(
+        return await this.webDriverClient.getElementText(
           element!["element-6066-11e4-a52e-4f735466cecf"],
         );
       } else {
-        throw new Error(`Element with path "${this.path}" is not found`);
+        throw new Error(`Element with path "${this.selector}" is not found`);
       }
     } else {
-      throw new Error(`Element with path "${this.path}" not visible`);
+      throw new Error(`Element with path "${this.selector}" not visible`);
     }
   }
 
@@ -282,10 +218,13 @@ export class Locator {
      */
 
     let elements: ElementReference[] = [];
-    if (typeof this.path === "string") {
-      elements = await this.driver.findElements(this.findStrategy, this.path);
-    } else if (this.path instanceof RegExp) {
-      elements = await this.driver.findElements("xpath", "//*"); // Get all elements
+    if (typeof this.selector === "string") {
+      elements = await this.webDriverClient.findElements(
+        this.findStrategy,
+        this.selector,
+      );
+    } else if (this.selector instanceof RegExp) {
+      elements = await this.webDriverClient.findElements("xpath", "//*"); // Get all elements
     }
 
     // If there is only one element, return it
@@ -297,7 +236,7 @@ export class Locator {
     //of finding the element is higher at higher depth
     const reversedElements = elements.reverse();
     for (const element of reversedElements) {
-      let text = await this.driver.getElementText(
+      let text = await this.webDriverClient.getElementText(
         element["element-6066-11e4-a52e-4f735466cecf"],
       );
 
@@ -305,10 +244,13 @@ export class Locator {
         return element;
       }
 
-      if (this.path instanceof RegExp && this.path.test(text)) {
+      if (this.selector instanceof RegExp && this.selector.test(text)) {
         return element;
       }
-      if (typeof this.path === "string" && text.includes(this.textToMatch!)) {
+      if (
+        typeof this.selector === "string" &&
+        text.includes(this.textToMatch!)
+      ) {
         return element;
       }
     }

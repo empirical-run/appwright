@@ -1,30 +1,32 @@
 import { test as base } from "@playwright/test";
 
-import { DeviceProvider } from "../providers/device";
-import { AppwrightDriver } from "../providers/driver";
-import { AppwrightLocator } from "../locator";
-import { Device, WaitUntilOptions } from "../types";
+import { DeviceProvider } from "../providers";
+import { AppwrightLocator, IDeviceProvider, WaitUntilOptions } from "../types";
+import { Device } from "../device";
 
 export const test = base.extend<{
+  deviceProvider: IDeviceProvider;
   device: Device;
-  client: AppwrightDriver;
   saveVideo: void;
 }>({
-  device: async ({}, use, testInfo) => {
-    const device = await DeviceProvider.getDevice(testInfo);
-    await use(device);
+  deviceProvider: async ({}, use, testInfo) => {
+    const provider = DeviceProvider.getInstance(testInfo);
+    await use(provider);
   },
-  client: async ({ device }, use) => {
-    const driver = await device.createDriver();
-    await use(driver);
-    await driver.close();
+  device: async ({ deviceProvider }, use) => {
+    const device = await deviceProvider.getDevice();
+    await use(device);
+    await device.close();
   },
   saveVideo: [
-    async ({ device }, use, testInfo) => {
+    async ({ deviceProvider }, use, testInfo) => {
       await use();
-      await device.setSessionStatus(testInfo.status, testInfo.error?.message);
+      await deviceProvider.syncTestDetails({
+        status: testInfo.status,
+        reason: testInfo.error?.message,
+      });
 
-      const videoData = await device.downloadVideo();
+      const videoData = await deviceProvider.downloadVideo();
       console.log(`Video saved to: ${JSON.stringify(videoData)}`);
 
       if (videoData) {

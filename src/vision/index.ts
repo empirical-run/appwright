@@ -1,32 +1,32 @@
-// @ts-ignore
-import { Client } from "webdriver";
 import { getBoundingBox, query } from "@empiricalrun/llm/vision";
-import { AppwrightDriver } from "../driver";
+// @ts-ignore
+import { Client as WebDriverClient } from "webdriver";
+import { IDevice } from "../types";
 
 export interface AppwrightVision {
-  extractTextWithPrompt(prompt: string): Promise<string>;
-  tapWithPrompt(prompt: string): Promise<void>;
+  extractText(prompt: string): Promise<string>;
+  tap(prompt: string): Promise<void>;
 }
 
 export class VisionProvider {
   constructor(
-    private client: Client,
-    private appwrightDriver: AppwrightDriver,
+    private device: IDevice,
+    private webDriverClient: WebDriverClient,
   ) {}
 
-  async extractTextWithPrompt(prompt: string): Promise<string> {
-    const base64Screenshot = await this.client.takeScreenshot();
+  async extractText(prompt: string): Promise<string> {
+    const base64Screenshot = await this.webDriverClient.takeScreenshot();
     return await query(base64Screenshot, prompt);
   }
 
-  async tapWithPrompt(prompt: string): Promise<void> {
-    const base64Screenshot = await this.client.takeScreenshot();
+  async tap(prompt: string): Promise<void> {
+    const base64Screenshot = await this.webDriverClient.takeScreenshot();
     const { center, container: imageSize } = await getBoundingBox(
       base64Screenshot,
       prompt,
     );
 
-    const driverSize = await this.client.getWindowRect();
+    const driverSize = await this.webDriverClient.getWindowRect();
     const scaleFactorWidth = imageSize.width / driverSize.width;
     const scaleFactorHeight = imageSize.height / driverSize.height;
     if (scaleFactorWidth !== scaleFactorHeight) {
@@ -34,7 +34,7 @@ export class VisionProvider {
         `Scale factors are different: ${scaleFactorWidth} vs ${scaleFactorHeight}`,
       );
     }
-    await this.appwrightDriver.tap({
+    await this.device.tap({
       x: center.x / scaleFactorWidth,
       y: center.y / scaleFactorWidth,
     });
