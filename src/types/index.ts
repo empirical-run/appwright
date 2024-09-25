@@ -8,7 +8,7 @@ export type TestInfoOptions = {
   expectTimeout: number;
 };
 
-export interface IDeviceProvider {
+export interface DeviceProvider {
   getDevice(): Promise<Device>;
   downloadVideo: () => Promise<{ path: string; contentType: string } | null>;
   syncTestDetails: (details: {

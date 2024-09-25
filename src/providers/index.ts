@@ -1,9 +1,7 @@
 import { TestInfo } from "@playwright/test";
-import { IDeviceProvider } from "../types";
 import { BrowserStackDeviceProvider } from "./browserstack";
+import { DeviceProvider } from "../types";
 
-export class DeviceProvider {
-  static getInstance(testInfo: TestInfo): IDeviceProvider {
-    return new BrowserStackDeviceProvider(testInfo);
-  }
+export function createDeviceProvider(testInfo: TestInfo): DeviceProvider {
+  return new BrowserStackDeviceProvider(testInfo);
 }

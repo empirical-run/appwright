@@ -1,17 +1,17 @@
 import { test as base } from "@playwright/test";
 
-import { DeviceProvider } from "../providers";
-import { AppwrightLocator, IDeviceProvider, WaitUntilOptions } from "../types";
+import { AppwrightLocator, DeviceProvider, WaitUntilOptions } from "../types";
 import { Device } from "../device";
+import { createDeviceProvider } from "../providers";
 
 export const test = base.extend<{
-  deviceProvider: IDeviceProvider;
+  deviceProvider: DeviceProvider;
   device: Device;
   saveVideo: void;
 }>({
   deviceProvider: async ({}, use, testInfo) => {
-    const provider = DeviceProvider.getInstance(testInfo);
-    await use(provider);
+    const deviceProvider = createDeviceProvider(testInfo);
+    await use(deviceProvider);
   },
   device: async ({ deviceProvider }, use) => {
     const device = await deviceProvider.getDevice();
