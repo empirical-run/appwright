@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import retry from "async-retry";
 import { TestInfo } from "@playwright/test";
-import { AppwrightConfig, IDeviceProvider, TestInfoOptions } from "../../types";
+import { AppwrightConfig, DeviceProvider, TestInfoOptions } from "../../types";
 // @ts-ignore ts not able to identify the import is just an interface
 import { Client as WebDriverClient } from "webdriver";
 import { Device } from "../../device";
@@ -31,7 +31,7 @@ type BrowserStackSessionDetails = {
   };
 };
 
-export class BrowserStackDeviceProvider implements IDeviceProvider {
+export class BrowserStackDeviceProvider implements DeviceProvider {
   private sessionDetails?: BrowserStackSessionDetails;
   private testInfo: TestInfo;
   private userName = process.env.BROWSERSTACK_USERNAME;
