@@ -37,15 +37,56 @@ export enum Platform {
 }
 
 export interface IDevice {
+  /**
+   * Helper method to identify which the mobile OS running on the device.
+   * @returns "android" or "ios"
+   */
+  getPlatform: () => Platform;
+
+  /**
+   * Closes the automation session. This is called automatically after each test.
+   */
   close: () => Promise<void>;
 
+  /**
+   * Tap on the screen at the given coordinates, specified as x and y. The top left corner
+   * of the screen is { x: 0, y: 0 }.
+   *
+   * @param coordinates to tap on
+   * @returns
+   */
   tap: ({ x, y }: { x: number; y: number }) => Promise<void>;
 
+  /**
+   * Locate an element on the screen with text content. This method defaults to a
+   * substring match, and this be overridden by setting the `exact` option to `true`.
+   *
+   * **Usage:**
+   * ```js
+   * // with string
+   * const submitButton = device.getByText("Submit");
+   *
+   * // with RegExp
+   * const counter = device.getByText(/^Counter: \d+/);
+   * ```
+   *
+   * @param text string or regular expression to search for
+   * @param options
+   * @returns
+   */
   getByText: (
     text: string | RegExp,
     options?: { exact?: boolean },
   ) => AppwrightLocator;
 
+  /**
+   * Locate an element on the screen with accessibility identifier. This method defaults to
+   * a substring match, and this can be overridden by setting the `exact` option to `true`.
+   *
+   * @param text string or regular expression to search for
+   * @param options
+   * @returns
+   */
   getById: (
     text: string | RegExp,
     options?: { exact?: boolean },
@@ -53,19 +94,23 @@ export interface IDevice {
 
   getByXpath: (xpath: string) => AppwrightLocator;
 
+  /**
+   * Retrieves text content from the clipboard of the mobile device. This is useful
+   * after a "copy to clipboard" action has been performed.
+   *
+   * @returns Returns the text content of the clipboard.
+   */
   getClipboardText: () => Promise<string>;
 
   beta: {
     tap: (prompt: string) => Promise<void>;
     extractText: (prompt: string) => Promise<string>;
   };
-
-  getPlatform: () => Platform;
 }
 
 export interface AppwrightLocator {
   /**
-   * Clicks (taps) on the element. This method waits for the element to be visible before clicking it.
+   * Taps (clicks) on the element. This method waits for the element to be visible before clicking it.
    *
    * **Usage:**
    * ```js

@@ -24,9 +24,12 @@ export default defineConfig({
       name: "android",
       use: {
         platform: Platform.ANDROID,
-        deviceName: "Google Pixel 8",
-        osVersion: "14.0",
-        buildURL: process.env.BROWSERSTACK_APP_URL,
+        device: {
+          provider: "emulator",
+          name: "Google Pixel 8",
+          osVersion: "14.0",
+        }
+        buildPath: "app-release.apk",
       },
     },
   ],
@@ -42,16 +45,7 @@ npx appwright test --project android
 npx appwright test --project ios
 ```
 
-These environment variables are required:
+## Docs
 
-- BROWSERSTACK_USERNAME
-- BROWSERSTACK_ACCESS_KEY
-- BROWSERSTACK_APP_URL
-
-## Development
-
-### Install dependencies
-
-```bash
-npm install
-```
+- [Configuration](docs/config.md)
+- [Locators](docs/locators.md)
