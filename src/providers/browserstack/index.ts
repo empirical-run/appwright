@@ -32,6 +32,9 @@ type BrowserStackSessionDetails = {
 
 const API_BASE_URL = "https://api-cloud.browserstack.com/app-automate";
 
+const APP_URL_KEY = (projectName: string) =>
+  `BROWSERSTACK_APP_URL_${projectName.toUpperCase()}`;
+
 function getAuthHeader() {
   const userName = process.env.BROWSERSTACK_USERNAME;
   const accessKey = process.env.BROWSERSTACK_ACCESS_KEY;
@@ -87,10 +90,7 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
     const data = await response.json();
     console.log("Upload response:", data);
     const appUrl = (data as any).app_url;
-    if (process.env.BROWSERSTACK_APP_URL) {
-      console.warn("Overriding BROWSERSTACK_APP_URL after build upload.");
-    }
-    process.env.BROWSERSTACK_APP_URL = appUrl;
+    process.env[APP_URL_KEY(this.project.name)] = appUrl;
   }
 
   async getDevice(): Promise<Device> {
@@ -189,9 +189,6 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
           retries: 10,
           factor: 2,
           minTimeout: 3_000,
-          // onRetry: (err, i) => {
-          //   console.log(`Retry attempt ${i} failed: ${err.message}`);
-          // },
         },
       );
       return new Promise((resolve, reject) => {
@@ -226,12 +223,12 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
         },
         body: details.name
           ? JSON.stringify({
-            name: details.name,
-          })
+              name: details.name,
+            })
           : JSON.stringify({
-            status: details.status,
-            reason: details.reason,
-          }),
+              status: details.status,
+              reason: details.reason,
+            }),
       },
     );
     if (!response.ok) {
@@ -242,7 +239,7 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
   }
 
   private createConfig() {
-    const platformName = this.platform;
+    const platformName = this.project.use.platform;
     const projectName = path.basename(process.cwd());
     if (!process.env.BROWSERSTACK_APP_URL) {
       throw new Error(
@@ -264,8 +261,8 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
           networkLogs: true,
           appiumVersion: "2.6.0",
           enableCameraImageInjection: true,
-          deviceName: this.deviceName,
-          osVersion: this.osVersion,
+          deviceName: this.project.use.deviceName,
+          osVersion: this.project.use.osVersion,
           platformName: platformName,
           buildName: `${projectName} ${platformName}`,
           sessionName: `${projectName} ${platformName} test`,
