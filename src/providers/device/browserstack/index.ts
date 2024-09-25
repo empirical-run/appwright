@@ -5,7 +5,7 @@ import { TestInfo } from "@playwright/test";
 import { AppwrightDriver } from "../../driver/webdriver";
 import { AppwrightConfig, Device, TestInfoOptions } from "../../../types";
 
-export type BrowserstackSessionDetails = {
+export type BrowserStackSessionDetails = {
   name: string;
   duration: number;
   os: string;
@@ -29,8 +29,8 @@ export type BrowserstackSessionDetails = {
   };
 };
 
-class BrowserstackDevice implements Device {
-  private sessionDetails?: BrowserstackSessionDetails;
+export class BrowserStackDevice implements Device {
+  private sessionDetails?: BrowserStackSessionDetails;
   private testInfo: TestInfo;
   private userName = process.env.BROWSERSTACK_USERNAME;
   private accessKey = process.env.BROWSERSTACK_ACCESS_KEY;
@@ -153,20 +153,17 @@ class BrowserstackDevice implements Device {
             Buffer.from(`${this.userName}:${this.accessKey}`).toString(
               "base64",
             ),
-          "Content-Type": "application/json", // Set the content type to JSON
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           status: status,
           reason: reason,
-        }), // Set the request body
+        }),
       },
     );
-
     if (!response.ok) {
       throw new Error(`Error setting session details: ${response.statusText}`);
     }
-
-    // Parse and print the response
     const responseData = await response.json();
     return responseData;
   }
@@ -178,16 +175,13 @@ class BrowserstackDevice implements Device {
         Authorization:
           "Basic " +
           Buffer.from(`${this.userName}:${this.accessKey}`).toString("base64"),
-        "Content-Type": "application/json", // Set the content type to JSON
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ name: `${data}` }), // Set the request body
+      body: JSON.stringify({ name: `${data}` }),
     });
-
     if (!response.ok) {
       throw new Error(`Error setting session details: ${response.statusText}`);
     }
-
-    // Parse and print the response
     const responseData = await response.json();
     return responseData;
   }
@@ -255,13 +249,5 @@ class BrowserstackDevice implements Device {
   private async getAppBundleId(): Promise<string> {
     await this.getSessionDetails();
     return this.sessionDetails?.app_details.app_name ?? "";
-  }
-}
-
-export class DeviceProvider {
-  static async getDevice(testInfo: TestInfo): Promise<Device> {
-    const device = new BrowserstackDevice(testInfo);
-    await device.init();
-    return device;
   }
 }

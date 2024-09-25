@@ -1,5 +1,5 @@
 // @ts-ignore ts not able to identify the import is just an interface
-import type { Client } from "webdriver";
+import type { Client as WebDriverClient } from "webdriver";
 import { test } from "./../../../fixture";
 import { AppwrightLocator, Locator } from "../../../locator";
 import { IAppwrightDriver, TestInfoOptions } from "../../../types";
@@ -29,9 +29,9 @@ export function boxedStep(
 }
 
 export class AppwrightDriver implements IAppwrightDriver {
-  private client: Client;
+  private client: WebDriverClient;
   constructor(
-    webdriverClient: Client,
+    webdriverClient: WebDriverClient,
     private bundleId: string,
     private testOptions: TestInfoOptions,
   ) {

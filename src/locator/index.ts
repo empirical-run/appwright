@@ -1,5 +1,5 @@
 // @ts-ignore
-import { Client } from "webdriver";
+import { Client as WebDriverClient } from "webdriver";
 import retry from "async-retry";
 import test from "@playwright/test";
 import {
@@ -45,7 +45,7 @@ export interface AppwrightLocator {
 
 export class Locator {
   constructor(
-    private driver: Client,
+    private driver: WebDriverClient,
     private path: string | RegExp,
     private findStrategy: string,
     private testOptions: TestInfoOptions,
