@@ -31,29 +31,75 @@ type BrowserStackSessionDetails = {
   };
 };
 
+const API_BASE_URL = "https://api-cloud.browserstack.com/app-automate";
+
+function getAuthHeader() {
+  const userName = process.env.BROWSERSTACK_USERNAME;
+  const accessKey = process.env.BROWSERSTACK_ACCESS_KEY;
+  const key = Buffer.from(`${userName}:${accessKey}`).toString("base64");
+  return `Basic ${key}`;
+}
+
 export class BrowserStackDeviceProvider implements IDeviceProvider {
   private sessionDetails?: BrowserStackSessionDetails;
   private testInfo: TestInfo;
-  private userName = process.env.BROWSERSTACK_USERNAME;
-  private accessKey = process.env.BROWSERSTACK_ACCESS_KEY;
   private sessionId?: string;
-  private sessionBaseURL =
-    "https://api-cloud.browserstack.com/app-automate/sessions";
-  private config: any;
+
   private webDriverClient!: WebDriverClient;
 
   constructor(testInfo: TestInfo) {
     this.testInfo = testInfo;
   }
 
-  async getDevice(): Promise<Device> {
-    this.createConfig();
-    return await this.createDriver();
+  static async globalSetup(appwrightConfig: AppwrightConfig) {
+    if (
+      !(
+        process.env.BROWSERSTACK_USERNAME && process.env.BROWSERSTACK_ACCESS_KEY
+      )
+    ) {
+      throw new Error(
+        "BROWSERSTACK_USERNAME and BROWSERSTACK_ACCESS_KEY are required environment variables for this device provider.",
+      );
+    }
+    const { buildPath } = appwrightConfig;
+    const isUrl = buildPath.startsWith("http");
+    console.log(`Uploading: ${buildPath}`);
+    if (!isUrl) {
+      throw new Error("Only URL uploads are supported");
+    }
+    console.log(1, getAuthHeader());
+    try {
+      const response = await fetch(`${API_BASE_URL}/upload`, {
+        method: "POST",
+        headers: {
+          Authorization: getAuthHeader(),
+        },
+        body: new URLSearchParams({
+          url: buildPath,
+        }),
+      });
+      console.log(2);
+      const data = await response.json();
+      console.log("Finished", data);
+      const appUrl = data.app_url;
+      if (process.env.BROWSERSTACK_APP_URL) {
+        console.warn("Overriding BROWSERSTACK_APP_URL after build upload.");
+      }
+      process.env.BROWSERSTACK_APP_URL = appUrl;
+    } catch (e) {
+      console.log("fat gaya");
+      console.error(e);
+    }
   }
 
-  private async createDriver(): Promise<Device> {
+  async getDevice(): Promise<Device> {
+    const config = this.createConfig();
+    return await this.createDriver(config);
+  }
+
+  private async createDriver(config: any): Promise<Device> {
     const WebDriver = (await import("webdriver")).default;
-    const webdriverClient = await WebDriver.newSession(this.config as any);
+    const webdriverClient = await WebDriver.newSession(config);
     this.sessionId = webdriverClient.sessionId;
     await this.syncTestDetails({ name: this.testInfo.title });
     const bundleId = await this.getAppBundleId();
@@ -67,15 +113,11 @@ export class BrowserStackDeviceProvider implements IDeviceProvider {
 
   private async getSessionDetails() {
     const response = await fetch(
-      `${this.sessionBaseURL}/${this.sessionId}.json`,
+      `${API_BASE_URL}/sessions/${this.sessionId}.json`,
       {
         method: "GET",
         headers: {
-          Authorization:
-            "Basic " +
-            Buffer.from(`${this.userName}:${this.accessKey}`).toString(
-              "base64",
-            ),
+          Authorization: getAuthHeader(),
         },
       },
     );
@@ -121,21 +163,16 @@ export class BrowserStackDeviceProvider implements IDeviceProvider {
           const response = await fetch(videoURL, {
             method: "GET",
           });
-
-          console.log(`Response: ${response.status}`);
           if (response.status !== 200) {
             // Retry if not 200
             throw new Error(
               `Video not found: ${response.status} (URL: ${this.sessionDetails?.video_url})`,
             );
           }
-
           const reader = response.body?.getReader();
-
           if (!reader) {
             throw new Error("Failed to get reader from response body.");
           }
-
           const streamToFile = async () => {
             // eslint-disable-next-line no-constant-condition
             while (true) {
@@ -144,7 +181,6 @@ export class BrowserStackDeviceProvider implements IDeviceProvider {
               fileStream.write(value);
             }
           };
-
           await streamToFile();
           fileStream.close();
         },
@@ -152,9 +188,9 @@ export class BrowserStackDeviceProvider implements IDeviceProvider {
           retries: 10,
           factor: 2,
           minTimeout: 3_000,
-          onRetry: (err, i) => {
-            console.log(`Retry attempt ${i} failed: ${err.message}`);
-          },
+          // onRetry: (err, i) => {
+          //   console.log(`Retry attempt ${i} failed: ${err.message}`);
+          // },
         },
       );
       return new Promise((resolve, reject) => {
@@ -180,25 +216,21 @@ export class BrowserStackDeviceProvider implements IDeviceProvider {
     name?: string;
   }) {
     const response = await fetch(
-      `${this.sessionBaseURL}/${this.sessionId}.json`,
+      `${API_BASE_URL}/sessions/${this.sessionId}.json`,
       {
         method: "PUT",
         headers: {
-          Authorization:
-            "Basic " +
-            Buffer.from(`${this.userName}:${this.accessKey}`).toString(
-              "base64",
-            ),
+          Authorization: getAuthHeader(),
           "Content-Type": "application/json",
         },
         body: details.name
           ? JSON.stringify({
-              name: details.name,
-            })
+            name: details.name,
+          })
           : JSON.stringify({
-              status: details.status,
-              reason: details.reason,
-            }),
+            status: details.status,
+            reason: details.reason,
+          }),
       },
     );
     if (!response.ok) {
@@ -212,7 +244,7 @@ export class BrowserStackDeviceProvider implements IDeviceProvider {
     const platformName = (this.testInfo.project.use as AppwrightConfig)
       .platform;
     const projectName = path.basename(process.cwd());
-    this.config = {
+    return {
       port: 443,
       path: "/wd/hub",
       protocol: "https",
@@ -238,7 +270,7 @@ export class BrowserStackDeviceProvider implements IDeviceProvider {
               : process.env.USER,
         },
         "appium:autoGrantPermissions": true,
-        "appium:app": (this.testInfo.project.use as AppwrightConfig).buildURL,
+        "appium:app": process.env.BROWSERSTACK_APP_URL,
         "appium:autoAcceptAlerts": true,
         "appium:fullReset": true,
       },

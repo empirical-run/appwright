@@ -4,18 +4,22 @@ import {
 } from "@playwright/test";
 import { AppwrightConfig } from "./types";
 
+// eslint-disable-next-line unused-imports/no-unused-imports
+import globalSetup from "./global-setup";
+
+const resolveGlobalSetup = () => {
+  const self = require.resolve(".");
+  return self.replace("index.js", "global-setup.js");
+};
+
 const defaultConfig: PlaywrightTestConfig<AppwrightConfig> = {
+  globalSetup: resolveGlobalSetup(),
   testDir: "./tests",
-  outputDir: "./playwright-report/data", // to store default playwright artifacts (during and post test run)
   fullyParallel: true,
   forbidOnly: false,
   retries: process.env.CI ? 2 : 0,
   workers: 2,
-  reporter: [
-    ["list"], // For real-time reporting on CI terminal (vs. the default "dot" reporter)
-    ["json"],
-    ["html"],
-  ],
+  reporter: [["list"], ["json"], ["html"]],
   use: {
     actionTimeout: 20_000,
     expectTimeout: 20_000,
