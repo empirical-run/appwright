@@ -4,7 +4,6 @@ import retry from "async-retry";
 import { TestInfo } from "@playwright/test";
 import { AppwrightConfig, IDeviceProvider, TestInfoOptions } from "../../types";
 // @ts-ignore ts not able to identify the import is just an interface
-import { Client as WebDriverClient } from "webdriver";
 import { Device } from "../../device";
 
 type BrowserStackSessionDetails = {
@@ -40,7 +39,6 @@ export class BrowserStackDeviceProvider implements IDeviceProvider {
   private sessionBaseURL =
     "https://api-cloud.browserstack.com/app-automate/sessions";
   private config: any;
-  private webDriverClient!: WebDriverClient;
 
   constructor(testInfo: TestInfo) {
     this.testInfo = testInfo;
@@ -53,8 +51,8 @@ export class BrowserStackDeviceProvider implements IDeviceProvider {
 
   private async createDriver(): Promise<Device> {
     const WebDriver = (await import("webdriver")).default;
-    const webdriverClient = await WebDriver.newSession(this.config as any);
-    this.sessionId = webdriverClient.sessionId;
+    const webDriverClient = await WebDriver.newSession(this.config as any);
+    this.sessionId = webDriverClient.sessionId;
     await this.syncTestDetails({ name: this.testInfo.title });
     const bundleId = await this.getAppBundleId();
     //@ts-ignore
@@ -62,7 +60,7 @@ export class BrowserStackDeviceProvider implements IDeviceProvider {
     const testOptions: TestInfoOptions = {
       expectTimeout,
     };
-    return new Device(this.webDriverClient, bundleId, testOptions);
+    return new Device(webDriverClient, bundleId, testOptions);
   }
 
   private async getSessionDetails() {
