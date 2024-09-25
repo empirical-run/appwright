@@ -3,24 +3,33 @@ import {
   PlaywrightTestConfig,
 } from "@playwright/test";
 import { AppwrightConfig } from "./types";
+import path from "path";
+
+// This import ensures global-setup is built by TypeScript
+// eslint-disable-next-line unused-imports/no-unused-imports, no-unused-vars
+import globalSetup from "./global-setup";
+
+const resolveGlobalSetup = () => {
+  const pathToInstalledAppwright = require.resolve(".");
+  const directory = path.dirname(pathToInstalledAppwright);
+  return path.join(directory, "global-setup.js");
+};
 
 const defaultConfig: PlaywrightTestConfig<AppwrightConfig> = {
+  globalSetup: resolveGlobalSetup(),
   testDir: "./tests",
-  outputDir: "./playwright-report/data", // to store default playwright artifacts (during and post test run)
   fullyParallel: true,
   forbidOnly: false,
   retries: process.env.CI ? 2 : 0,
   workers: 2,
-  reporter: [
-    ["list"], // For real-time reporting on CI terminal (vs. the default "dot" reporter)
-    ["json"],
-    ["html"],
-  ],
+  reporter: [["list"], ["json"], ["html"]],
   use: {
+    // TODO: Use this for actions
     actionTimeout: 20_000,
     expectTimeout: 20_000,
   },
   expect: {
+    // This is not used right now
     timeout: 20_000,
   },
   timeout: 0,

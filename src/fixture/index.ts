@@ -10,11 +10,12 @@ export const test = base.extend<{
   saveVideo: void;
 }>({
   deviceProvider: async ({}, use, testInfo) => {
-    const deviceProvider = createDeviceProvider(testInfo);
+    const deviceProvider = createDeviceProvider(testInfo.project);
     await use(deviceProvider);
   },
-  device: async ({ deviceProvider }, use) => {
+  device: async ({ deviceProvider }, use, testInfo) => {
     const device = await deviceProvider.getDevice();
+    await deviceProvider.syncTestDetails({ name: testInfo.title });
     await use(device);
     await device.close();
   },
@@ -25,10 +26,11 @@ export const test = base.extend<{
         status: testInfo.status,
         reason: testInfo.error?.message,
       });
-
-      const videoData = await deviceProvider.downloadVideo();
-      console.log(`Video saved to: ${JSON.stringify(videoData)}`);
-
+      const outputDir = testInfo.project.outputDir;
+      const videoData = await deviceProvider.downloadVideo(
+        outputDir,
+        testInfo.testId,
+      );
       if (videoData) {
         await testInfo.attach("video", videoData);
       }

@@ -1,9 +1,9 @@
+import retry from "async-retry";
+import FormData from "form-data";
 import fs from "fs";
 import path from "path";
-import retry from "async-retry";
-import { TestInfo } from "@playwright/test";
-import { AppwrightConfig, DeviceProvider, TestInfoOptions } from "../../types";
-// @ts-ignore ts not able to identify the import is just an interface
+import { AppwrightConfig, DeviceProvider } from "../../types";
+import { FullProject } from "@playwright/test";
 import { Device } from "../../device";
 
 type BrowserStackSessionDetails = {
@@ -30,50 +30,92 @@ type BrowserStackSessionDetails = {
   };
 };
 
+const API_BASE_URL = "https://api-cloud.browserstack.com/app-automate";
+
+const APP_URL_KEY = (projectName: string) =>
+  `BROWSERSTACK_APP_URL_${projectName.toUpperCase()}`;
+
+function getAuthHeader() {
+  const userName = process.env.BROWSERSTACK_USERNAME;
+  const accessKey = process.env.BROWSERSTACK_ACCESS_KEY;
+  const key = Buffer.from(`${userName}:${accessKey}`).toString("base64");
+  return `Basic ${key}`;
+}
+
 export class BrowserStackDeviceProvider implements DeviceProvider {
   private sessionDetails?: BrowserStackSessionDetails;
-  private testInfo: TestInfo;
-  private userName = process.env.BROWSERSTACK_USERNAME;
-  private accessKey = process.env.BROWSERSTACK_ACCESS_KEY;
   private sessionId?: string;
-  private sessionBaseURL =
-    "https://api-cloud.browserstack.com/app-automate/sessions";
-  private config: any;
+  private project: FullProject<AppwrightConfig>;
 
-  constructor(testInfo: TestInfo) {
-    this.testInfo = testInfo;
+  constructor(project: FullProject<AppwrightConfig>) {
+    this.project = project;
+  }
+
+  async globalSetup() {
+    if (
+      !(
+        process.env.BROWSERSTACK_USERNAME && process.env.BROWSERSTACK_ACCESS_KEY
+      )
+    ) {
+      throw new Error(
+        "BROWSERSTACK_USERNAME and BROWSERSTACK_ACCESS_KEY are required environment variables for this device provider.",
+      );
+    }
+    const buildPath = this.project.use.buildPath!;
+    console.log(`Uploading: ${buildPath}`);
+    const isUrl = buildPath.startsWith("http");
+    let body;
+    let headers = {
+      Authorization: getAuthHeader(),
+    };
+    if (isUrl) {
+      body = new URLSearchParams({
+        url: buildPath,
+      });
+    } else {
+      if (!fs.existsSync(buildPath)) {
+        throw new Error(`Build file not found: ${buildPath}`);
+      }
+      const form = new FormData();
+      form.append("file", fs.createReadStream(buildPath));
+      headers = { ...headers, ...form.getHeaders() };
+      body = form;
+    }
+    const fetch = (await import("node-fetch")).default;
+    const response = await fetch(`${API_BASE_URL}/upload`, {
+      method: "POST",
+      headers,
+      body,
+    });
+    const data = await response.json();
+    console.log("Upload response:", data);
+    const appUrl = (data as any).app_url;
+    process.env[APP_URL_KEY(this.project.name)] = appUrl;
   }
 
   async getDevice(): Promise<Device> {
-    this.createConfig();
-    return await this.createDriver();
+    const config = this.createConfig();
+    return await this.createDriver(config);
   }
 
-  private async createDriver(): Promise<Device> {
+  private async createDriver(config: any): Promise<Device> {
     const WebDriver = (await import("webdriver")).default;
-    const webDriverClient = await WebDriver.newSession(this.config as any);
+    const webDriverClient = await WebDriver.newSession(config);
     this.sessionId = webDriverClient.sessionId;
-    await this.syncTestDetails({ name: this.testInfo.title });
     const bundleId = await this.getAppBundleId();
-    //@ts-ignore
-    const expectTimeout = this.testInfo.project.use.expectTimeout;
-    const testOptions: TestInfoOptions = {
-      expectTimeout,
+    const testOptions = {
+      expectTimeout: this.project.use.expectTimeout!,
     };
     return new Device(webDriverClient, bundleId, testOptions);
   }
 
   private async getSessionDetails() {
     const response = await fetch(
-      `${this.sessionBaseURL}/${this.sessionId}.json`,
+      `${API_BASE_URL}/sessions/${this.sessionId}.json`,
       {
         method: "GET",
         headers: {
-          Authorization:
-            "Basic " +
-            Buffer.from(`${this.userName}:${this.accessKey}`).toString(
-              "base64",
-            ),
+          Authorization: getAuthHeader(),
         },
       },
     );
@@ -91,13 +133,16 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
     return this.sessionDetails?.app_details.app_name ?? "";
   }
 
-  async downloadVideo(): Promise<{ path: string; contentType: string } | null> {
+  async downloadVideo(
+    outputDir: string,
+    fileName: string,
+  ): Promise<{ path: string; contentType: string } | null> {
     await this.getSessionDetails();
     const videoURL = this.sessionDetails?.video_url;
     const pathToTestVideo = path.join(
-      this.testInfo.project.outputDir,
+      outputDir,
       "videos-store",
-      `${this.testInfo.testId}.mp4`,
+      `${fileName}.mp4`,
     );
     const dir = path.dirname(pathToTestVideo);
     fs.mkdirSync(dir, { recursive: true });
@@ -119,21 +164,16 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
           const response = await fetch(videoURL, {
             method: "GET",
           });
-
-          console.log(`Response: ${response.status}`);
           if (response.status !== 200) {
             // Retry if not 200
             throw new Error(
               `Video not found: ${response.status} (URL: ${this.sessionDetails?.video_url})`,
             );
           }
-
           const reader = response.body?.getReader();
-
           if (!reader) {
             throw new Error("Failed to get reader from response body.");
           }
-
           const streamToFile = async () => {
             // eslint-disable-next-line no-constant-condition
             while (true) {
@@ -142,7 +182,6 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
               fileStream.write(value);
             }
           };
-
           await streamToFile();
           fileStream.close();
         },
@@ -150,9 +189,6 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
           retries: 10,
           factor: 2,
           minTimeout: 3_000,
-          onRetry: (err, i) => {
-            console.log(`Retry attempt ${i} failed: ${err.message}`);
-          },
         },
       );
       return new Promise((resolve, reject) => {
@@ -178,15 +214,11 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
     name?: string;
   }) {
     const response = await fetch(
-      `${this.sessionBaseURL}/${this.sessionId}.json`,
+      `${API_BASE_URL}/sessions/${this.sessionId}.json`,
       {
         method: "PUT",
         headers: {
-          Authorization:
-            "Basic " +
-            Buffer.from(`${this.userName}:${this.accessKey}`).toString(
-              "base64",
-            ),
+          Authorization: getAuthHeader(),
           "Content-Type": "application/json",
         },
         body: details.name
@@ -207,10 +239,14 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
   }
 
   private createConfig() {
-    const platformName = (this.testInfo.project.use as AppwrightConfig)
-      .platform;
+    const platformName = this.project.use.platform;
     const projectName = path.basename(process.cwd());
-    this.config = {
+    if (!process.env.BROWSERSTACK_APP_URL) {
+      throw new Error(
+        "BROWSERSTACK_APP_URL is not set. Did the file upload work?",
+      );
+    }
+    return {
       port: 443,
       path: "/wd/hub",
       protocol: "https",
@@ -225,8 +261,8 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
           networkLogs: true,
           appiumVersion: "2.6.0",
           enableCameraImageInjection: true,
-          deviceName: (this.testInfo.project.use as AppwrightConfig).deviceName,
-          osVersion: (this.testInfo.project.use as AppwrightConfig).osVersion,
+          deviceName: this.project.use.deviceName,
+          osVersion: this.project.use.osVersion,
           platformName: platformName,
           buildName: `${projectName} ${platformName}`,
           sessionName: `${projectName} ${platformName} test`,
@@ -236,7 +272,7 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
               : process.env.USER,
         },
         "appium:autoGrantPermissions": true,
-        "appium:app": (this.testInfo.project.use as AppwrightConfig).buildURL,
+        "appium:app": process.env.BROWSERSTACK_APP_URL,
         "appium:autoAcceptAlerts": true,
         "appium:fullReset": true,
       },
