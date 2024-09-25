@@ -13,8 +13,8 @@ const defaultConfig: PlaywrightTestConfig<AppwrightConfig> = {
   workers: 2,
   reporter: [
     ["list"], // For real-time reporting on CI terminal (vs. the default "dot" reporter)
-    ["json", { outputFile: "playwright-report/summary.json" }],
-    ["./node_modules/@empiricalrun/playwright-utils/dist/reporter/custom.js"],
+    ["json"],
+    ["html"],
   ],
   use: {
     actionTimeout: 20_000,
