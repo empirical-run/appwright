@@ -23,17 +23,21 @@ export class EmulatorProvider implements DeviceProvider {
   }
 
   private async createDriver(): Promise<Device> {
-    await startAppiumServer();
+    await startAppiumServer(this.project.use.device?.provider!);
     const WebDriver = (await import("webdriver")).default;
     const webDriverClient = await WebDriver.newSession(this.config as any);
-    //TODO: get bundle id
-    // const bundleId = await this.getAppBundleId();
-    //@ts-ignore
+    //TODO: Add bundle id implementation
+    const bundleId = "";
     const expectTimeout = this.project.use.expectTimeout!;
     const testOptions: TestInfoOptions = {
       expectTimeout,
     };
-    return new Device(webDriverClient, "", testOptions);
+    return new Device(
+      webDriverClient,
+      bundleId,
+      testOptions,
+      this.project.use.device?.provider!,
+    );
   }
 
   async downloadVideo(): Promise<{
@@ -59,6 +63,7 @@ export class EmulatorProvider implements DeviceProvider {
         "appium:autoGrantPermissions": true,
         "appium:app": this.project.use.buildPath,
         "appium:autoAcceptAlerts": true,
+        "appium:fullReset": true,
       },
     };
   }

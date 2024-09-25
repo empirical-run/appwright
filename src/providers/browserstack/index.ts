@@ -8,7 +8,6 @@ import {
   BrowserstackConfig,
 } from "../../types";
 import { FullProject } from "@playwright/test";
-// @ts-ignore ts not able to identify the import is just an interface
 import { Device } from "../../device";
 
 type BrowserStackSessionDetails = {
@@ -121,7 +120,12 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
     const testOptions = {
       expectTimeout: this.project.use.expectTimeout!,
     };
-    return new Device(webDriverClient, bundleId, testOptions);
+    return new Device(
+      webDriverClient,
+      bundleId,
+      testOptions,
+      this.project.use.device?.provider!,
+    );
   }
 
   private async getSessionDetails() {

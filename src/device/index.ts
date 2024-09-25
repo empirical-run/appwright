@@ -15,6 +15,7 @@ export class Device implements IDevice {
     private webdriverClient: WebDriverClient,
     private bundleId: string,
     private testOptions: TestInfoOptions,
+    private provider: string,
   ) {}
 
   locator(
@@ -131,18 +132,23 @@ export class Device implements IDevice {
     if (this.getPlatform() == Platform.ANDROID) {
       return await this.webdriverClient.getClipboard();
     } else {
-      await this.webdriverClient.executeScript("mobile: activateApp", [
-        {
-          bundleId: "com.facebook.WebDriverAgentRunner.xctrunner",
-        },
-      ]);
-      const clipboardDataBase64 = await this.webdriverClient.getClipboard();
-      await this.webdriverClient.executeScript("mobile: activateApp", [
-        {
-          bundleId: this.bundleId,
-        },
-      ]);
-      return clipboardDataBase64;
+      //iOS simulator supports clipboard sharing
+      if (this.provider == "emulator") {
+        return await this.webdriverClient.getClipboard();
+      } else {
+        await this.webdriverClient.executeScript("mobile: activateApp", [
+          {
+            bundleId: "com.facebook.WebDriverAgentRunner.xctrunner",
+          },
+        ]);
+        const clipboardDataBase64 = await this.webdriverClient.getClipboard();
+        await this.webdriverClient.executeScript("mobile: activateApp", [
+          {
+            bundleId: this.bundleId,
+          },
+        ]);
+        return clipboardDataBase64;
+      }
     }
   }
 }

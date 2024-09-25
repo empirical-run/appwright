@@ -18,7 +18,7 @@ export class LocalDeviceProvider implements DeviceProvider {
   async globalSetup() {}
 
   async getDevice(): Promise<Device> {
-    // this.validateConfig();
+    this.validateConfig();
     this.createConfig();
     return await this.createDriver();
   }
@@ -32,17 +32,21 @@ export class LocalDeviceProvider implements DeviceProvider {
   }
 
   private async createDriver(): Promise<Device> {
-    await startAppiumServer();
+    await startAppiumServer(this.project.use.device?.provider!);
     const WebDriver = (await import("webdriver")).default;
     const webDriverClient = await WebDriver.newSession(this.config as any);
-    //TODO: get bundle id
-    // const bundleId = await this.getAppBundleId();
-    //@ts-ignore
+    //TODO: Add bundle id implementation
+    const bundleId = "";
     const expectTimeout = this.project.use.expectTimeout!;
     const testOptions: TestInfoOptions = {
       expectTimeout,
     };
-    return new Device(webDriverClient, "", testOptions);
+    return new Device(
+      webDriverClient,
+      bundleId,
+      testOptions,
+      this.project.use.device?.provider!,
+    );
   }
 
   async downloadVideo(): Promise<{
@@ -60,6 +64,7 @@ export class LocalDeviceProvider implements DeviceProvider {
       port: 4723,
       capabilities: {
         "appium:deviceName": this.project.use.device?.name,
+        "appium:udid": (this.project.use.device as LocalDeviceConfig).udid,
         "appium:automationName":
           platformName == Platform.ANDROID ? "uiautomator2" : "xcuitest",
         platformName: platformName,
