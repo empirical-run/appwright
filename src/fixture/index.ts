@@ -31,8 +31,6 @@ export const test = base.extend<{
         outputDir,
         testInfo.testId,
       );
-      console.log(`Video saved to: ${JSON.stringify(videoData)}`);
-
       if (videoData) {
         await testInfo.attach("video", videoData);
       }
