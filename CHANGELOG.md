@@ -1,5 +1,11 @@
 # appwright
 
+## 0.0.17
+
+### Patch Changes
+
+- ee98722: chore: refactored appwright APIs
+
 ## 0.0.16
 
 ### Patch Changes
