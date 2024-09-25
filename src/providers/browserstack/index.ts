@@ -2,9 +2,8 @@ import fs from "fs";
 import path from "path";
 import retry from "async-retry";
 import { TestInfo } from "@playwright/test";
-import { AppwrightConfig, IDeviceProvider, TestInfoOptions } from "../../types";
+import { AppwrightConfig, DeviceProvider, TestInfoOptions } from "../../types";
 // @ts-ignore ts not able to identify the import is just an interface
-import { Client as WebDriverClient } from "webdriver";
 import { Device } from "../../device";
 
 type BrowserStackSessionDetails = {
@@ -40,12 +39,10 @@ function getAuthHeader() {
   return `Basic ${key}`;
 }
 
-export class BrowserStackDeviceProvider implements IDeviceProvider {
+export class BrowserStackDeviceProvider implements DeviceProvider {
   private sessionDetails?: BrowserStackSessionDetails;
   private testInfo: TestInfo;
   private sessionId?: string;
-
-  private webDriverClient!: WebDriverClient;
 
   constructor(testInfo: TestInfo) {
     this.testInfo = testInfo;
@@ -99,8 +96,8 @@ export class BrowserStackDeviceProvider implements IDeviceProvider {
 
   private async createDriver(config: any): Promise<Device> {
     const WebDriver = (await import("webdriver")).default;
-    const webdriverClient = await WebDriver.newSession(config);
-    this.sessionId = webdriverClient.sessionId;
+    const webDriverClient = await WebDriver.newSession(config);
+    this.sessionId = webDriverClient.sessionId;
     await this.syncTestDetails({ name: this.testInfo.title });
     const bundleId = await this.getAppBundleId();
     //@ts-ignore
@@ -108,7 +105,7 @@ export class BrowserStackDeviceProvider implements IDeviceProvider {
     const testOptions: TestInfoOptions = {
       expectTimeout,
     };
-    return new Device(this.webDriverClient, bundleId, testOptions);
+    return new Device(webDriverClient, bundleId, testOptions);
   }
 
   private async getSessionDetails() {

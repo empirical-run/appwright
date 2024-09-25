@@ -1,5 +1,12 @@
 # appwright
 
+## 0.0.18
+
+### Patch Changes
+
+- 6458d17: chore: refactored device provider methods
+- 1b26228: fix: webdriver client getting passed as undefined to device
+
 ## 0.0.17
 
 ### Patch Changes
