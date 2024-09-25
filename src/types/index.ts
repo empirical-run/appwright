@@ -34,7 +34,7 @@ export enum Platform {
 export interface IAppwrightDriver {
   close: () => Promise<void>;
 
-  tapAtGivenCoordinates: ({ x, y }: { x: number; y: number }) => Promise<void>;
+  tap: ({ x, y }: { x: number; y: number }) => Promise<void>;
 
   getByText: (
     text: string | RegExp,
