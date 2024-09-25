@@ -6,7 +6,7 @@ export function boxedStep(
 ) {
   return function replacementMethod(...args: any) {
     //@ts-ignore
-    const path = this.path ? `("${this.path}")` : "";
+    const path = this.selector ? `("${this.selector}")` : "";
     const argsString = args.length
       ? "(" +
         Array.from(args)
