@@ -108,7 +108,7 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
     const device = this.project.use.device as BrowserstackConfig;
     if (!device.name || !device.osVersion) {
       throw new Error(
-        "Device name and osVersion are required for running tests on browserstack",
+        "Device name and osVersion are required for running tests on BrowserStack",
       );
     }
   }
