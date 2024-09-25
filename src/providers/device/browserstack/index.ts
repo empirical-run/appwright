@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import retry from "async-retry";
 import { TestInfo } from "@playwright/test";
-import { AppwrightDriver } from "../../driver/webdriver";
+import { AppwrightDriver } from "../../driver";
 import { AppwrightConfig, Device, TestInfoOptions } from "../../../types";
 
 export type BrowserStackSessionDetails = {
