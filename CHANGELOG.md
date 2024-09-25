@@ -1,5 +1,15 @@
 # appwright
 
+## 0.0.15
+
+### Patch Changes
+
+- b9f5c3d: chore: move boxedStep to util and add locator docstrings
+- 912b092: chore: rename internal classes for readability
+- 2d1c600: feat: rename tap method
+- 8febdb4: fix: added `boxedStep` decorator to actions
+- 3abaabe: fix: corrected import for driver
+
 ## 0.0.14
 
 ### Patch Changes
