@@ -146,7 +146,7 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
 
   async downloadVideo(
     outputDir: string,
-    testId: string,
+    fileName: string,
   ): Promise<{ path: string; contentType: string } | null> {
     await this.getSessionDetails();
     const videoURL = this.sessionDetails?.video_url;
