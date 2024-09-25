@@ -9,7 +9,7 @@ export const test = base.extend<{
   device: Device;
   saveVideo: void;
 }>({
-  deviceProvider: async ({ }, use, testInfo) => {
+  deviceProvider: async ({}, use, testInfo) => {
     const deviceProvider = createDeviceProvider(testInfo.project);
     await use(deviceProvider);
   },
