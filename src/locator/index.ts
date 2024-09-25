@@ -1,45 +1,75 @@
 // @ts-ignore
 import { Client as WebDriverClient } from "webdriver";
 import retry from "async-retry";
-import test from "@playwright/test";
 import {
   ElementReference,
   TestInfoOptions,
   WaitUntilOptions,
   WebdriverErrors,
 } from "../types";
-
-export function boxedStep(
-  target: Function,
-  context: ClassMethodDecoratorContext,
-) {
-  return function replacementMethod(...args: any) {
-    //@ts-ignore
-    const path = this.path;
-    const argsString = args.length
-      ? "(" +
-        Array.from(args)
-          .map((a) => JSON.stringify(a))
-          .join(" , ") +
-        ")"
-      : "";
-    const name = `${context.name as string}("${path}")${argsString}`;
-    return test.step(
-      name,
-      async () => {
-        // @ts-ignore
-        return await target.call(this, ...args);
-      },
-      { box: true },
-    ); // Note the "box" option here.
-  };
-}
+import { boxedStep } from "../utils";
 
 export interface AppwrightLocator {
-  fill(value: string, options?: WaitUntilOptions): Promise<void>;
-  sendKeyStrokes(value: string, options?: WaitUntilOptions): Promise<void>;
-  isVisible(options?: WaitUntilOptions): Promise<boolean>;
+  /**
+   * Clicks (taps) on the element. This method waits for the element to be visible before clicking it.
+   *
+   * **Usage:**
+   * ```js
+   * await client.getByText("Submit").click();
+   * ```
+   *
+   * @param options Use this to override the timeout for this action
+   */
   click(options?: WaitUntilOptions): Promise<void>;
+
+  /**
+   * Fills the input element with the given value. This method waits for the element to be visible before filling it.
+   *
+   * **Usage:**
+   * ```js
+   * await client.getByText("Search").fill("My query");
+   * ```
+   *
+   * @param value The value to fill in the input field
+   * @param options Use this to override the timeout for this action
+   */
+  fill(value: string, optionasds?: WaitUntilOptions): Promise<void>;
+
+  /**
+   * Sends key strokes to the element. This method waits for the element to be visible before sending the key strokes.
+   *
+   * **Usage:**
+   * ```js
+   * await client.getByText("Search").sendKeyStrokes("My query");
+   * ```
+   *
+   * @param value The string to send as key strokes.
+   * @param options Use this to override the timeout for this action
+   */
+  sendKeyStrokes(value: string, options?: WaitUntilOptions): Promise<void>;
+
+  /**
+   * Checks if the element is visible on the page, while attempting for the `timeout` duration. Returns `true` if the element is visible, `false` otherwise.
+   *
+   * **Usage:**
+   * ```js
+   * const isVisible = await client.getByText("Search").isVisible();
+   * ```
+   *
+   * @param options Use this to override the timeout for this action
+   */
+  isVisible(options?: WaitUntilOptions): Promise<boolean>;
+
+  /**
+   * Returns the text content of the element. This method waits for the element to be visible before getting the text.
+   *
+   * **Usage:**
+   * ```js
+   * const textContent = await client.getByText("Search").getText();
+   * ```
+   *
+   * @param options Use this to override the timeout for this action
+   */
   getText(options?: WaitUntilOptions): Promise<string>;
 }
 
