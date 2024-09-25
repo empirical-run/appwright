@@ -5,10 +5,9 @@ import { createDeviceProvider } from "./providers";
 async function globalSetup(config: FullConfig<AppwrightConfig>) {
   console.log("Global setup");
   const length = config.projects.length;
-
   for (let i = 0; i < length; i++) {
     const project = config.projects[i]!;
-    const provider = createDeviceProvider(project.use as AppwrightConfig);
+    const provider = createDeviceProvider(project);
     await provider.globalSetup();
   }
 }

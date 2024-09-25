@@ -24,10 +24,12 @@ const defaultConfig: PlaywrightTestConfig<AppwrightConfig> = {
   workers: 2,
   reporter: [["list"], ["json"], ["html"]],
   use: {
+    // TODO: Use this for actions
     actionTimeout: 20_000,
     expectTimeout: 20_000,
   },
   expect: {
+    // This is not used right now
     timeout: 20_000,
   },
   timeout: 0,

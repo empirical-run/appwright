@@ -1,14 +1,9 @@
+import retry from "async-retry";
+import FormData from "form-data";
 import fs from "fs";
 import path from "path";
-import retry from "async-retry";
-import {
-  AppwrightConfig,
-  DeviceProvider,
-  Platform,
-  TestInfoOptions,
-} from "../../types";
-import FormData from "form-data";
-// @ts-ignore ts not able to identify the import is just an interface
+import { AppwrightConfig, DeviceProvider } from "../../types";
+import { FullProject } from "@playwright/test";
 import { Device } from "../../device";
 
 type BrowserStackSessionDetails = {
@@ -47,20 +42,10 @@ function getAuthHeader() {
 export class BrowserStackDeviceProvider implements DeviceProvider {
   private sessionDetails?: BrowserStackSessionDetails;
   private sessionId?: string;
-  private platform: Platform;
-  private deviceName: string;
-  private osVersion: string;
-  private buildPath: string;
-  private testOptions: TestInfoOptions;
+  private project: FullProject<AppwrightConfig>;
 
-  constructor(config: AppwrightConfig) {
-    this.platform = config.platform;
-    this.deviceName = config.deviceName;
-    this.osVersion = config.osVersion;
-    this.buildPath = config.buildPath;
-    this.testOptions = {
-      expectTimeout: config.expectTimeout,
-    };
+  constructor(project: FullProject<AppwrightConfig>) {
+    this.project = project;
   }
 
   async globalSetup() {
@@ -73,22 +58,23 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
         "BROWSERSTACK_USERNAME and BROWSERSTACK_ACCESS_KEY are required environment variables for this device provider.",
       );
     }
-    console.log(`Uploading: ${this.buildPath}`);
-    const isUrl = this.buildPath.startsWith("http");
+    const buildPath = this.project.use.buildPath!;
+    console.log(`Uploading: ${buildPath}`);
+    const isUrl = buildPath.startsWith("http");
     let body;
     let headers = {
       Authorization: getAuthHeader(),
     };
     if (isUrl) {
       body = new URLSearchParams({
-        url: this.buildPath,
+        url: buildPath,
       });
     } else {
-      if (!fs.existsSync(this.buildPath)) {
-        throw new Error(`Build file not found: ${this.buildPath}`);
+      if (!fs.existsSync(buildPath)) {
+        throw new Error(`Build file not found: ${buildPath}`);
       }
       const form = new FormData();
-      form.append("file", fs.createReadStream(this.buildPath));
+      form.append("file", fs.createReadStream(buildPath));
       headers = { ...headers, ...form.getHeaders() };
       body = form;
     }
@@ -117,7 +103,10 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
     const webDriverClient = await WebDriver.newSession(config);
     this.sessionId = webDriverClient.sessionId;
     const bundleId = await this.getAppBundleId();
-    return new Device(webDriverClient, bundleId, this.testOptions);
+    const testOptions = {
+      expectTimeout: this.project.use.expectTimeout!,
+    };
+    return new Device(webDriverClient, bundleId, testOptions);
   }
 
   private async getSessionDetails() {
@@ -153,7 +142,7 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
     const pathToTestVideo = path.join(
       outputDir,
       "videos-store",
-      `${testId}.mp4`,
+      `${fileName}.mp4`,
     );
     const dir = path.dirname(pathToTestVideo);
     fs.mkdirSync(dir, { recursive: true });

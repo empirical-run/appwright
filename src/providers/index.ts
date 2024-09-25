@@ -1,8 +1,9 @@
 import { BrowserStackDeviceProvider } from "./browserstack";
 import { AppwrightConfig, DeviceProvider } from "../types";
+import { FullProject } from "@playwright/test";
 
 export function createDeviceProvider(
-  projectConfig: AppwrightConfig,
+  project: FullProject<AppwrightConfig>,
 ): DeviceProvider {
-  return new BrowserStackDeviceProvider(projectConfig);
+  return new BrowserStackDeviceProvider(project);
 }
