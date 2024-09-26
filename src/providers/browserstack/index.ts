@@ -2,9 +2,14 @@ import retry from "async-retry";
 import FormData from "form-data";
 import fs from "fs";
 import path from "path";
-import { AppwrightConfig, DeviceProvider } from "../../types";
+import {
+  AppwrightConfig,
+  DeviceProvider,
+  BrowserstackConfig,
+} from "../../types";
 import { FullProject } from "@playwright/test";
 import { Device } from "../../device";
+import { getAppBundleId } from "../appium";
 
 type BrowserStackSessionDetails = {
   name: string;
@@ -94,19 +99,34 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
   }
 
   async getDevice(): Promise<Device> {
+    this.validateConfig();
     const config = this.createConfig();
     return await this.createDriver(config);
+  }
+
+  private validateConfig() {
+    const device = this.project.use.device as BrowserstackConfig;
+    if (!device.name || !device.osVersion) {
+      throw new Error(
+        "Device name and osVersion are required for running tests on BrowserStack",
+      );
+    }
   }
 
   private async createDriver(config: any): Promise<Device> {
     const WebDriver = (await import("webdriver")).default;
     const webDriverClient = await WebDriver.newSession(config);
     this.sessionId = webDriverClient.sessionId;
-    const bundleId = await this.getAppBundleId();
+    const bundleId = await getAppBundleId(this.project.use.buildPath!);
     const testOptions = {
       expectTimeout: this.project.use.expectTimeout!,
     };
-    return new Device(webDriverClient, bundleId, testOptions);
+    return new Device(
+      webDriverClient,
+      bundleId,
+      testOptions,
+      this.project.use.device?.provider!,
+    );
   }
 
   private async getSessionDetails() {
@@ -126,11 +146,6 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
 
     const data = await response.json();
     this.sessionDetails = data.automation_session;
-  }
-
-  private async getAppBundleId(): Promise<string> {
-    await this.getSessionDetails();
-    return this.sessionDetails?.app_details.app_name ?? "";
   }
 
   async downloadVideo(
@@ -262,8 +277,8 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
           networkLogs: true,
           appiumVersion: "2.6.0",
           enableCameraImageInjection: true,
-          deviceName: this.project.use.deviceName,
-          osVersion: this.project.use.osVersion,
+          deviceName: this.project.use.device?.name,
+          osVersion: (this.project.use.device as BrowserstackConfig).osVersion,
           platformName: platformName,
           buildName: `${projectName} ${platformName}`,
           sessionName: `${projectName} ${platformName} test`,
