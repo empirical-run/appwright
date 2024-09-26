@@ -1,5 +1,11 @@
 # appwright
 
+## 0.0.24
+
+### Patch Changes
+
+- 4951c96: fix: install appium driver if not installed already
+
 ## 0.0.23
 
 ### Patch Changes
