@@ -25,7 +25,7 @@ function installDriver(driverName: string): Promise<void> {
     });
 
     installProcess.on("error", (error) => {
-      console.error(`Appium: ${error.message}`);
+      console.error(`Install Driver: ${error.message}`);
       reject(error);
     });
   });
@@ -49,11 +49,7 @@ function isDriverInstalled(driver: string): Promise<boolean> {
 
     appiumProcess.on("close", (code) => {
       if (code !== 0) {
-        reject(
-          new Error(
-            `Failed to check for installed drivers, exited with code ${code}`,
-          ),
-        );
+        reject(new Error("Failed to check for installed appium drivers"));
       } else if (output.includes(driver)) {
         resolve(true);
       } else {
@@ -62,7 +58,7 @@ function isDriverInstalled(driver: string): Promise<boolean> {
     });
 
     appiumProcess.on("error", (error) => {
-      console.error(`Appium: ${error.message}`);
+      console.error(`Is driver installed: ${error.message}`);
       reject(error);
     });
   });
