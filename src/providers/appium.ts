@@ -1,7 +1,89 @@
 import { ChildProcess, spawn, exec } from "child_process";
 import path from "path";
+import { Platform } from "../types";
 
-export function startAppiumServer(provider: string): Promise<ChildProcess> {
+function installDriver(driverName: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const installProcess = spawn(
+      "npx",
+      ["appium", "driver", "install", driverName],
+      {
+        stdio: "pipe",
+      },
+    );
+
+    installProcess.on("close", (code) => {
+      if (code === 0) {
+        resolve();
+      } else {
+        reject(
+          new Error(
+            `Failed to install ${driverName}, exited with code ${code}`,
+          ),
+        );
+      }
+    });
+
+    installProcess.on("error", (error) => {
+      console.error(`Appium: ${error.message}`);
+      reject(error);
+    });
+  });
+}
+
+function isDriverInstalled(driver: string): Promise<boolean> {
+  return new Promise((resolve, reject) => {
+    const appiumProcess = spawn(
+      "npx",
+      ["appium", "driver", "list", "--installed"],
+      {
+        stdio: "pipe",
+      },
+    );
+
+    let output = "";
+
+    appiumProcess.stderr.on("data", (data: Buffer) => {
+      output += data.toString();
+    });
+
+    appiumProcess.on("close", (code) => {
+      if (code !== 0) {
+        reject(
+          new Error(
+            `Failed to check for installed drivers, exited with code ${code}`,
+          ),
+        );
+      } else if (output.includes(driver)) {
+        resolve(true);
+      } else {
+        resolve(false);
+      }
+    });
+
+    appiumProcess.on("error", (error) => {
+      console.error(`Appium: ${error.message}`);
+      reject(error);
+    });
+  });
+}
+
+export async function startAppiumServer(
+  provider: string,
+  platform: Platform,
+): Promise<ChildProcess> {
+  if (platform == Platform.ANDROID) {
+    const isuiAutomatorInstalled = await isDriverInstalled("uiautomator2");
+    if (!isuiAutomatorInstalled) {
+      await installDriver("uiautomator2");
+    }
+  } else {
+    const isxcuitestInstalled = await isDriverInstalled("xcuitest");
+    if (!isxcuitestInstalled) {
+      await installDriver("xcuitest");
+    }
+  }
+
   let emulatorStartRequested = false;
   return new Promise((resolve, reject) => {
     const appiumProcess = spawn("npx", ["appium"], {

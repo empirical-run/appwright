@@ -17,7 +17,10 @@ export class EmulatorProvider implements DeviceProvider {
   }
 
   private async createDriver(): Promise<Device> {
-    await startAppiumServer(this.project.use.device?.provider!);
+    await startAppiumServer(
+      this.project.use.device?.provider!,
+      this.project.use.platform!,
+    );
     const WebDriver = (await import("webdriver")).default;
     const webDriverClient = await WebDriver.newSession(this.createConfig());
     const bundleId = await getAppBundleId(this.project.use.buildPath!);
