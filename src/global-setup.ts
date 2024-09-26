@@ -7,7 +7,7 @@ async function globalSetup(config: FullConfig<AppwrightConfig>) {
   for (let i = 0; i < length; i++) {
     const project = config.projects[i]!;
     const provider = createDeviceProvider(project);
-    await provider.globalSetup();
+    await provider.globalSetup?.();
   }
 }
 

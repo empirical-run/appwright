@@ -1,6 +1,6 @@
 # Appwright
 
-![NPM Version](https://img.shields.io/npm/v/appwright)
+![NPM Version](https://img.shields.io/npm/v/appwright?color=4AC61C)
 
 Appwright is a test runner for e2e testing of mobile apps, based on Playwright and Appium.
 
