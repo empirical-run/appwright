@@ -1,5 +1,12 @@
 # appwright
 
+## 0.0.20
+
+### Patch Changes
+
+- b210e79: fix: build upload validation in browserstack provider
+- 9266137: chore: warning for globalSetup config behavior
+
 ## 0.0.19
 
 ### Patch Changes
