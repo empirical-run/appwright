@@ -8,14 +8,14 @@ Appwright is a test runner for e2e testing of mobile apps, based on Playwright a
 
 ### Install
 
-```sh {"id":"01J8PCK0BB23X53P03AY3JYQGW"}
+```sh {"language":"sh"}
 npm i --save-dev appwright
 touch appwright.config.ts
 ```
 
 ### Configure
 
-```ts {"id":"01J8PCK0BB23X53P03B0X6PMN8"}
+```ts {"language":"ts"}
 // In appwright.config.ts
 import { defineConfig, Platform } from "appwright";
 export default defineConfig({
@@ -40,7 +40,7 @@ export default defineConfig({
 
 Appwright currently runs tests on BrowserStack only.
 
-```sh {"id":"01J8PCK0BB23X53P03B22TBR01"}
+```sh {"language":"sh"}
 npx appwright test --project android
 npx appwright test --project ios
 ```

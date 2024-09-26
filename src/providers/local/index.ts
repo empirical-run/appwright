@@ -11,15 +11,10 @@ import { FullProject } from "@playwright/test";
 import { getAppBundleId, startAppiumServer } from "../appium";
 
 export class LocalDeviceProvider implements DeviceProvider {
-  private config: any;
-
   constructor(private project: FullProject<AppwrightConfig>) {}
-
-  async globalSetup() {}
 
   async getDevice(): Promise<Device> {
     this.validateConfig();
-    this.createConfig();
     return await this.createDriver();
   }
 
@@ -34,7 +29,7 @@ export class LocalDeviceProvider implements DeviceProvider {
   private async createDriver(): Promise<Device> {
     await startAppiumServer(this.project.use.device?.provider!);
     const WebDriver = (await import("webdriver")).default;
-    const webDriverClient = await WebDriver.newSession(this.config as any);
+    const webDriverClient = await WebDriver.newSession(this.createConfig());
     const bundleId = await getAppBundleId(this.project.use.buildPath!);
     const expectTimeout = this.project.use.expectTimeout!;
     const testOptions: TestInfoOptions = {
@@ -48,18 +43,9 @@ export class LocalDeviceProvider implements DeviceProvider {
     );
   }
 
-  async downloadVideo(): Promise<{
-    path: string;
-    contentType: string;
-  } | null> {
-    return null;
-  }
-
-  async syncTestDetails() {}
-
   private createConfig() {
     const platformName = this.project.use.platform;
-    this.config = {
+    return {
       port: 4723,
       capabilities: {
         "appium:deviceName": this.project.use.device?.name,

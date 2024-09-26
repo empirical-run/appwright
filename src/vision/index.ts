@@ -1,7 +1,7 @@
 import { getBoundingBox, query } from "@empiricalrun/llm/vision";
-// @ts-ignore
+// @ts-ignore ts not able to identify the import is just an interface
 import { Client as WebDriverClient } from "webdriver";
-import { IDevice } from "../types";
+import { Device } from "../device";
 
 export interface AppwrightVision {
   extractText(prompt: string): Promise<string>;
@@ -10,7 +10,7 @@ export interface AppwrightVision {
 
 export class VisionProvider {
   constructor(
-    private device: IDevice,
+    private device: Device,
     private webDriverClient: WebDriverClient,
   ) {}
 

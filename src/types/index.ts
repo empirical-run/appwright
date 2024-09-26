@@ -9,13 +9,13 @@ export type TestInfoOptions = {
 };
 
 export interface DeviceProvider {
-  globalSetup(): Promise<void>;
+  globalSetup?(): Promise<void>;
   getDevice(): Promise<Device>;
-  downloadVideo: (
+  downloadVideo?: (
     outputDir: string,
     fileName: string,
   ) => Promise<{ path: string; contentType: string } | null>;
-  syncTestDetails: (details: {
+  syncTestDetails?: (details: {
     status?: string;
     reason?: string;
     name?: string;
@@ -56,78 +56,6 @@ export type EmulatorConfig = {
 export enum Platform {
   ANDROID = "android",
   IOS = "ios",
-}
-
-export interface IDevice {
-  /**
-   * Helper method to identify which the mobile OS running on the device.
-   * @returns "android" or "ios"
-   */
-  getPlatform: () => Platform;
-
-  /**
-   * Closes the automation session. This is called automatically after each test.
-   */
-  close: () => Promise<void>;
-
-  /**
-   * Tap on the screen at the given coordinates, specified as x and y. The top left corner
-   * of the screen is { x: 0, y: 0 }.
-   *
-   * @param coordinates to tap on
-   * @returns
-   */
-  tap: ({ x, y }: { x: number; y: number }) => Promise<void>;
-
-  /**
-   * Locate an element on the screen with text content. This method defaults to a
-   * substring match, and this be overridden by setting the `exact` option to `true`.
-   *
-   * **Usage:**
-   * ```js
-   * // with string
-   * const submitButton = device.getByText("Submit");
-   *
-   * // with RegExp
-   * const counter = device.getByText(/^Counter: \d+/);
-   * ```
-   *
-   * @param text string or regular expression to search for
-   * @param options
-   * @returns
-   */
-  getByText: (
-    text: string | RegExp,
-    options?: { exact?: boolean },
-  ) => AppwrightLocator;
-
-  /**
-   * Locate an element on the screen with accessibility identifier. This method defaults to
-   * a substring match, and this can be overridden by setting the `exact` option to `true`.
-   *
-   * @param text string or regular expression to search for
-   * @param options
-   * @returns
-   */
-  getById: (
-    text: string | RegExp,
-    options?: { exact?: boolean },
-  ) => AppwrightLocator;
-
-  getByXpath: (xpath: string) => AppwrightLocator;
-
-  /**
-   * Retrieves text content from the clipboard of the mobile device. This is useful
-   * after a "copy to clipboard" action has been performed.
-   *
-   * @returns Returns the text content of the clipboard.
-   */
-  getClipboardText: () => Promise<string>;
-
-  beta: {
-    tap: (prompt: string) => Promise<void>;
-    extractText: (prompt: string) => Promise<string>;
-  };
 }
 
 export interface AppwrightLocator {

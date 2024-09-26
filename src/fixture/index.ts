@@ -15,19 +15,19 @@ export const test = base.extend<{
   },
   device: async ({ deviceProvider }, use, testInfo) => {
     const device = await deviceProvider.getDevice();
-    await deviceProvider.syncTestDetails({ name: testInfo.title });
+    await deviceProvider.syncTestDetails?.({ name: testInfo.title });
     await use(device);
     await device.close();
   },
   saveVideo: [
     async ({ deviceProvider }, use, testInfo) => {
       await use();
-      await deviceProvider.syncTestDetails({
+      await deviceProvider.syncTestDetails?.({
         status: testInfo.status,
         reason: testInfo.error?.message,
       });
       const outputDir = testInfo.project.outputDir;
-      const videoData = await deviceProvider.downloadVideo(
+      const videoData = await deviceProvider.downloadVideo?.(
         outputDir,
         testInfo.testId,
       );
