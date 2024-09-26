@@ -29,7 +29,7 @@ export default defineConfig({
           name: "Google Pixel 8",
           osVersion: "14.0",
         },
-        buildPath: "app-release.apk", // path to local app build
+        buildPath: "app-release.apk",
       },
     },
   ],
