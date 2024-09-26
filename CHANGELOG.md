@@ -1,5 +1,25 @@
 # appwright
 
+## 0.0.21
+
+### Patch Changes
+
+- 99a557c: fix: validation for config.globalSetup
+
+## 0.0.20
+
+### Patch Changes
+
+- b210e79: fix: build upload validation in browserstack provider
+- 9266137: chore: warning for globalSetup config behavior
+
+## 0.0.19
+
+### Patch Changes
+
+- b8e6947: feat: support buildPath and build uploads with globalSetup
+- 10c7397: fix: pick correct browserstack build url
+
 ## 0.0.18
 
 ### Patch Changes

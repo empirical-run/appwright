@@ -37,7 +37,7 @@ type BrowserStackSessionDetails = {
 
 const API_BASE_URL = "https://api-cloud.browserstack.com/app-automate";
 
-const APP_URL_KEY = (projectName: string) =>
+const envVarKeyForBuild = (projectName: string) =>
   `BROWSERSTACK_APP_URL_${projectName.toUpperCase()}`;
 
 function getAuthHeader() {
@@ -95,7 +95,7 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
     const data = await response.json();
     console.log("Upload response:", data);
     const appUrl = (data as any).app_url;
-    process.env[APP_URL_KEY(this.project.name)] = appUrl;
+    process.env[envVarKeyForBuild(this.project.name)] = appUrl;
   }
 
   async getDevice(): Promise<Device> {
@@ -256,9 +256,10 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
   private createConfig() {
     const platformName = this.project.use.platform;
     const projectName = path.basename(process.cwd());
-    if (!process.env.BROWSERSTACK_APP_URL) {
+    const envVarKey = envVarKeyForBuild(this.project.name);
+    if (!process.env[envVarKey]) {
       throw new Error(
-        "BROWSERSTACK_APP_URL is not set. Did the file upload work?",
+        `process.env.${envVarKey} is not set. Did the file upload work?`,
       );
     }
     return {
@@ -287,7 +288,7 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
               : process.env.USER,
         },
         "appium:autoGrantPermissions": true,
-        "appium:app": process.env[APP_URL_KEY(this.project.name)],
+        "appium:app": process.env[envVarKey],
         "appium:autoAcceptAlerts": true,
         "appium:fullReset": true,
       },
