@@ -88,8 +88,10 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
       body,
     });
     const data = await response.json();
-    console.log("Upload response:", data);
     const appUrl = (data as any).app_url;
+    if (!appUrl) {
+      console.error("Uploading the build failed:", data);
+    }
     process.env[envVarKeyForBuild(this.project.name)] = appUrl;
   }
 
@@ -146,7 +148,6 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
     );
     const dir = path.dirname(pathToTestVideo);
     fs.mkdirSync(dir, { recursive: true });
-    console.log(`Video URL: ${videoURL}`);
     /**
      * The BrowserStack video URL initially returns a 200 status,
      * but the video file may still be empty. To avoid downloading
