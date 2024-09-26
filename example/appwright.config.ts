@@ -4,7 +4,7 @@ import { join } from "path";
 export default defineConfig({
   reporter: [
     ["list"], // For real-time reporting on CI terminal (vs. the default "dot" reporter)
-    ["json", { outputFile: "playwright-report/summary.json" }],
+    ['html', { open: 'always' }],
   ],
   projects: [
     {
@@ -15,7 +15,7 @@ export default defineConfig({
           name: "iPhone 14 Pro",
           provider: "emulator",
         },
-        buildPath: join(process.cwd(), "wikipedia.app"),
+        buildPath: join(process.cwd(), "Wikipedia.app"),
       },
     },
     {
