@@ -5,7 +5,6 @@ import {
   Platform,
   TestInfoOptions,
 } from "../../types";
-// @ts-ignore ts not able to identify the import is just an interface
 import { Device } from "../../device";
 import { FullProject } from "@playwright/test";
 import { getAppBundleId, startAppiumServer } from "../appium";
