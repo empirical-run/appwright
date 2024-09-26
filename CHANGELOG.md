@@ -1,5 +1,12 @@
 # appwright
 
+## 0.0.22
+
+### Patch Changes
+
+- 8563e13: chore: remove verbose logs
+- df08327: feat: added support to run appwright on local device
+
 ## 0.0.21
 
 ### Patch Changes
