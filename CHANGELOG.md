@@ -1,5 +1,11 @@
 # appwright
 
+## 0.0.23
+
+### Patch Changes
+
+- dcee15e: chore: update doc strings
+
 ## 0.0.22
 
 ### Patch Changes
