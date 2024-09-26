@@ -223,12 +223,12 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
         },
         body: details.name
           ? JSON.stringify({
-            name: details.name,
-          })
+              name: details.name,
+            })
           : JSON.stringify({
-            status: details.status,
-            reason: details.reason,
-          }),
+              status: details.status,
+              reason: details.reason,
+            }),
       },
     );
     if (!response.ok) {
