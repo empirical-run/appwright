@@ -23,5 +23,5 @@ To run the tests on iOS:
 Unzip the `wikipedia.zip` file and run the following command:
 
 ```sh {"id":"01J8QHA99VRJ41X79VD85VJA2M"}
-npx appwright run --project ios
+npx appwright test --project ios
 ```
