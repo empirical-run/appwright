@@ -155,7 +155,7 @@ export class Device {
   }
 
   /**
-   * Helper method to identify which the mobile OS running on the device.
+   * Helper method to detect the mobile OS running on the device.
    * @returns "android" or "ios"
    */
   getPlatform(): Platform {

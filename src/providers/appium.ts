@@ -120,7 +120,7 @@ export function getAppBundleId(path: string): Promise<string> {
 
     exec(command, (error, stdout, stderr) => {
       if (error) {
-        console.error(error.message);
+        console.error("osascript:", error.message);
         return reject(error);
       }
 
