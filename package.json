@@ -23,7 +23,11 @@
     "type": "git",
     "url": "https://github.com/empirical-run/appwright.git"
   },
-  "keywords": [],
+  "keywords": [
+    "e2e",
+    "testing",
+    "mobile"
+  ],
   "author": "Empirical Team <hey@empirical.run>",
   "license": "Apache-2.0",
   "description": "E2E mobile app testing done right, with the Playwright test runner",
