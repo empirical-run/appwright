@@ -37,11 +37,11 @@ const defaultConfig: PlaywrightTestConfig<AppwrightConfig> = {
 
 export function defineConfig(config: PlaywrightTestConfig<AppwrightConfig>) {
   const hasGlobalSetup = config.globalSetup !== undefined;
-  if (!hasGlobalSetup) {
+  if (hasGlobalSetup) {
     console.warn(
       "The `globalSetup` parameter in config will be ignored. See https://github.com/empirical-run/appwright/issues/57",
     );
-    config.globalSetup = undefined;
+    delete config.globalSetup;
   }
   return defineConfigPlaywright<AppwrightConfig>({
     ...defaultConfig,
