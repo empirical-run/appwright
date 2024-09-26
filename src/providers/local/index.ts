@@ -26,10 +26,7 @@ export class LocalDeviceProvider implements DeviceProvider {
   }
 
   private async createDriver(): Promise<Device> {
-    await startAppiumServer(
-      this.project.use.device?.provider!,
-      this.project.use.platform!,
-    );
+    await startAppiumServer(this.project.use.device?.provider!);
     const WebDriver = (await import("webdriver")).default;
     const webDriverClient = await WebDriver.newSession(this.createConfig());
     const bundleId = await getAppBundleId(this.project.use.buildPath!);

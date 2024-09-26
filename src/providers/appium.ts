@@ -2,7 +2,7 @@ import { ChildProcess, spawn, exec } from "child_process";
 import path from "path";
 import { Platform } from "../types";
 
-function installDriver(driverName: string): Promise<void> {
+export function installDriver(driverName: string): Promise<void> {
   return new Promise((resolve, reject) => {
     const installProcess = spawn(
       "npx",
@@ -31,7 +31,7 @@ function installDriver(driverName: string): Promise<void> {
   });
 }
 
-function isDriverInstalled(driver: string): Promise<boolean> {
+export function isDriverInstalled(driver: string): Promise<boolean> {
   return new Promise((resolve, reject) => {
     const appiumProcess = spawn(
       "npx",
@@ -66,20 +66,7 @@ function isDriverInstalled(driver: string): Promise<boolean> {
 
 export async function startAppiumServer(
   provider: string,
-  platform: Platform,
 ): Promise<ChildProcess> {
-  if (platform == Platform.ANDROID) {
-    const isuiAutomatorInstalled = await isDriverInstalled("uiautomator2");
-    if (!isuiAutomatorInstalled) {
-      await installDriver("uiautomator2");
-    }
-  } else {
-    const isxcuitestInstalled = await isDriverInstalled("xcuitest");
-    if (!isxcuitestInstalled) {
-      await installDriver("xcuitest");
-    }
-  }
-
   let emulatorStartRequested = false;
   return new Promise((resolve, reject) => {
     const appiumProcess = spawn("npx", ["appium"], {
@@ -117,24 +104,86 @@ export async function startAppiumServer(
   });
 }
 
-async function startAndroidEmulator(): Promise<void> {
+export function isEmulatorInstalled(platform: Platform): Promise<boolean> {
+  return new Promise((resolve, reject) => {
+    if (platform == Platform.ANDROID) {
+      const androidHome = process.env.ANDROID_HOME;
+
+      const emulatorPath = path.join(androidHome!, "emulator", "emulator");
+      exec(`${emulatorPath} -list-avds`, (error, stdout, stderr) => {
+        if (error) {
+          return reject(
+            `Error fetching emulator list. Please install emulator from Android SDK Tools. Follow this guide to install emulators: https://developer.android.com/studio/run/managing-avds`,
+          );
+        }
+        if (stderr) {
+          console.error(`Emulator: ${stderr}`);
+        }
+
+        const lines = stdout.trim().split("\n");
+
+        const deviceNames = lines.filter(
+          (line) =>
+            line.trim() && !line.startsWith("INFO") && !line.includes("/tmp/"),
+        );
+
+        if (deviceNames.length > 0) {
+          resolve(true);
+        } else {
+          return reject(
+            "No installed emulators found. Follow this guide to install emulators: https://developer.android.com/studio/run/emulator#avd",
+          );
+        }
+      });
+    } else {
+      // TODO: Verify this method
+      // exec("xcrun simctl list", (error, stdout, stderr) => {
+      //   if (error) {
+      //     // Throw explicit error if xcrun is not found or any error occurs
+      //     return reject(
+      //       new Error(
+      //         `iPhone Simulator setup is missing or incomplete. Ensure that Xcode and its command-line tools are installed correctly. `,
+      //       ),
+      //     );
+      //   }
+      //   if (stderr) {
+      //     console.error(stderr);
+      //     return reject(
+      //       new Error(
+      //         "An unexpected error occurred while checking iPhone Simulator setup.",
+      //       ),
+      //     );
+      //   }
+      //   // Check if any simulators are listed
+      //   if (!stdout.includes("iPhone")) {
+      //     return reject(
+      //       new Error(
+      //         "No iPhone simulators found. Please ensure that Xcode is properly configured with iPhone simulators.",
+      //       ),
+      //     );
+      //   }
+      //   // If everything is set up correctly
+      //   console.log("iPhone Simulator setup is complete.");
+      //   resolve(true);
+      // });
+    }
+  });
+}
+
+export async function startAndroidEmulator(): Promise<void> {
   return new Promise((resolve, reject) => {
     const androidHome = process.env.ANDROID_HOME;
 
-    if (!androidHome) {
-      return reject(
-        "The ANDROID_HOME environment variable is not set. This variable is required to locate your Android SDK. Please set it to the correct path of your Android SDK installation. For detailed instructions on how to set up the Android SDK path, visit: https://developer.android.com/tools/variables#envar",
-      );
-    }
-
-    const emulatorPath = path.join(androidHome, "emulator", "emulator");
+    const emulatorPath = path.join(androidHome!, "emulator", "emulator");
 
     exec(`${emulatorPath} -list-avds`, (error, stdout, stderr) => {
       if (error) {
-        return reject(`Error fetching emulator list: ${error.message}`);
+        return reject(
+          `Error fetching emulator list. Please install emulator from Android SDK Tools. Follow this guide to install emulators: https://developer.android.com/studio/run/managing-avds`,
+        );
       }
       if (stderr) {
-        console.error(stderr);
+        console.error(`Emulator: ${stderr}`);
       }
 
       const lines = stdout.trim().split("\n");
