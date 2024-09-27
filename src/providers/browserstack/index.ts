@@ -9,7 +9,6 @@ import {
 } from "../../types";
 import { FullProject } from "@playwright/test";
 import { Device } from "../../device";
-import { getAppBundleId } from "../appium";
 
 type BrowserStackSessionDetails = {
   name: string;
@@ -119,7 +118,7 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
     const WebDriver = (await import("webdriver")).default;
     const webDriverClient = await WebDriver.newSession(config);
     this.sessionId = webDriverClient.sessionId;
-    const bundleId = await getAppBundleId(this.project.use.buildPath!);
+    const bundleId = await this.getAppBundleIdFromSession();
     const testOptions = {
       expectTimeout: this.project.use.expectTimeout!,
     };
@@ -141,13 +140,16 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
         },
       },
     );
-
     if (!response.ok) {
       throw new Error(`Error fetching session details: ${response.statusText}`);
     }
-
     const data = await response.json();
     this.sessionDetails = data.automation_session;
+  }
+
+  private async getAppBundleIdFromSession(): Promise<string> {
+    await this.getSessionDetails();
+    return this.sessionDetails?.app_details.app_name ?? "";
   }
 
   async downloadVideo(

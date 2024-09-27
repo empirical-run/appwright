@@ -8,7 +8,7 @@ import { boxedStep } from "../utils";
 export class Device {
   constructor(
     private webdriverClient: WebDriverClient,
-    private bundleId: string,
+    private bundleId: string | undefined,
     private testOptions: TestInfoOptions,
     private provider: string,
   ) {}
@@ -173,10 +173,15 @@ export class Device {
     if (this.getPlatform() == Platform.ANDROID) {
       return await this.webdriverClient.getClipboard();
     } else {
-      //iOS simulator supports clipboard sharing
       if (this.provider == "emulator") {
+        // iOS simulator supports clipboard sharing
         return await this.webdriverClient.getClipboard();
       } else {
+        if (!this.bundleId) {
+          throw new Error(
+            "bundleId is required to retrieve clipboard data on a real device.",
+          );
+        }
         await this.webdriverClient.executeScript("mobile: activateApp", [
           {
             bundleId: "com.facebook.WebDriverAgentRunner.xctrunner",
