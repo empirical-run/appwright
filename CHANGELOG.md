@@ -1,5 +1,12 @@
 # appwright
 
+## 0.0.32
+
+### Patch Changes
+
+- ba88b2f: Buildpath validation
+- 4f49719: chore: update error strings and add doc links
+
 ## 0.0.31
 
 ### Patch Changes
