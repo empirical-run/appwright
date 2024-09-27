@@ -36,7 +36,7 @@ export function validateBuildPath(
 ) {
   if (!buildPath) {
     throw new Error(
-      `Build path not found. Please set the build path in the config file.`,
+      `Build path not found. Please set the build path in appwright.config.ts`,
     );
   }
 
