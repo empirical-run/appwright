@@ -28,13 +28,21 @@ export class EmulatorProvider implements DeviceProvider {
     );
     if (this.project.use.platform == Platform.ANDROID) {
       const androidHome = process.env.ANDROID_HOME;
-
+      const androidSimulatorConfigDocLink =
+        "https://github.com/empirical-run/appwright/blob/main/docs/config.md#android-emulator";
       if (!androidHome) {
         throw new Error(
           `The ANDROID_HOME environment variable is not set. 
 This variable is required to locate your Android SDK.
 Please set it to the correct path of your Android SDK installation. 
-For detailed instructions on how to set up the Android SDK path, visit: https://developer.android.com/tools.`,
+Follow the steps mentioned in ${androidSimulatorConfigDocLink} to run test on Android emulator.`,
+        );
+      }
+
+      if (!androidHome) {
+        throw new Error(
+          `The JAVA_HOME environment variable is not set.  
+Follow the steps mentioned in ${androidSimulatorConfigDocLink} to run test on Android emulator.`,
         );
       }
 
