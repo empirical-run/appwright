@@ -49,7 +49,7 @@ export function validateBuildPath(
   if (!fs.existsSync(buildPath)) {
     throw new Error(
       `File not found at given path: ${buildPath}
-Please provide the correct path of the file.`,
+Please provide the correct path of the build.`,
     );
   }
 }
