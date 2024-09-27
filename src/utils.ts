@@ -42,7 +42,7 @@ export function validateBuildPath(
 
   if (!buildPath.endsWith(expectedExtension)) {
     throw new Error(
-      `File path is not supported. Please provide ${expectedExtension} file path in the config file.`,
+      `File path is not supported for the given combination of platform and provider. Please provide build with ${expectedExtension} file extension in the appwright.config.ts`,
     );
   }
 
