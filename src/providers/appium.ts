@@ -3,8 +3,22 @@ import path from "path";
 import { Platform } from "../types";
 import { logger } from "../logger";
 
-export function installDriver(driverName: string): Promise<void> {
-  return new Promise((resolve) => {
+export async function installDriver(driverName: string): Promise<void> {
+  // uninstall the driver first to avoid conflicts
+  await new Promise((resolve) => {
+    const installProcess = spawn(
+      "npx",
+      ["appium", "driver", "uninstall", driverName],
+      {
+        stdio: "pipe",
+      },
+    );
+    installProcess.on("exit", (code) => {
+      resolve(code);
+    });
+  });
+  // install the driver
+  await new Promise((resolve) => {
     const installProcess = spawn(
       "npx",
       ["appium", "driver", "install", driverName],
@@ -12,8 +26,8 @@ export function installDriver(driverName: string): Promise<void> {
         stdio: "pipe",
       },
     );
-    installProcess.on("exit", () => {
-      resolve();
+    installProcess.on("exit", (code) => {
+      resolve(code);
     });
   });
 }
