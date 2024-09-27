@@ -1,4 +1,5 @@
 import test from "@playwright/test";
+import fs from "fs";
 
 export function boxedStep(
   target: Function,
@@ -27,4 +28,28 @@ export function boxedStep(
       { box: true },
     );
   };
+}
+
+export function validateBuildPath(
+  buildPath: string,
+  expectedExtension: string,
+) {
+  if (!buildPath) {
+    throw new Error(
+      `Build path not found. Please set the build path in the config file.`,
+    );
+  }
+
+  if (!buildPath.endsWith(expectedExtension)) {
+    throw new Error(
+      `File path is not supported. Please provide ${expectedExtension} file path in the config file.`,
+    );
+  }
+
+  if (!fs.existsSync(buildPath)) {
+    throw new Error(
+      `File not found at given path: ${buildPath}
+Please provide the correct path of the file.`,
+    );
+  }
 }

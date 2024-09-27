@@ -13,6 +13,7 @@ import {
   isEmulatorInstalled,
   startAppiumServer,
 } from "../appium";
+import { validateBuildPath } from "../../utils";
 
 export class LocalDeviceProvider implements DeviceProvider {
   constructor(private project: FullProject<AppwrightConfig>) {}
@@ -35,6 +36,10 @@ export class LocalDeviceProvider implements DeviceProvider {
   }
 
   async globalSetup() {
+    validateBuildPath(
+      this.project.use.buildPath!,
+      this.project.use.platform == Platform.ANDROID ? ".apk" : ".ipa",
+    );
     if (this.project.use.platform == Platform.ANDROID) {
       const androidHome = process.env.ANDROID_HOME;
 

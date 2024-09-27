@@ -56,6 +56,11 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
   }
 
   async globalSetup() {
+    if (!this.project.use.buildPath) {
+      throw new Error(
+        `Build path not found. Please set the build path in the config file.`,
+      );
+    }
     if (
       !(
         process.env.BROWSERSTACK_USERNAME && process.env.BROWSERSTACK_ACCESS_KEY
