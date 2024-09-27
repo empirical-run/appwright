@@ -7,7 +7,13 @@ import {
 } from "../../types";
 import { Device } from "../../device";
 import { FullProject } from "@playwright/test";
-import { getAppBundleId, startAppiumServer } from "../appium";
+import {
+  getAppBundleId,
+  installDriver,
+  isDriverInstalled,
+  isEmulatorInstalled,
+  startAppiumServer,
+} from "../appium";
 
 export class LocalDeviceProvider implements DeviceProvider {
   constructor(private project: FullProject<AppwrightConfig>) {}
@@ -22,6 +28,31 @@ export class LocalDeviceProvider implements DeviceProvider {
       .device as LocalDeviceConfig;
     if (!device.udid) {
       throw new Error("UDID is required for running tests on real devices");
+    }
+  }
+
+  async globalSetup() {
+    if (this.project.use.platform == Platform.ANDROID) {
+      const androidHome = process.env.ANDROID_HOME;
+
+      if (!androidHome) {
+        return Promise.reject(
+          "The ANDROID_HOME environment variable is not set. This variable is required to locate your Android SDK. Please set it to the correct path of your Android SDK installation. For detailed instructions on how to set up the Android SDK path, visit: https://developer.android.com/tools",
+        );
+      }
+
+      await isEmulatorInstalled(this.project.use.platform);
+
+      ///check for driver in appium i.e. android and iOS
+      const isuiAutomatorInstalled = await isDriverInstalled("uiautomator2");
+      if (!isuiAutomatorInstalled) {
+        await installDriver("uiautomator2");
+      }
+    } else {
+      const isxcuitestInstalled = await isDriverInstalled("xcuitest");
+      if (!isxcuitestInstalled) {
+        await installDriver("xcuitest");
+      }
     }
   }
 
