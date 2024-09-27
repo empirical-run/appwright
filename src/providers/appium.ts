@@ -105,15 +105,15 @@ export async function startAppiumServer(
 }
 
 export function isEmulatorInstalled(platform: Platform): Promise<boolean> {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     if (platform == Platform.ANDROID) {
       const androidHome = process.env.ANDROID_HOME;
 
       const emulatorPath = path.join(androidHome!, "emulator", "emulator");
       exec(`${emulatorPath} -list-avds`, (error, stdout, stderr) => {
         if (error) {
-          return reject(
-            `Error fetching emulator list. Please install emulator from Android SDK Tools. Follow this guide to install emulators: https://community.neptune-software.com/topics/tips--tricks/blogs/how-to-install--android-emulator-without--android--st`,
+          throw new Error(
+            `Error fetching emulator list.\nPlease install emulator from Android SDK Tools.\nFollow this guide to install emulators: https://community.neptune-software.com/topics/tips--tricks/blogs/how-to-install--android-emulator-without--android--st`,
           );
         }
         if (stderr) {
@@ -130,8 +130,8 @@ export function isEmulatorInstalled(platform: Platform): Promise<boolean> {
         if (deviceNames.length > 0) {
           resolve(true);
         } else {
-          return reject(
-            "No installed emulators found. Follow this guide to install emulators: https://community.neptune-software.com/topics/tips--tricks/blogs/how-to-install--android-emulator-without--android--st",
+          throw new Error(
+            `No installed emulators found.\nFollow this guide to install emulators: https://community.neptune-software.com/topics/tips--tricks/blogs/how-to-install--android-emulator-without--android--st`,
           );
         }
       });
@@ -147,8 +147,8 @@ export async function startAndroidEmulator(): Promise<void> {
 
     exec(`${emulatorPath} -list-avds`, (error, stdout, stderr) => {
       if (error) {
-        return reject(
-          `Error fetching emulator list. Please install emulator from Android SDK Tools. Follow this guide to install emulators: https://developer.android.com/studio/run/managing-avds`,
+        throw new Error(
+          `Error fetching emulator list.\nPlease install emulator from Android SDK Tools.\nFollow this guide to install emulators: https://community.neptune-software.com/topics/tips--tricks/blogs/how-to-install--android-emulator-without--android--st`,
         );
       }
       if (stderr) {
@@ -164,8 +164,8 @@ export async function startAndroidEmulator(): Promise<void> {
       );
 
       if (deviceNames.length === 0) {
-        return reject(
-          "No installed emulators found. Follow this guide to install emulators: https://developer.android.com/studio/run/emulator#avd",
+        throw new Error(
+          `No installed emulators found.\nFollow this guide to install emulators: https://community.neptune-software.com/topics/tips--tricks/blogs/how-to-install--android-emulator-without--android--st`,
         );
       } else {
         console.log(`Available Emulators: ${deviceNames}`);
