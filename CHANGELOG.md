@@ -1,5 +1,11 @@
 # appwright
 
+## 0.0.30
+
+### Patch Changes
+
+- f34bb56: fix: run global setup only for provided project
+
 ## 0.0.29
 
 ### Patch Changes
