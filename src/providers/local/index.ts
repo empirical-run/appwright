@@ -24,10 +24,14 @@ export class LocalDeviceProvider implements DeviceProvider {
   }
 
   private validateConfig() {
-    const device = (this.project.use as AppwrightConfig)
-      .device as LocalDeviceConfig;
+    const device = this.project.use.device as LocalDeviceConfig;
+    const platform = this.project.use.platform;
+    let errorMessage = `UDID is required for running tests on real devices`;
     if (!device.udid) {
-      throw new Error("UDID is required for running tests on real devices");
+      if (platform == Platform.IOS) {
+        errorMessage = `${errorMessage}. Run "xcrun xctrace list devices | grep iPhone | grep -v Simulator" to find it for your iPhone device.`;
+      }
+      throw new Error(errorMessage);
     }
   }
 
