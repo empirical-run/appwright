@@ -3,35 +3,6 @@ import path from "path";
 import { Platform } from "../types";
 import { logger } from "../logger";
 
-export function installDriver(driverName: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const installProcess = spawn(
-      "npx",
-      ["appium", "driver", "install", driverName],
-      {
-        stdio: "pipe",
-      },
-    );
-
-    installProcess.on("close", (code) => {
-      if (code === 0) {
-        resolve();
-      } else {
-        reject(
-          new Error(
-            `Failed to install ${driverName}, exited with code ${code}`,
-          ),
-        );
-      }
-    });
-
-    installProcess.on("error", (error) => {
-      logger.error(`Install Driver: ${error.message}`);
-      reject(error);
-    });
-  });
-}
-
 export async function startAppiumServer(
   provider: string,
 ): Promise<ChildProcess> {
