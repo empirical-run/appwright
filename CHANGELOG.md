@@ -1,5 +1,11 @@
 # appwright
 
+## 0.0.28
+
+### Patch Changes
+
+- c2efc55: fix: error running tests due to missing appium drivers
+
 ## 0.0.27
 
 ### Patch Changes
