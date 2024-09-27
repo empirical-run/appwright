@@ -13,6 +13,7 @@ import {
   startAppiumServer,
 } from "../appium";
 import { FullProject } from "@playwright/test";
+import { logger } from "../../logger";
 
 export class EmulatorProvider implements DeviceProvider {
   constructor(private project: FullProject<AppwrightConfig>) {}
@@ -26,8 +27,11 @@ export class EmulatorProvider implements DeviceProvider {
       const androidHome = process.env.ANDROID_HOME;
 
       if (!androidHome) {
-        return Promise.reject(
-          "The ANDROID_HOME environment variable is not set. This variable is required to locate your Android SDK. Please set it to the correct path of your Android SDK installation. For detailed instructions on how to set up the Android SDK path, visit: https://developer.android.com/tools",
+        throw new Error(
+          `The ANDROID_HOME environment variable is not set. 
+This variable is required to locate your Android SDK.
+Please set it to the correct path of your Android SDK installation. 
+For detailed instructions on how to set up the Android SDK path, visit: https://developer.android.com/tools.`,
         );
       }
 
@@ -36,12 +40,18 @@ export class EmulatorProvider implements DeviceProvider {
       ///check for driver in appium i.e. android and iOS
       const isuiAutomatorInstalled = await isDriverInstalled("uiautomator2");
       if (!isuiAutomatorInstalled) {
+        logger.warn("uiautomator2 driver not installed");
+        logger.log("Trying to install uiautomator2");
         await installDriver("uiautomator2");
+        logger.log("uiautomator2 driver installed successfully");
       }
     } else {
       const isxcuitestInstalled = await isDriverInstalled("xcuitest");
       if (!isxcuitestInstalled) {
+        logger.warn("xcuitest driver not installed");
+        logger.log("Trying to install xcuitest");
         await installDriver("xcuitest");
+        logger.log("xcuitest driver installed successfully");
       }
     }
   }
