@@ -29,7 +29,16 @@ export class EmulatorProvider implements DeviceProvider {
           `The ANDROID_HOME environment variable is not set. 
 This variable is required to locate your Android SDK.
 Please set it to the correct path of your Android SDK installation. 
-For detailed instructions on how to set up the Android SDK path, visit: https://developer.android.com/tools.`,
+Please follow the pre-requisites mentioned in https://github.com/empirical-run/appwright/blob/main/docs/config.md#android-emulator
+to run test on Android emulator.`,
+        );
+      }
+
+      if (!androidHome) {
+        throw new Error(
+          `The JAVA_HOME environment variable is not set.  
+Please follow the pre-requisites mentioned in https://github.com/empirical-run/appwright/blob/main/docs/config.md#android-emulator
+to run test on Android emulator.`,
         );
       }
 
