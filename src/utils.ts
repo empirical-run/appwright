@@ -31,7 +31,7 @@ export function boxedStep(
 }
 
 export function validateBuildPath(
-  buildPath: string,
+  buildPath: string | undefined,
   expectedExtension: string,
 ) {
   if (!buildPath) {

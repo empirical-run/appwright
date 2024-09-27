@@ -23,7 +23,7 @@ export class EmulatorProvider implements DeviceProvider {
 
   async globalSetup() {
     validateBuildPath(
-      this.project.use.buildPath!,
+      this.project.use.buildPath,
       this.project.use.platform == Platform.ANDROID ? ".apk" : ".app",
     );
     if (this.project.use.platform == Platform.ANDROID) {

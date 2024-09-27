@@ -37,7 +37,7 @@ export class LocalDeviceProvider implements DeviceProvider {
 
   async globalSetup() {
     validateBuildPath(
-      this.project.use.buildPath!,
+      this.project.use.buildPath,
       this.project.use.platform == Platform.ANDROID ? ".apk" : ".ipa",
     );
     if (this.project.use.platform == Platform.ANDROID) {
