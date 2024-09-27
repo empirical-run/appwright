@@ -9,8 +9,6 @@ import { Device } from "../../device";
 import { FullProject } from "@playwright/test";
 import {
   getAppBundleId,
-  installDriver,
-  isDriverInstalled,
   isEmulatorInstalled,
   startAppiumServer,
 } from "../appium";
@@ -46,17 +44,6 @@ export class LocalDeviceProvider implements DeviceProvider {
       }
 
       await isEmulatorInstalled(this.project.use.platform);
-
-      ///check for driver in appium i.e. android and iOS
-      const isuiAutomatorInstalled = await isDriverInstalled("uiautomator2");
-      if (!isuiAutomatorInstalled) {
-        await installDriver("uiautomator2");
-      }
-    } else {
-      const isxcuitestInstalled = await isDriverInstalled("xcuitest");
-      if (!isxcuitestInstalled) {
-        await installDriver("xcuitest");
-      }
     }
   }
 

@@ -6,14 +6,8 @@ import {
   TestInfoOptions,
 } from "../../types";
 import { Device } from "../../device";
-import {
-  isEmulatorInstalled,
-  installDriver,
-  isDriverInstalled,
-  startAppiumServer,
-} from "../appium";
+import { isEmulatorInstalled, startAppiumServer } from "../appium";
 import { FullProject } from "@playwright/test";
-import { logger } from "../../logger";
 
 export class EmulatorProvider implements DeviceProvider {
   constructor(private project: FullProject<AppwrightConfig>) {}
@@ -36,23 +30,6 @@ For detailed instructions on how to set up the Android SDK path, visit: https://
       }
 
       await isEmulatorInstalled(this.project.use.platform);
-
-      ///check for driver in appium i.e. android and iOS
-      const isuiAutomatorInstalled = await isDriverInstalled("uiautomator2");
-      if (!isuiAutomatorInstalled) {
-        logger.warn("uiautomator2 driver not installed");
-        logger.log("Trying to install uiautomator2");
-        await installDriver("uiautomator2");
-        logger.log("uiautomator2 driver installed successfully");
-      }
-    } else {
-      const isxcuitestInstalled = await isDriverInstalled("xcuitest");
-      if (!isxcuitestInstalled) {
-        logger.warn("xcuitest driver not installed");
-        logger.log("Trying to install xcuitest");
-        await installDriver("xcuitest");
-        logger.log("xcuitest driver installed successfully");
-      }
     }
   }
 

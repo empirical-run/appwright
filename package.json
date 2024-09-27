@@ -48,6 +48,8 @@
     "@empiricalrun/typescript-config": "^0.3.0",
     "@types/async-retry": "^1.4.8",
     "@types/node": "^22.5.2",
+    "appium-uiautomator2-driver": "^3.8.0",
+    "appium-xcuitest-driver": "^7.27.0",
     "eslint": "8.57.0"
   }
 }

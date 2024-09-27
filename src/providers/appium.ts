@@ -32,39 +32,6 @@ export function installDriver(driverName: string): Promise<void> {
   });
 }
 
-export function isDriverInstalled(driver: string): Promise<boolean> {
-  return new Promise((resolve, reject) => {
-    const appiumProcess = spawn(
-      "npx",
-      ["appium", "driver", "list", "--installed"],
-      {
-        stdio: "pipe",
-      },
-    );
-
-    let output = "";
-
-    appiumProcess.stderr.on("data", (data: Buffer) => {
-      output += data.toString();
-    });
-
-    appiumProcess.on("close", (code) => {
-      if (code !== 0) {
-        reject(new Error("Failed to check for installed appium drivers"));
-      } else if (output.includes(driver)) {
-        resolve(true);
-      } else {
-        resolve(false);
-      }
-    });
-
-    appiumProcess.on("error", (error) => {
-      logger.error(`Is driver installed: ${error.message}`);
-      reject(error);
-    });
-  });
-}
-
 export async function startAppiumServer(
   provider: string,
 ): Promise<ChildProcess> {
