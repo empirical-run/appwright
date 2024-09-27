@@ -135,37 +135,6 @@ export function isEmulatorInstalled(platform: Platform): Promise<boolean> {
           );
         }
       });
-    } else {
-      // TODO: Verify this method
-      // exec("xcrun simctl list", (error, stdout, stderr) => {
-      //   if (error) {
-      //     // Throw explicit error if xcrun is not found or any error occurs
-      //     return reject(
-      //       new Error(
-      //         `iPhone Simulator setup is missing or incomplete. Ensure that Xcode and its command-line tools are installed correctly. `,
-      //       ),
-      //     );
-      //   }
-      //   if (stderr) {
-      //     console.error(stderr);
-      //     return reject(
-      //       new Error(
-      //         "An unexpected error occurred while checking iPhone Simulator setup.",
-      //       ),
-      //     );
-      //   }
-      //   // Check if any simulators are listed
-      //   if (!stdout.includes("iPhone")) {
-      //     return reject(
-      //       new Error(
-      //         "No iPhone simulators found. Please ensure that Xcode is properly configured with iPhone simulators.",
-      //       ),
-      //     );
-      //   }
-      //   // If everything is set up correctly
-      //   console.log("iPhone Simulator setup is complete.");
-      //   resolve(true);
-      // });
     }
   });
 }
