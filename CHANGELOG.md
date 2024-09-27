@@ -1,5 +1,11 @@
 # appwright
 
+## 0.0.27
+
+### Patch Changes
+
+- db747d5: fix: add driver dependencies to appium
+
 ## 0.0.26
 
 ### Patch Changes
