@@ -12,6 +12,7 @@ import {
   startAppiumServer,
 } from "../appium";
 import { FullProject } from "@playwright/test";
+import { validateBuildPath } from "../../utils";
 
 export class EmulatorProvider implements DeviceProvider {
   constructor(private project: FullProject<AppwrightConfig>) {}
@@ -21,6 +22,10 @@ export class EmulatorProvider implements DeviceProvider {
   }
 
   async globalSetup() {
+    validateBuildPath(
+      this.project.use.buildPath,
+      this.project.use.platform == Platform.ANDROID ? ".apk" : ".app",
+    );
     if (this.project.use.platform == Platform.ANDROID) {
       const androidHome = process.env.ANDROID_HOME;
 

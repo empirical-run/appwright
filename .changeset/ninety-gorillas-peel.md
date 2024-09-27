@@ -1,0 +1,5 @@
+---
+"appwright": patch
+---
+
+Buildpath validation

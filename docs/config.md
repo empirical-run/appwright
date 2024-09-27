@@ -22,6 +22,8 @@ These environment variables are required for the BrowserStack
 - BROWSERSTACK_USERNAME
 - BROWSERSTACK_ACCESS_KEY
 
+BrowserStack also requires `name` and `osVersion` of the device to be set in the projects in appwright config file.
+
 ### Android Emulator
 
 To run tests on the Android emulator, ensure the following installations are available. If not, follow these steps:
@@ -31,3 +33,23 @@ To run tests on the Android emulator, ensure the following installations are ava
 3. **Check Java Installation**: Verify if Java is installed by running `java -version`. If it's not installed:
    - Install Java using Homebrew: `brew install java`.
    - After installation, run the symlink command provided at the end of the installation process.
+
+
+To check for available emulators, run the following command:
+
+```sh
+$ANDROID_HOME/emulator/emulator --list-avds
+```
+
+### iOS Simulator
+
+To run tests on the iOS Simulator, ensure the following installations are available. If not, follow these steps:
+
+1. **Install Xcode**: If not installed, download and install it from [here](https://developer.apple.com/xcode/).
+2. **Download iOS Simulator**: While installing Xcode, you will be prompted to select the platform to develop for. Ensure that iOS is selected.
+
+To check for available iOS simulators, run the following command:
+
+```sh
+xcrun simctl list
+```
