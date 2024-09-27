@@ -1,5 +1,11 @@
 # appwright
 
+## 0.0.31
+
+### Patch Changes
+
+- f7bd426: feat: add support for test.skip if llm keys are not available
+
 ## 0.0.30
 
 ### Patch Changes
