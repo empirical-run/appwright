@@ -1,5 +1,11 @@
 # appwright
 
+## 0.0.29
+
+### Patch Changes
+
+- a512d15: feat: add reinstallation of drivers
+
 ## 0.0.28
 
 ### Patch Changes
