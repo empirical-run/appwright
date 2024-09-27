@@ -1,5 +1,11 @@
 # appwright
 
+## 0.0.25
+
+### Patch Changes
+
+- 62c6759: fix: app bundle id for browserstack provider
+
 ## 0.0.24
 
 ### Patch Changes
