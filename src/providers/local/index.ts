@@ -9,6 +9,7 @@ import { Device } from "../../device";
 import { FullProject } from "@playwright/test";
 import {
   getAppBundleId,
+  installDriver,
   isEmulatorInstalled,
   startAppiumServer,
 } from "../appium";
@@ -48,6 +49,11 @@ export class LocalDeviceProvider implements DeviceProvider {
   }
 
   private async createDriver(): Promise<Device> {
+    await installDriver(
+      this.project.use.platform == Platform.ANDROID
+        ? "uiautomator2"
+        : "xcuitest",
+    );
     await startAppiumServer(this.project.use.device?.provider!);
     const WebDriver = (await import("webdriver")).default;
     const webDriverClient = await WebDriver.newSession(this.createConfig());

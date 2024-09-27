@@ -6,7 +6,11 @@ import {
   TestInfoOptions,
 } from "../../types";
 import { Device } from "../../device";
-import { isEmulatorInstalled, startAppiumServer } from "../appium";
+import {
+  installDriver,
+  isEmulatorInstalled,
+  startAppiumServer,
+} from "../appium";
 import { FullProject } from "@playwright/test";
 
 export class EmulatorProvider implements DeviceProvider {
@@ -34,6 +38,11 @@ For detailed instructions on how to set up the Android SDK path, visit: https://
   }
 
   private async createDriver(): Promise<Device> {
+    await installDriver(
+      this.project.use.platform == Platform.ANDROID
+        ? "uiautomator2"
+        : "xcuitest",
+    );
     await startAppiumServer(this.project.use.device?.provider!);
     const WebDriver = (await import("webdriver")).default;
     const webDriverClient = await WebDriver.newSession(this.createConfig());
