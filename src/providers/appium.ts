@@ -1,8 +1,9 @@
 import { ChildProcess, spawn, exec } from "child_process";
 import path from "path";
 import { Platform } from "../types";
+import { logger } from "../logger";
 
-function installDriver(driverName: string): Promise<void> {
+export function installDriver(driverName: string): Promise<void> {
   return new Promise((resolve, reject) => {
     const installProcess = spawn(
       "npx",
@@ -25,13 +26,13 @@ function installDriver(driverName: string): Promise<void> {
     });
 
     installProcess.on("error", (error) => {
-      console.error(`Install Driver: ${error.message}`);
+      logger.error(`Install Driver: ${error.message}`);
       reject(error);
     });
   });
 }
 
-function isDriverInstalled(driver: string): Promise<boolean> {
+export function isDriverInstalled(driver: string): Promise<boolean> {
   return new Promise((resolve, reject) => {
     const appiumProcess = spawn(
       "npx",
@@ -58,7 +59,7 @@ function isDriverInstalled(driver: string): Promise<boolean> {
     });
 
     appiumProcess.on("error", (error) => {
-      console.error(`Is driver installed: ${error.message}`);
+      logger.error(`Is driver installed: ${error.message}`);
       reject(error);
     });
   });
@@ -66,24 +67,12 @@ function isDriverInstalled(driver: string): Promise<boolean> {
 
 export async function startAppiumServer(
   provider: string,
-  platform: Platform,
 ): Promise<ChildProcess> {
-  if (platform == Platform.ANDROID) {
-    const isuiAutomatorInstalled = await isDriverInstalled("uiautomator2");
-    if (!isuiAutomatorInstalled) {
-      await installDriver("uiautomator2");
-    }
-  } else {
-    const isxcuitestInstalled = await isDriverInstalled("xcuitest");
-    if (!isxcuitestInstalled) {
-      await installDriver("xcuitest");
-    }
-  }
-
   let emulatorStartRequested = false;
   return new Promise((resolve, reject) => {
     const appiumProcess = spawn("npx", ["appium"], {
       stdio: "pipe",
+      cwd: process.cwd(),
     });
 
     appiumProcess.stdout.on("data", async (data: Buffer) => {
@@ -96,45 +85,78 @@ export async function startAppiumServer(
       }
 
       if (output.includes("Appium REST http interface listener started")) {
-        console.log("Appium server is up and running.");
+        logger.log("Appium server is up and running.");
         resolve(appiumProcess);
       }
     });
 
     appiumProcess.on("error", (error) => {
-      console.error(`Appium: ${error}`);
+      logger.error(`Appium: ${error}`);
       reject(error);
     });
 
     process.on("exit", () => {
-      console.log("Main process exiting. Killing Appium server...");
+      logger.log("Main process exiting. Killing Appium server...");
       appiumProcess.kill();
     });
 
     appiumProcess.on("close", (code: number) => {
-      console.log(`Appium server exited with code ${code}`);
+      logger.log(`Appium server exited with code ${code}`);
     });
   });
 }
 
-async function startAndroidEmulator(): Promise<void> {
+export function isEmulatorInstalled(platform: Platform): Promise<boolean> {
+  return new Promise((resolve) => {
+    if (platform == Platform.ANDROID) {
+      const androidHome = process.env.ANDROID_HOME;
+
+      const emulatorPath = path.join(androidHome!, "emulator", "emulator");
+      exec(`${emulatorPath} -list-avds`, (error, stdout, stderr) => {
+        if (error) {
+          throw new Error(
+            `Error fetching emulator list.\nPlease install emulator from Android SDK Tools.
+Follow this guide to install emulators: https://community.neptune-software.com/topics/tips--tricks/blogs/how-to-install--android-emulator-without--android--st`,
+          );
+        }
+        if (stderr) {
+          logger.error(`Emulator: ${stderr}`);
+        }
+
+        const lines = stdout.trim().split("\n");
+
+        const deviceNames = lines.filter(
+          (line) =>
+            line.trim() && !line.startsWith("INFO") && !line.includes("/tmp/"),
+        );
+
+        if (deviceNames.length > 0) {
+          resolve(true);
+        } else {
+          throw new Error(
+            `No installed emulators found.
+Follow this guide to install emulators: https://community.neptune-software.com/topics/tips--tricks/blogs/how-to-install--android-emulator-without--android--st`,
+          );
+        }
+      });
+    }
+  });
+}
+
+export async function startAndroidEmulator(): Promise<void> {
   return new Promise((resolve, reject) => {
     const androidHome = process.env.ANDROID_HOME;
 
-    if (!androidHome) {
-      return reject(
-        "The ANDROID_HOME environment variable is not set. This variable is required to locate your Android SDK. Please set it to the correct path of your Android SDK installation. For detailed instructions on how to set up the Android SDK path, visit: https://developer.android.com/tools/variables#envar",
-      );
-    }
-
-    const emulatorPath = path.join(androidHome, "emulator", "emulator");
+    const emulatorPath = path.join(androidHome!, "emulator", "emulator");
 
     exec(`${emulatorPath} -list-avds`, (error, stdout, stderr) => {
       if (error) {
-        return reject(`Error fetching emulator list: ${error.message}`);
+        throw new Error(
+          `Error fetching emulator list.\nPlease install emulator from Android SDK Tools.\nFollow this guide to install emulators: https://community.neptune-software.com/topics/tips--tricks/blogs/how-to-install--android-emulator-without--android--st`,
+        );
       }
       if (stderr) {
-        console.error(stderr);
+        logger.error(`Emulator: ${stderr}`);
       }
 
       const lines = stdout.trim().split("\n");
@@ -146,11 +168,11 @@ async function startAndroidEmulator(): Promise<void> {
       );
 
       if (deviceNames.length === 0) {
-        return reject(
-          "No installed emulators found. Follow this guide to install emulators: https://developer.android.com/studio/run/emulator#avd",
+        throw new Error(
+          `No installed emulators found.\nFollow this guide to install emulators: https://community.neptune-software.com/topics/tips--tricks/blogs/how-to-install--android-emulator-without--android--st`,
         );
       } else {
-        console.log(`Available Emulators: ${deviceNames}`);
+        logger.log(`Available Emulators: ${deviceNames}`);
       }
 
       const emulatorToStart = deviceNames[0];
@@ -160,20 +182,16 @@ async function startAndroidEmulator(): Promise<void> {
       });
 
       emulatorProcess.stdout?.on("data", (data) => {
-        console.log(`Emulator: ${data}`);
+        logger.log(`Emulator: ${data}`);
 
         if (data.includes("Successfully loaded snapshot 'default_boot'")) {
-          console.log("Emulator started successfully.");
+          logger.log("Emulator started successfully.");
           resolve();
         }
       });
 
-      emulatorProcess.stderr?.on("data", (data) => {
-        console.error(`Emulator: ${data}`);
-      });
-
       emulatorProcess.on("error", (err) => {
-        console.error(`Emulator: ${err.message}`);
+        logger.error(`Emulator: ${err.message}`);
         reject(`Failed to start emulator: ${err.message}`);
       });
 
@@ -185,7 +203,7 @@ async function startAndroidEmulator(): Promise<void> {
 
       // Ensure the emulator process is killed when the main process exits
       process.on("exit", () => {
-        console.log("Main process exiting. Killing the emulator process...");
+        logger.log("Main process exiting. Killing the emulator process...");
         emulatorProcess.kill();
       });
     });
@@ -198,12 +216,12 @@ export function getAppBundleId(path: string): Promise<string> {
 
     exec(command, (error, stdout, stderr) => {
       if (error) {
-        console.error("osascript:", error.message);
+        logger.error("osascript:", error.message);
         return reject(error);
       }
 
       if (stderr) {
-        console.error(`osascript: ${stderr}`);
+        logger.error(`osascript: ${stderr}`);
         return reject(new Error(stderr));
       }
 
