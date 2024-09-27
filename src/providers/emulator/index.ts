@@ -51,14 +51,13 @@ export class EmulatorProvider implements DeviceProvider {
     await startAppiumServer(this.project.use.device?.provider!);
     const WebDriver = (await import("webdriver")).default;
     const webDriverClient = await WebDriver.newSession(this.createConfig());
-    const bundleId = await getAppBundleId(this.project.use.buildPath!);
     const expectTimeout = this.project.use.expectTimeout!;
     const testOptions: TestInfoOptions = {
       expectTimeout,
     };
     return new Device(
       webDriverClient,
-      bundleId,
+      undefined,
       testOptions,
       this.project.use.device?.provider!,
     );
