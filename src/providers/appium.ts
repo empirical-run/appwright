@@ -113,7 +113,7 @@ export function isEmulatorInstalled(platform: Platform): Promise<boolean> {
       exec(`${emulatorPath} -list-avds`, (error, stdout, stderr) => {
         if (error) {
           return reject(
-            `Error fetching emulator list. Please install emulator from Android SDK Tools. Follow this guide to install emulators: https://developer.android.com/studio/run/managing-avds`,
+            `Error fetching emulator list. Please install emulator from Android SDK Tools. Follow this guide to install emulators: https://community.neptune-software.com/topics/tips--tricks/blogs/how-to-install--android-emulator-without--android--st`,
           );
         }
         if (stderr) {
@@ -131,7 +131,7 @@ export function isEmulatorInstalled(platform: Platform): Promise<boolean> {
           resolve(true);
         } else {
           return reject(
-            "No installed emulators found. Follow this guide to install emulators: https://developer.android.com/studio/run/emulator#avd",
+            "No installed emulators found. Follow this guide to install emulators: https://community.neptune-software.com/topics/tips--tricks/blogs/how-to-install--android-emulator-without--android--st",
           );
         }
       });

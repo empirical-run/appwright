@@ -8,7 +8,6 @@ import {
 import { Device } from "../../device";
 import {
   isEmulatorInstalled,
-  getAppBundleId,
   installDriver,
   isDriverInstalled,
   startAppiumServer,
@@ -28,7 +27,7 @@ export class EmulatorProvider implements DeviceProvider {
 
       if (!androidHome) {
         return Promise.reject(
-          "The ANDROID_HOME environment variable is not set. This variable is required to locate your Android SDK. Please set it to the correct path of your Android SDK installation. For detailed instructions on how to set up the Android SDK path, visit: https://developer.android.com/tools/variables#envar",
+          "The ANDROID_HOME environment variable is not set. This variable is required to locate your Android SDK. Please set it to the correct path of your Android SDK installation. For detailed instructions on how to set up the Android SDK path, visit: https://developer.android.com/tools",
         );
       }
 
