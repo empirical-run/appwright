@@ -1,5 +1,11 @@
 # appwright
 
+## 0.0.26
+
+### Patch Changes
+
+- 7b8d39a: feat: error message for udid for ios
+
 ## 0.0.25
 
 ### Patch Changes
