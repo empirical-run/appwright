@@ -15,11 +15,22 @@ async function globalSetup(config: FullConfig<AppwrightConfig>) {
       }
     }
   });
-  const length = projects.length ? projects.length : config.projects.length;
+
+  if (projects.length == 0) {
+    for (let i = 0; i < config.projects.length; i++) {
+      projects.push(config.projects[i]!.name);
+    }
+  }
+
+  const length = projects.length;
   for (let i = 0; i < length; i++) {
-    const project = config.projects[i]!;
-    const provider = createDeviceProvider(project);
-    await provider.globalSetup?.();
+    const project = config.projects.find(
+      (project) => project.name === projects[i],
+    );
+    if (project) {
+      const provider = createDeviceProvider(project);
+      await provider.globalSetup?.();
+    }
   }
 }
 
