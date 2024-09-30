@@ -199,12 +199,12 @@ export class Device {
     }
   }
 
-  async scanQRCode(): Promise<void> {
+  async scanQRCode(qrImagePath: string): Promise<void> {
     if (this.provider == "browserstack") {
-      const imageURL = await readQRCode();
+      const imageURL = await readQRCode(qrImagePath);
       await this.webdriverClient.executeScript(
-        "browserstack_executor': cameraImageInjection",
-        [`"arguments": {"imageUrl" : "${imageURL}"}`],
+        `browserstack_executor: {"action":"cameraImageInjection", "arguments": {"imageUrl" : "${imageURL}"}}`,
+        [],
       );
     }
   }
