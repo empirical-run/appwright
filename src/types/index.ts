@@ -20,6 +20,7 @@ export interface DeviceProvider {
     reason?: string;
     name?: string;
   }) => Promise<void>;
+  readQRCode?: () => Promise<void>;
 }
 
 export type AppwrightConfig = {

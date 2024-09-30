@@ -4,6 +4,7 @@ import { Locator } from "../locator";
 import { AppwrightLocator, Platform, TestInfoOptions } from "../types";
 import { AppwrightVision, VisionProvider } from "../vision";
 import { boxedStep } from "../utils";
+import { readQRCode } from "../providers/browserstack/utils";
 
 export class Device {
   constructor(
@@ -195,6 +196,16 @@ export class Device {
         ]);
         return clipboardDataBase64;
       }
+    }
+  }
+
+  async scanQRCode(): Promise<void> {
+    if (this.provider == "browserstack") {
+      const imageURL = await readQRCode();
+      await this.webdriverClient.executeScript(
+        "browserstack_executor': cameraImageInjection",
+        [`"arguments": {"imageUrl" : "${imageURL}"}`],
+      );
     }
   }
 }
