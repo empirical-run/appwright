@@ -2,7 +2,7 @@ import { ChildProcess, spawn, exec } from "child_process";
 import path from "path";
 import { Platform } from "../types";
 import { logger } from "../logger";
-import fs from "fs";
+import fs from "fs/promises";
 
 export async function installDriver(driverName: string): Promise<void> {
   // uninstall the driver first to avoid conflicts
