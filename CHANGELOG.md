@@ -1,5 +1,134 @@
 # appwright
 
+## 0.0.32
+
+### Patch Changes
+
+- ba88b2f: Buildpath validation
+- 4f49719: chore: update error strings and add doc links
+
+## 0.0.31
+
+### Patch Changes
+
+- f7bd426: feat: add support for test.skip if llm keys are not available
+
+## 0.0.30
+
+### Patch Changes
+
+- f34bb56: fix: run global setup only for provided project
+
+## 0.0.29
+
+### Patch Changes
+
+- a512d15: feat: add reinstallation of drivers
+
+## 0.0.28
+
+### Patch Changes
+
+- c2efc55: fix: error running tests due to missing appium drivers
+
+## 0.0.27
+
+### Patch Changes
+
+- db747d5: fix: add driver dependencies to appium
+
+## 0.0.26
+
+### Patch Changes
+
+- 7b8d39a: feat: error message for udid for ios
+
+## 0.0.25
+
+### Patch Changes
+
+- 62c6759: fix: app bundle id for browserstack provider
+
+## 0.0.24
+
+### Patch Changes
+
+- 4951c96: fix: install appium driver if not installed already
+
+## 0.0.23
+
+### Patch Changes
+
+- dcee15e: chore: update doc strings
+
+## 0.0.22
+
+### Patch Changes
+
+- 8563e13: chore: remove verbose logs
+- df08327: feat: added support to run appwright on local device
+
+## 0.0.21
+
+### Patch Changes
+
+- 99a557c: fix: validation for config.globalSetup
+
+## 0.0.20
+
+### Patch Changes
+
+- b210e79: fix: build upload validation in browserstack provider
+- 9266137: chore: warning for globalSetup config behavior
+
+## 0.0.19
+
+### Patch Changes
+
+- b8e6947: feat: support buildPath and build uploads with globalSetup
+- 10c7397: fix: pick correct browserstack build url
+
+## 0.0.18
+
+### Patch Changes
+
+- 6458d17: chore: refactored device provider methods
+- 1b26228: fix: webdriver client getting passed as undefined to device
+
+## 0.0.17
+
+### Patch Changes
+
+- ee98722: chore: refactored appwright APIs
+
+## 0.0.16
+
+### Patch Changes
+
+- 8c04904: fix: remove custom reporter
+
+## 0.0.15
+
+### Patch Changes
+
+- b9f5c3d: chore: move boxedStep to util and add locator docstrings
+- 912b092: chore: rename internal classes for readability
+- 2d1c600: feat: rename tap method
+- 8febdb4: fix: added `boxedStep` decorator to actions
+- 3abaabe: fix: corrected import for driver
+
+## 0.0.14
+
+### Patch Changes
+
+- ebfb243: feat: added capability to search element using regex
+
+## 0.0.13
+
+### Patch Changes
+
+- 4cb2069: feat: expose npx appwright bin
+
 ## 0.0.12
 
 ### Patch Changes
