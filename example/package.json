@@ -10,6 +10,6 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "appwright": "^0.0.24"
+    "appwright": ".."
   }
 }

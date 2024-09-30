@@ -3,6 +3,10 @@ import path from "path";
 import { Platform } from "../types";
 import { logger } from "../logger";
 import fs from "fs/promises";
+import { promisify } from "util";
+import { getLatestBuildToolsVersions } from "../utils";
+
+const execPromise = promisify(exec);
 
 export async function installDriver(driverName: string): Promise<void> {
   // uninstall the driver first to avoid conflicts
@@ -202,73 +206,74 @@ export function getAppBundleId(path: string): Promise<string> {
   });
 }
 
-async function getLatestBuildToolsVersion(
-  androidHome: string,
-): Promise<string | undefined> {
-  return new Promise((resolve, reject) => {
-    const buildToolsPath = path.join(androidHome, "build-tools");
+async function getLatestBuildToolsVersion(): Promise<string | undefined> {
+  const androidHome = process.env.ANDROID_HOME;
+  const buildToolsPath = path.join(androidHome!, "build-tools");
+  try {
+    const files = await fs.readdir(buildToolsPath);
 
-    fs.readdir(buildToolsPath, (err, files) => {
-      if (err) {
-        console.error(`getLatestBuildToolsVersion: ${err}`);
-        return reject("Error reading build-tools directory");
-      }
+    const versions = files.filter((file) =>
+      /^\d+\.\d+\.\d+(-rc\d+)?$/.test(file),
+    );
 
-      // Filter out files that are not valid build-tools versions (directories with version numbers)
-      const versions = files.filter((file) =>
-        /^\d+\.\d+\.\d+(-rc\d+)?$/.test(file),
+    if (versions.length === 0) {
+      throw new Error(
+        `No valid build-tools found in ${buildToolsPath}. Please download from Android Studio: https://developer.android.com/studio/intro/update#required`,
       );
+    }
 
-      if (versions.length === 0) {
-        return reject("No valid build-tools version found");
-      }
-
-      const latestVersion = versions.sort((a, b) => (a > b ? -1 : 1))[0];
-      resolve(latestVersion);
-    });
-  });
+    return getLatestBuildToolsVersions(versions);
+  } catch (err) {
+    console.error(`getLatestBuildToolsVersion: ${err}`);
+    throw new Error(
+      `Error reading ${buildToolsPath}. Ensure it exists or download from Android Studio: https://developer.android.com/studio/intro/update#required`,
+    );
+  }
 }
 
 export async function getApkDetails(buildPath: string): Promise<{
   packageName: string | undefined;
   launchableActivity: string | undefined;
 }> {
-  const buildToolsVersion = await getLatestBuildToolsVersion(
-    process.env.ANDROID_HOME!,
-  );
+  const androidHome = process.env.ANDROID_HOME;
+  const buildToolsVersion = await getLatestBuildToolsVersion();
+
   if (!buildToolsVersion) {
-    throw new Error("Failed to get latest build tools version");
-  }
-  return new Promise((resolve, reject) => {
-    const androidHome = process.env.ANDROID_HOME;
-
-    const aaptPath = path.join(
-      androidHome!,
-      "build-tools",
-      buildToolsVersion!,
-      "aapt",
+    throw new Error(
+      `No valid build-tools found in ${buildToolsVersion}. Please download from Android Studio: https://developer.android.com/studio/intro/update#required`,
     );
-    const command = `${aaptPath} dump badging ${buildPath}`;
+  }
 
-    exec(command, (error, stdout, stderr) => {
-      if (error) {
-        logger.error(`getApkDetails: ${error.message}`);
-        return reject(new Error(`Error executing aapt: ${stderr}`));
-      }
+  const aaptPath = path.join(
+    androidHome!,
+    "build-tools",
+    buildToolsVersion!,
+    "aapt",
+  );
+  const command = `${aaptPath} dump badging ${buildPath}`;
 
-      const packageMatch = stdout.match(/package: name='(\S+)'/);
-      const activityMatch = stdout.match(/launchable-activity: name='(\S+)'/);
+  try {
+    const { stdout, stderr } = await execPromise(command);
 
-      if (!packageMatch || !activityMatch) {
-        return reject(
-          "Unable to find package or launchable activity in the APK. Please check the APK and try again.",
-        );
-      }
+    if (stderr) {
+      console.error(`getApkDetails: ${stderr}`);
+      throw new Error(`Error executing aapt: ${stderr}`);
+    }
 
-      const packageName = packageMatch[1];
-      const launchableActivity = activityMatch[1];
+    const packageMatch = stdout.match(/package: name='(\S+)'/);
+    const activityMatch = stdout.match(/launchable-activity: name='(\S+)'/);
 
-      resolve({ packageName, launchableActivity });
-    });
-  });
+    if (!packageMatch || !activityMatch) {
+      throw new Error(
+        `Unable to retrieve package or launchable activity from the APK. Please verify that the provided file is a valid APK.`,
+      );
+    }
+
+    const packageName = packageMatch[1];
+    const launchableActivity = activityMatch[1];
+
+    return { packageName, launchableActivity };
+  } catch (error: any) {
+    throw new Error(`getApkDetails: ${error.message}`);
+  }
 }

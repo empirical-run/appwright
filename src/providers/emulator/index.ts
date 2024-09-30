@@ -80,7 +80,6 @@ Follow the steps mentioned in ${androidSimulatorConfigDocLink} to run test on An
     const { packageName, launchableActivity } = await getApkDetails(
       this.project.use.buildPath!,
     );
-    console.log(packageName, launchableActivity);
     return {
       port: 4723,
       capabilities: {
@@ -89,7 +88,6 @@ Follow the steps mentioned in ${androidSimulatorConfigDocLink} to run test on An
           platformName == Platform.ANDROID ? "uiautomator2" : "xcuitest",
         "appium:platformVersion": (this.project.use.device as EmulatorConfig)
           .osVersion,
-        //TODO: Figure out the scenario for multiple activities
         "appium:appActivity": launchableActivity,
         "appium:appPackage": packageName,
         platformName: platformName,
