@@ -200,3 +200,36 @@ export function getAppBundleId(path: string): Promise<string> {
     });
   });
 }
+
+export async function getApkDetails(buildPath: string): Promise<{
+  packageName: string | undefined;
+  launchableActivity: string | undefined;
+}> {
+  return new Promise((resolve, reject) => {
+    const androidHome = process.env.ANDROID_HOME;
+
+    const aaptPath = path.join(androidHome!, "build-tools", "35.0.0", "aapt");
+    const command = `${aaptPath} dump badging ${buildPath}`;
+
+    exec(command, (error, stdout, stderr) => {
+      if (error) {
+        logger.error(`getApkDetails: ${error.message}`);
+        return reject(new Error(`Error executing aapt: ${stderr}`));
+      }
+
+      const packageMatch = stdout.match(/package: name='(\S+)'/);
+      const activityMatch = stdout.match(/launchable-activity: name='(\S+)'/);
+
+      if (!packageMatch || !activityMatch) {
+        return reject(
+          "Unable to find package or launchable activity in the APK. Please check the APK and try again.",
+        );
+      }
+
+      const packageName = packageMatch[1];
+      const launchableActivity = activityMatch[1];
+
+      resolve({ packageName, launchableActivity });
+    });
+  });
+}

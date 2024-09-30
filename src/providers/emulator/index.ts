@@ -7,6 +7,7 @@ import {
 } from "../../types";
 import { Device } from "../../device";
 import {
+  getApkDetails,
   installDriver,
   isEmulatorInstalled,
   startAppiumServer,
@@ -58,7 +59,9 @@ Follow the steps mentioned in ${androidSimulatorConfigDocLink} to run test on An
     );
     await startAppiumServer(this.project.use.device?.provider!);
     const WebDriver = (await import("webdriver")).default;
-    const webDriverClient = await WebDriver.newSession(this.createConfig());
+    const webDriverClient = await WebDriver.newSession(
+      await this.createConfig(),
+    );
     const expectTimeout = this.project.use.expectTimeout!;
     const testOptions: TestInfoOptions = {
       expectTimeout,
@@ -71,8 +74,13 @@ Follow the steps mentioned in ${androidSimulatorConfigDocLink} to run test on An
     );
   }
 
-  private createConfig() {
+  private async createConfig() {
     const platformName = this.project.use.platform;
+
+    const { packageName, launchableActivity } = await getApkDetails(
+      this.project.use.buildPath!,
+    );
+    console.log(packageName, launchableActivity);
     return {
       port: 4723,
       capabilities: {
@@ -82,8 +90,8 @@ Follow the steps mentioned in ${androidSimulatorConfigDocLink} to run test on An
         "appium:platformVersion": (this.project.use.device as EmulatorConfig)
           .osVersion,
         //TODO: Figure out the scenario for multiple activities
-        // "appium:appActivity": "org.wikipedia.main.MainActivity",
-        // "appium:appPackage": "org.wikipedia",
+        "appium:appActivity": launchableActivity,
+        "appium:appPackage": packageName,
         platformName: platformName,
         "appium:autoGrantPermissions": true,
         "appium:app": this.project.use.buildPath,
