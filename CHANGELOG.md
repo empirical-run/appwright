@@ -1,5 +1,11 @@
 # appwright
 
+## 0.0.33
+
+### Patch Changes
+
+- 0a35685: fix: correct project not getting selected with `--project` flag
+
 ## 0.0.32
 
 ### Patch Changes
