@@ -2,6 +2,7 @@ import { ChildProcess, spawn, exec } from "child_process";
 import path from "path";
 import { Platform } from "../types";
 import { logger } from "../logger";
+import fs from "fs";
 
 export async function installDriver(driverName: string): Promise<void> {
   // uninstall the driver first to avoid conflicts
@@ -201,14 +202,52 @@ export function getAppBundleId(path: string): Promise<string> {
   });
 }
 
+async function getLatestBuildToolsVersion(
+  androidHome: string,
+): Promise<string | undefined> {
+  return new Promise((resolve, reject) => {
+    const buildToolsPath = path.join(androidHome, "build-tools");
+
+    fs.readdir(buildToolsPath, (err, files) => {
+      if (err) {
+        console.error(`getLatestBuildToolsVersion: ${err}`);
+        return reject("Error reading build-tools directory");
+      }
+
+      // Filter out files that are not valid build-tools versions (directories with version numbers)
+      const versions = files.filter((file) =>
+        /^\d+\.\d+\.\d+(-rc\d+)?$/.test(file),
+      );
+
+      if (versions.length === 0) {
+        return reject("No valid build-tools version found");
+      }
+
+      const latestVersion = versions.sort((a, b) => (a > b ? -1 : 1))[0];
+      resolve(latestVersion);
+    });
+  });
+}
+
 export async function getApkDetails(buildPath: string): Promise<{
   packageName: string | undefined;
   launchableActivity: string | undefined;
 }> {
+  const buildToolsVersion = await getLatestBuildToolsVersion(
+    process.env.ANDROID_HOME!,
+  );
+  if (!buildToolsVersion) {
+    throw new Error("Failed to get latest build tools version");
+  }
   return new Promise((resolve, reject) => {
     const androidHome = process.env.ANDROID_HOME;
 
-    const aaptPath = path.join(androidHome!, "build-tools", "35.0.0", "aapt");
+    const aaptPath = path.join(
+      androidHome!,
+      "build-tools",
+      buildToolsVersion!,
+      "aapt",
+    );
     const command = `${aaptPath} dump badging ${buildPath}`;
 
     exec(command, (error, stdout, stderr) => {
