@@ -8,7 +8,9 @@ import {
 import { Device } from "../../device";
 import { FullProject } from "@playwright/test";
 import {
+  getActiveAndroidDevices,
   getAppBundleId,
+  getConnectedIOSDeviceUDID,
   installDriver,
   isEmulatorInstalled,
   startAppiumServer,
@@ -19,20 +21,7 @@ export class LocalDeviceProvider implements DeviceProvider {
   constructor(private project: FullProject<AppwrightConfig>) {}
 
   async getDevice(): Promise<Device> {
-    this.validateConfig();
     return await this.createDriver();
-  }
-
-  private validateConfig() {
-    const device = this.project.use.device as LocalDeviceConfig;
-    const platform = this.project.use.platform;
-    let errorMessage = `UDID is required for running tests on real devices`;
-    if (!device.udid) {
-      if (platform == Platform.IOS) {
-        errorMessage = `${errorMessage}. Run "xcrun xctrace list devices | grep iPhone | grep -v Simulator" to find it for your iPhone device.`;
-      }
-      throw new Error(errorMessage);
-    }
   }
 
   async globalSetup() {
@@ -61,7 +50,9 @@ export class LocalDeviceProvider implements DeviceProvider {
     );
     await startAppiumServer(this.project.use.device?.provider!);
     const WebDriver = (await import("webdriver")).default;
-    const webDriverClient = await WebDriver.newSession(this.createConfig());
+    const webDriverClient = await WebDriver.newSession(
+      await this.createConfig(),
+    );
     const bundleId = await getAppBundleId(this.project.use.buildPath!);
     const expectTimeout = this.project.use.expectTimeout!;
     const testOptions: TestInfoOptions = {
@@ -75,13 +66,27 @@ export class LocalDeviceProvider implements DeviceProvider {
     );
   }
 
-  private createConfig() {
+  private async createConfig() {
     const platformName = this.project.use.platform;
+    let udid = (this.project.use.device as LocalDeviceConfig).udid;
+    if (!udid) {
+      if (platformName == Platform.IOS) {
+        udid = await getConnectedIOSDeviceUDID();
+      } else {
+        const activeAndroidDevices = await getActiveAndroidDevices();
+        if (activeAndroidDevices > 1) {
+          console.warn(
+            `Multiple active devices detected. Selecting one for the test. 
+To specify a device, use the udid property. Run "adb devices" to get the UDID for active devices.`,
+          );
+        }
+      }
+    }
     return {
       port: 4723,
       capabilities: {
         "appium:deviceName": this.project.use.device?.name,
-        "appium:udid": (this.project.use.device as LocalDeviceConfig).udid,
+        "appium:udid": udid,
         "appium:automationName":
           platformName == Platform.ANDROID ? "uiautomator2" : "xcuitest",
         platformName: platformName,

@@ -2,6 +2,8 @@ import { ChildProcess, spawn, exec } from "child_process";
 import path from "path";
 import { Platform } from "../types";
 import { logger } from "../logger";
+import { promisify } from "util";
+const execPromise = promisify(exec);
 
 export async function installDriver(driverName: string): Promise<void> {
   // uninstall the driver first to avoid conflicts
@@ -179,18 +181,15 @@ export async function startAndroidEmulator(): Promise<void> {
 export function getAppBundleId(path: string): Promise<string> {
   return new Promise((resolve, reject) => {
     const command = `osascript -e 'id of app "${path}"'`;
-
     exec(command, (error, stdout, stderr) => {
       if (error) {
         logger.error("osascript:", error.message);
         return reject(error);
       }
-
       if (stderr) {
         logger.error(`osascript: ${stderr}`);
         return reject(new Error(stderr));
       }
-
       const bundleId = stdout.trim();
       if (bundleId) {
         resolve(bundleId);
@@ -199,4 +198,56 @@ export function getAppBundleId(path: string): Promise<string> {
       }
     });
   });
+}
+
+export async function getConnectedIOSDeviceUDID(): Promise<string> {
+  try {
+    const { stdout } = await execPromise(`xcrun xctrace list devices`);
+
+    const iphoneDevices = stdout
+      .split("\n")
+      .filter((line) => line.includes("iPhone"));
+
+    const realDevices = iphoneDevices.filter(
+      (line) => !line.includes("Simulator"),
+    );
+
+    if (realDevices.length === 0) {
+      throw new Error(
+        `No connected iPhone detected. Please ensure your device is connected and try again.`,
+      );
+    }
+
+    const deviceLine = realDevices[0];
+    const matches = deviceLine!.match(/\(([\da-fA-F-]+)\)$/);
+
+    if (matches && matches[1]) {
+      return matches[1];
+    } else {
+      throw new Error(
+        `Please check your iPhone device connection. 
+To check for connected devices run "xcrun xctrace list devices | grep iPhone | grep -v Simulator"`,
+      );
+    }
+  } catch (error) {
+    //@ts-ignore
+    throw new Error(`getConnectedIOSDeviceUDID: ${error.message}`);
+  }
+}
+
+export async function getActiveAndroidDevices(): Promise<number> {
+  try {
+    const { stdout } = await execPromise("adb devices");
+
+    const lines = stdout.trim().split("\n");
+
+    const deviceLines = lines.filter((line) => line.includes("\tdevice"));
+
+    return deviceLines.length;
+  } catch (error) {
+    throw new Error(
+      //@ts-ignore
+      `getActiveAndroidDevices: ${error.message}`,
+    );
+  }
 }

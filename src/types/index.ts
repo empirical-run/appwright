@@ -44,7 +44,7 @@ export type BrowserstackConfig = {
 export type LocalDeviceConfig = {
   provider: "local-device";
   name?: string;
-  udid: string;
+  udid?: string;
 };
 
 export type EmulatorConfig = {
