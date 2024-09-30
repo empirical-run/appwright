@@ -1,5 +1,11 @@
 # appwright
 
+## 0.0.34
+
+### Patch Changes
+
+- 14e72b7: chore: added npm script to extract app file
+
 ## 0.0.33
 
 ### Patch Changes
