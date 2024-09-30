@@ -17,18 +17,16 @@ async function globalSetup(config: FullConfig<AppwrightConfig>) {
   });
 
   if (projects.length == 0) {
-    for (let i = 0; i < config.projects.length; i++) {
-      projects.push(config.projects[i]!.name);
-    }
+    // Capability to run all projects is not supported currently
+    // This will be added after support for using same appium server for multiple projects is added
+    throw new Error(
+      "Capability to run all projects is not supported. Please specify the project name with --project flag.",
+    );
   }
 
-  const length = projects.length;
-  for (let i = 0; i < length; i++) {
-    const project = config.projects.find(
-      (project) => project.name === projects[i],
-    );
-    if (project) {
-      const provider = createDeviceProvider(project);
+  for (let i = 0; i < config.projects.length; i++) {
+    if (projects.includes(config.projects[i]!.name)) {
+      const provider = createDeviceProvider(config.projects[i]!);
       await provider.globalSetup?.();
     }
   }
