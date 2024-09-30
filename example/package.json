@@ -2,9 +2,10 @@
   "name": "example",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "extract:app": "unzip -o ./wikipedia_ios.zip -d wikipedia_ios.app && mv  wikipedia_ios.app/Wikipedia.app ./wikipedia.app && pwd && rm -rf wikipedia_ios.app"
+    "extract:app": "node tools/extract"
   },
   "keywords": [],
   "author": "",

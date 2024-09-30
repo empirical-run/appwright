@@ -14,7 +14,6 @@ export default defineConfig({
         device: {
           provider: "emulator",
           name: "iPhone 14 Pro",
-          osVersion: "17.5",
         },
         buildPath: join(process.cwd(), "wikipedia.app"),
       },
