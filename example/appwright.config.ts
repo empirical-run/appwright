@@ -12,10 +12,10 @@ export default defineConfig({
       use: {
         platform: Platform.IOS,
         device: {
-          name: "iPhone 14 Pro",
           provider: "emulator",
+          name: "iPhone 14 Pro",
         },
-        buildPath: join(process.cwd(), "Wikipedia.app"),
+        buildPath: join(process.cwd(), "wikipedia.app"),
       },
     },
     {
