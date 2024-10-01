@@ -53,3 +53,9 @@ Please provide the correct path of the build.`,
     );
   }
 }
+
+export function getLatestBuildToolsVersions(
+  versions: string[],
+): string | undefined {
+  return versions.sort((a, b) => (a > b ? -1 : 1))[0];
+}

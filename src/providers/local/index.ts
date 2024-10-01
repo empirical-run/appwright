@@ -9,6 +9,7 @@ import { Device } from "../../device";
 import { FullProject } from "@playwright/test";
 import {
   getActiveAndroidDevices,
+  getApkDetails,
   getAppBundleId,
   getConnectedIOSDeviceUDID,
   installDriver,
@@ -82,6 +83,9 @@ To specify a device, use the udid property. Run "adb devices" to get the UDID fo
         }
       }
     }
+    const { packageName, launchableActivity } = await getApkDetails(
+      this.project.use.buildPath!,
+    );
     return {
       port: 4723,
       capabilities: {
@@ -92,6 +96,8 @@ To specify a device, use the udid property. Run "adb devices" to get the UDID fo
         platformName: platformName,
         "appium:autoGrantPermissions": true,
         "appium:app": this.project.use.buildPath,
+        "appium:appActivity": launchableActivity,
+        "appium:appPackage": packageName,
         "appium:autoAcceptAlerts": true,
         "appium:fullReset": true,
       },
