@@ -17,6 +17,7 @@ import {
   startAppiumServer,
 } from "../appium";
 import { validateBuildPath } from "../../utils";
+import { logger } from "../../logger";
 
 export class LocalDeviceProvider implements DeviceProvider {
   constructor(private project: FullProject<AppwrightConfig>) {}
@@ -86,7 +87,7 @@ export class LocalDeviceProvider implements DeviceProvider {
       } else {
         const activeAndroidDevices = await getActiveAndroidDevices();
         if (activeAndroidDevices > 1) {
-          console.warn(
+          logger.warn(
             `Multiple active devices detected. Selecting one for the test. 
 To specify a device, use the udid property. Run "adb devices" to get the UDID for active devices.`,
           );

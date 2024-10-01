@@ -222,6 +222,8 @@ export async function getConnectedIOSDeviceUDID(): Promise<string> {
     }
 
     const deviceLine = realDevices[0];
+    //the output from above looks like this: User’s iPhone (18.0) (00003110-002A304e3A53C41E)
+    //where `00003110-000A304e3A53C41E` is the UDID of the device
     const matches = deviceLine!.match(/\(([\da-fA-F-]+)\)$/);
 
     if (matches && matches[1]) {
@@ -272,7 +274,7 @@ async function getLatestBuildToolsVersion(): Promise<string | undefined> {
 
     return getLatestBuildToolsVersions(versions);
   } catch (err) {
-    console.error(`getLatestBuildToolsVersion: ${err}`);
+    logger.error(`getLatestBuildToolsVersion: ${err}`);
     throw new Error(
       `Error reading ${buildToolsPath}. Ensure it exists or download from Android Studio: https://developer.android.com/studio/intro/update#required`,
     );
