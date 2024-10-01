@@ -184,18 +184,15 @@ export async function startAndroidEmulator(): Promise<void> {
 export function getAppBundleId(path: string): Promise<string> {
   return new Promise((resolve, reject) => {
     const command = `osascript -e 'id of app "${path}"'`;
-
     exec(command, (error, stdout, stderr) => {
       if (error) {
         logger.error("osascript:", error.message);
         return reject(error);
       }
-
       if (stderr) {
         logger.error(`osascript: ${stderr}`);
         return reject(new Error(stderr));
       }
-
       const bundleId = stdout.trim();
       if (bundleId) {
         resolve(bundleId);
@@ -206,6 +203,59 @@ export function getAppBundleId(path: string): Promise<string> {
   });
 }
 
+export async function getConnectedIOSDeviceUDID(): Promise<string> {
+  try {
+    const { stdout } = await execPromise(`xcrun xctrace list devices`);
+
+    const iphoneDevices = stdout
+      .split("\n")
+      .filter((line) => line.includes("iPhone"));
+
+    const realDevices = iphoneDevices.filter(
+      (line) => !line.includes("Simulator"),
+    );
+
+    if (!realDevices.length) {
+      throw new Error(
+        `No connected iPhone detected. Please ensure your device is connected and try again.`,
+      );
+    }
+
+    const deviceLine = realDevices[0];
+    //the output from above looks like this: User’s iPhone (18.0) (00003110-002A304e3A53C41E)
+    //where `00003110-000A304e3A53C41E` is the UDID of the device
+    const matches = deviceLine!.match(/\(([\da-fA-F-]+)\)$/);
+
+    if (matches && matches[1]) {
+      return matches[1];
+    } else {
+      throw new Error(
+        `Please check your iPhone device connection. 
+To check for connected devices run "xcrun xctrace list devices | grep iPhone | grep -v Simulator"`,
+      );
+    }
+  } catch (error) {
+    //@ts-ignore
+    throw new Error(`getConnectedIOSDeviceUDID: ${error.message}`);
+  }
+}
+
+export async function getActiveAndroidDevices(): Promise<number> {
+  try {
+    const { stdout } = await execPromise("adb devices");
+
+    const lines = stdout.trim().split("\n");
+
+    const deviceLines = lines.filter((line) => line.includes("\tdevice"));
+
+    return deviceLines.length;
+  } catch (error) {
+    throw new Error(
+      //@ts-ignore
+      `getActiveAndroidDevices: ${error.message}`,
+    );
+  }
+}
 async function getLatestBuildToolsVersion(): Promise<string | undefined> {
   const androidHome = process.env.ANDROID_HOME;
   const buildToolsPath = path.join(androidHome!, "build-tools");
@@ -224,7 +274,7 @@ async function getLatestBuildToolsVersion(): Promise<string | undefined> {
 
     return getLatestBuildToolsVersions(versions);
   } catch (err) {
-    console.error(`getLatestBuildToolsVersion: ${err}`);
+    logger.error(`getLatestBuildToolsVersion: ${err}`);
     throw new Error(
       `Error reading ${buildToolsPath}. Ensure it exists or download from Android Studio: https://developer.android.com/studio/intro/update#required`,
     );

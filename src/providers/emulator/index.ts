@@ -76,10 +76,16 @@ Follow the steps mentioned in ${androidSimulatorConfigDocLink} to run test on An
 
   private async createConfig() {
     const platformName = this.project.use.platform;
+    let appPackageName: string | undefined;
+    let appLaunchableActivity: string | undefined;
 
-    const { packageName, launchableActivity } = await getApkDetails(
-      this.project.use.buildPath!,
-    );
+    if (platformName == Platform.ANDROID) {
+      const { packageName, launchableActivity } = await getApkDetails(
+        this.project.use.buildPath!,
+      );
+      appPackageName = packageName!;
+      appLaunchableActivity = launchableActivity!;
+    }
     return {
       port: 4723,
       capabilities: {
@@ -88,8 +94,8 @@ Follow the steps mentioned in ${androidSimulatorConfigDocLink} to run test on An
           platformName == Platform.ANDROID ? "uiautomator2" : "xcuitest",
         "appium:platformVersion": (this.project.use.device as EmulatorConfig)
           .osVersion,
-        "appium:appActivity": launchableActivity,
-        "appium:appPackage": packageName,
+        "appium:appActivity": appLaunchableActivity,
+        "appium:appPackage": appPackageName,
         platformName: platformName,
         "appium:autoGrantPermissions": true,
         "appium:app": this.project.use.buildPath,
