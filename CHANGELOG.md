@@ -1,5 +1,14 @@
 # appwright
 
+## 0.0.35
+
+### Patch Changes
+
+- b763d60: chore: eslint error in example
+- 30712fd: feat: local device config now supports optional udid parameter
+- 7b95f16: feat: added capability to perform browserStack camera injection using appwright
+- 848108e: feat: multi activity support
+
 ## 0.0.34
 
 ### Patch Changes
