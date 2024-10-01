@@ -18,7 +18,7 @@
     "changeset": "changeset",
     "clean": "tsc --build --clean",
     "release": "changeset publish",
-     "build:doc": "typedoc --out api-references src"
+    "build:doc": "typedoc --out api-references src"
   },
   "repository": {
     "type": "git",
@@ -52,6 +52,7 @@
     "@empiricalrun/typescript-config": "^0.3.0",
     "@types/async-retry": "^1.4.8",
     "@types/node": "^22.5.2",
-    "eslint": "8.57.0"
+    "eslint": "8.57.0",
+    "typedoc": "0.26.7"
   }
 }
