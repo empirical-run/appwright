@@ -45,3 +45,5 @@ jobs:
       - id: "deployment"
         name: "Deploy documentation to GitHub Pages"
         uses: "actions/deploy-pages@v4"
+        with:
+          path: "api-references/"
