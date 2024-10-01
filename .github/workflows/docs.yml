@@ -19,35 +19,27 @@ jobs:
         name: "Check out Git repository"
         uses: "actions/checkout@v3"
 
-      - id: "setup-pnpm"
-        name: "Set up pnpm"
-        uses: "pnpm/action-setup@v2"
-        with:
-          version: "8"
-          run_install: false
-
       - id: "setup-node"
-        name: "Set up Node.js"
-        uses: "actions/setup-node@v3"
+        name: Setup Node.js environment
+        uses: actions/setup-node@v4
         with:
-          node-version-file: ".nvmrc"
-          cache: "pnpm"
+          node-version: 20
 
       - id: "install-dependencies"
         name: "Install Node.js dependencies"
-        run: |
-          set -euo pipefail
-          pnpm install --frozen-lockfile
+        run: npm install
+
       - id: "build"
         name: "Build documentation"
         run: |
           set -euo pipefail
-          pnpm run build:doc
+          npm run build:doc
+
       - id: "upload-documentation"
         name: "Upload Pages artifact"
         uses: "actions/upload-pages-artifact@v2"
         with:
-          path: "docs/"
+          path: "api-references/"
 
       - id: "deployment"
         name: "Deploy documentation to GitHub Pages"
