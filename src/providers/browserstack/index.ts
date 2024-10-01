@@ -258,7 +258,6 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
       throw new Error(`Error setting session details: ${response.statusText}`);
     }
 
-    // Parse and print the response
     const responseData = await response.json();
     return responseData;
   }

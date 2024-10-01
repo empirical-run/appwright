@@ -4,7 +4,7 @@ import { Locator } from "../locator";
 import { AppwrightLocator, Platform, TestInfoOptions } from "../types";
 import { AppwrightVision, VisionProvider } from "../vision";
 import { boxedStep } from "../utils";
-import { readQRCode } from "../providers/browserstack/utils";
+import { uploadImageToBS } from "../providers/browserstack/utils";
 
 export class Device {
   constructor(
@@ -199,9 +199,9 @@ export class Device {
     }
   }
 
-  async scanQRCode(qrImagePath: string): Promise<void> {
+  async injectQR(qrImagePath: string): Promise<void> {
     if (this.provider == "browserstack") {
-      const imageURL = await readQRCode(qrImagePath);
+      const imageURL = await uploadImageToBS(qrImagePath);
       await this.webdriverClient.executeScript(
         `browserstack_executor: {"action":"cameraImageInjection", "arguments": {"imageUrl" : "${imageURL}"}}`,
         [],

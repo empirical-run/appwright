@@ -14,7 +14,7 @@ interface MediaUploadResponse {
   shareable_id: string;
 }
 
-export async function readQRCode(qrImagePath: string): Promise<string> {
+export async function uploadImageToBS(qrImagePath: string): Promise<string> {
   const formData = new FormData();
   if (!fs.existsSync(qrImagePath)) {
     throw new Error(
