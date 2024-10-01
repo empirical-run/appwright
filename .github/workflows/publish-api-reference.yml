@@ -1,4 +1,4 @@
-name: Publish documentation
+name: Publish API References
 on:
   pull_request:
     types: [opened, synchronize]
@@ -39,6 +39,7 @@ jobs:
         name: "Upload Pages artifact"
         uses: "actions/upload-artifact@v4"
         with:
+          name: "github-pages"
           path: "api-references/"
 
       - id: "deployment"
