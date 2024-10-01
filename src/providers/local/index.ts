@@ -8,6 +8,7 @@ import {
 import { Device } from "../../device";
 import { FullProject } from "@playwright/test";
 import {
+  getApkDetails,
   getAppBundleId,
   installDriver,
   isEmulatorInstalled,
@@ -61,7 +62,9 @@ export class LocalDeviceProvider implements DeviceProvider {
     );
     await startAppiumServer(this.project.use.device?.provider!);
     const WebDriver = (await import("webdriver")).default;
-    const webDriverClient = await WebDriver.newSession(this.createConfig());
+    const webDriverClient = await WebDriver.newSession(
+      await this.createConfig(),
+    );
     const bundleId = await getAppBundleId(this.project.use.buildPath!);
     const expectTimeout = this.project.use.expectTimeout!;
     const testOptions: TestInfoOptions = {
@@ -75,8 +78,11 @@ export class LocalDeviceProvider implements DeviceProvider {
     );
   }
 
-  private createConfig() {
+  private async createConfig() {
     const platformName = this.project.use.platform;
+    const { packageName, launchableActivity } = await getApkDetails(
+      this.project.use.buildPath!,
+    );
     return {
       port: 4723,
       capabilities: {
@@ -87,6 +93,8 @@ export class LocalDeviceProvider implements DeviceProvider {
         platformName: platformName,
         "appium:autoGrantPermissions": true,
         "appium:app": this.project.use.buildPath,
+        "appium:appActivity": launchableActivity,
+        "appium:appPackage": packageName,
         "appium:autoAcceptAlerts": true,
         "appium:fullReset": true,
       },
