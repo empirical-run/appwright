@@ -4,6 +4,7 @@ import { Locator } from "../locator";
 import { AppwrightLocator, Platform, TestInfoOptions } from "../types";
 import { AppwrightVision, VisionProvider } from "../vision";
 import { boxedStep } from "../utils";
+import { uploadImageToBS } from "../providers/browserstack/utils";
 
 export class Device {
   constructor(
@@ -195,6 +196,16 @@ export class Device {
         ]);
         return clipboardDataBase64;
       }
+    }
+  }
+
+  async mockCameraView(imagePath: string): Promise<void> {
+    if (this.provider == "browserstack") {
+      const imageURL = await uploadImageToBS(imagePath);
+      await this.webdriverClient.executeScript(
+        `browserstack_executor: {"action":"cameraImageInjection", "arguments": {"imageUrl" : "${imageURL}"}}`,
+        [],
+      );
     }
   }
 }
