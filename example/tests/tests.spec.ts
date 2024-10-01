@@ -4,10 +4,10 @@ test("Navigate to wikipedia dashboard, search for playwright and verfiy `Microso
   device,
 }) => {
   await device.getByText("Skip").tap();
-  await device.getByText("Search Wikipedia", { exact: true }).tap();
+  await device.getByText("Search Wikipedia").tap();
   await device
-    .getByText("Search Wikipedia", { exact: true })
+    .getByText("Search Wikipedia")
     .fill("playwright");
-  await device.getByText("Playwright (software)", { exact: true }).tap();
+  await device.getByText("Playwright (software)").tap();
   await expect(device.getByText("Microsoft")).toBeVisible();
 });
