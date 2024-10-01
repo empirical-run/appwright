@@ -10,7 +10,7 @@ jobs:
       pages: "write"
 
     environment:
-      name: "github-pages"
+      name: "api-references"
       url: "${{ steps.deployment.outputs.page_url }}"
 
     runs-on: "ubuntu-latest"
@@ -39,8 +39,7 @@ jobs:
         name: "Upload Pages artifact"
         uses: "actions/upload-artifact@v4"
         with:
-          name: "github-pages"
-          path: "api-references/"
+          path: "api-references"
 
       - id: "deployment"
         name: "Deploy documentation to GitHub Pages"
