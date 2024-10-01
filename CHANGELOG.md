@@ -1,5 +1,11 @@
 # appwright
 
+## 0.0.36
+
+### Patch Changes
+
+- 0a3c34b: chore: updated `mockCameraView` method name
+
 ## 0.0.35
 
 ### Patch Changes
