@@ -199,9 +199,9 @@ export class Device {
     }
   }
 
-  async injectQR(qrImagePath: string): Promise<void> {
+  async mockCameraView(imagePath: string): Promise<void> {
     if (this.provider == "browserstack") {
-      const imageURL = await uploadImageToBS(qrImagePath);
+      const imageURL = await uploadImageToBS(imagePath);
       await this.webdriverClient.executeScript(
         `browserstack_executor: {"action":"cameraImageInjection", "arguments": {"imageUrl" : "${imageURL}"}}`,
         [],

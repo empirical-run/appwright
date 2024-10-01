@@ -14,15 +14,15 @@ interface MediaUploadResponse {
   shareable_id: string;
 }
 
-export async function uploadImageToBS(qrImagePath: string): Promise<string> {
+export async function uploadImageToBS(imagePath: string): Promise<string> {
   const formData = new FormData();
-  if (!fs.existsSync(qrImagePath)) {
+  if (!fs.existsSync(imagePath)) {
     throw new Error(
-      `No image file found at the specified path: ${qrImagePath}. Please provide a valid image file. 
+      `No image file found at the specified path: ${imagePath}. Please provide a valid image file. 
 Supported formats include JPG, JPEG, and PNG. Ensure the file exists and the path is correct.`,
     );
   }
-  formData.append("file", fs.createReadStream(qrImagePath));
+  formData.append("file", fs.createReadStream(imagePath));
   formData.append("custom_id", "SampleMedia");
   const fetch = (await import("node-fetch")).default;
   const response = await fetch(
