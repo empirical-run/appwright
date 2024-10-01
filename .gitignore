@@ -6,4 +6,3 @@ playwright/.cache/
 
 dist/
 .DS_Store
-api-references

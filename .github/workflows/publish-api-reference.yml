@@ -39,7 +39,8 @@ jobs:
         name: "Upload Pages artifact"
         uses: "actions/upload-artifact@v4"
         with:
-          path: "github-pages"
+          name: "github-pages"
+          path: "api-references"
 
       - id: "deployment"
         name: "Deploy documentation to GitHub Pages"
