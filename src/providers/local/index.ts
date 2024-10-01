@@ -69,6 +69,16 @@ export class LocalDeviceProvider implements DeviceProvider {
 
   private async createConfig() {
     const platformName = this.project.use.platform;
+    let appPackageName: string | undefined;
+    let appLaunchableActivity: string | undefined;
+
+    if (platformName == Platform.ANDROID) {
+      const { packageName, launchableActivity } = await getApkDetails(
+        this.project.use.buildPath!,
+      );
+      appPackageName = packageName!;
+      appLaunchableActivity = launchableActivity!;
+    }
     let udid = (this.project.use.device as LocalDeviceConfig).udid;
     if (!udid) {
       if (platformName == Platform.IOS) {
@@ -83,9 +93,6 @@ To specify a device, use the udid property. Run "adb devices" to get the UDID fo
         }
       }
     }
-    const { packageName, launchableActivity } = await getApkDetails(
-      this.project.use.buildPath!,
-    );
     return {
       port: 4723,
       capabilities: {
@@ -96,8 +103,8 @@ To specify a device, use the udid property. Run "adb devices" to get the UDID fo
         platformName: platformName,
         "appium:autoGrantPermissions": true,
         "appium:app": this.project.use.buildPath,
-        "appium:appActivity": launchableActivity,
-        "appium:appPackage": packageName,
+        "appium:appActivity": appLaunchableActivity,
+        "appium:appPackage": appPackageName,
         "appium:autoAcceptAlerts": true,
         "appium:fullReset": true,
       },
