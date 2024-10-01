@@ -215,7 +215,7 @@ export async function getConnectedIOSDeviceUDID(): Promise<string> {
       (line) => !line.includes("Simulator"),
     );
 
-    if (realDevices.length === 0) {
+    if (!realDevices.length) {
       throw new Error(
         `No connected iPhone detected. Please ensure your device is connected and try again.`,
       );
