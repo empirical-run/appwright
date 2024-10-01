@@ -37,13 +37,11 @@ jobs:
 
       - id: "upload-documentation"
         name: "Upload Pages artifact"
-        uses: "actions/upload-artifact@v4"
+        uses: "actions/upload-pages-artifact@v1"
         with:
           name: "github-pages"
           path: "api-references"
 
       - id: "deployment"
         name: "Deploy documentation to GitHub Pages"
-        uses: "actions/deploy-pages@v4"
-        with:
-          path: "api-references/"
+        uses: "actions/deploy-pages@v1"
