@@ -1,6 +1,6 @@
 import retry from "async-retry";
-import FormData from "form-data";
 import fs from "fs";
+import FormData from "form-data";
 import path from "path";
 import {
   AppwrightConfig,
@@ -257,6 +257,7 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
     if (!response.ok) {
       throw new Error(`Error setting session details: ${response.statusText}`);
     }
+
     const responseData = await response.json();
     return responseData;
   }
