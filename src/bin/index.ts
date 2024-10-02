@@ -35,7 +35,6 @@ function cmd(
 
 async function runPlaywrightCmd(args: string) {
   const pwRunCmd = `npx playwright ${args}`;
-  console.log("Playwright command:", pwRunCmd);
   return cmd(pwRunCmd.split(" "), {});
 }
 
