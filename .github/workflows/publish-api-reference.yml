@@ -28,7 +28,7 @@ jobs:
 
       - id: "install-dependencies"
         name: "Install Node.js dependencies"
-        run: npm install
+        run: npm ci
 
       - id: "build"
         name: "Build documentation"
