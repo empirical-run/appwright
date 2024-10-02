@@ -1,10 +1,10 @@
 import { test, expect } from "appwright";
 
-test("Navigate to wikipedia dashboard, search for playwright and verfiy `Microsoft` is visible", async ({
+test("Navigate to wikipedia dashboard, search for playwright and verify `Microsoft` is visible", async ({
   device,
 }) => {
   await device.getByText("Skip").tap();
-  await device.getByText("Search Wikipedia").tap();
+  await device.getByText("Search Wikipedia", {exact: true}).tap();
   await device
     .getByText("Search Wikipedia")
     .fill("playwright");
