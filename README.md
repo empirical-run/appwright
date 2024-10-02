@@ -37,7 +37,7 @@ export default defineConfig({
         device: {
           provider: "emulator", // or 'local-device' or 'browserstack'
         },
-        buildPath: "app-release.ipa", // Path to your IPA file
+        buildPath: "app-release.app", // Path to your .app file
       },
     },
   ],
@@ -89,5 +89,8 @@ Appwright supports BrowserStack out of the box. To run tests on BrowserStack, up
 
 ## Docs
 
+- [Basics](docs/basics.md)
 - [Configuration](docs/config.md)
 - [Locators](docs/locators.md)
+- [Assertions](docs/assertions.md)
+- [References](docs/references.md)

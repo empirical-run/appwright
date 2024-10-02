@@ -20,7 +20,12 @@ npx appwright test --project android
 
 To run the tests on iOS:
 
-Unzip the `wikipedia.zip` file and run the following command:
+- Unzip the `wikipedia.zip` file
+
+```sh
+npm run extract:app
+```
+- Run the following command:
 
 ```sh
 npx appwright test --project ios
