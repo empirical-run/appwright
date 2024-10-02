@@ -17,7 +17,8 @@
     "build": "tsc --build",
     "changeset": "changeset",
     "clean": "tsc --build --clean",
-    "release": "changeset publish"
+    "release": "changeset publish",
+    "build:doc": "typedoc --out api-references src"
   },
   "repository": {
     "type": "git",
