@@ -1,5 +1,11 @@
 # appwright
 
+## 0.0.40
+
+### Patch Changes
+
+- e9ca490: fix: removed console logs from bin
+
 ## 0.0.39
 
 ### Patch Changes
