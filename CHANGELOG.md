@@ -1,5 +1,11 @@
 # appwright
 
+## 0.0.39
+
+### Patch Changes
+
+- 1e97b20: fix: references doc link
+
 ## 0.0.38
 
 ### Patch Changes
