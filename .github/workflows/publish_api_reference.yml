@@ -1,0 +1,49 @@
+name: Publish API References
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  publish-documentation:
+    permissions:
+      id-token: "write"
+      pages: "write"
+
+    environment:
+      name: "github-pages"
+      url: "${{ steps.deployment.outputs.page_url }}"
+
+    runs-on: "ubuntu-latest"
+    steps:
+      - id: "checkout"
+        name: "Check out Git repository"
+        uses: "actions/checkout@v3"
+
+      - id: "setup-node"
+        name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - id: "install-dependencies"
+        name: "Install Node.js dependencies"
+        run: npm ci
+
+      - id: "build"
+        name: "Build documentation"
+        run: |
+          set -euo pipefail
+          npm run build:doc
+
+      - id: "upload-documentation"
+        name: "Upload Pages artifact"
+        uses: "actions/upload-pages-artifact@v1"
+        with:
+          name: "github-pages"
+          path: "api-references"
+
+      - id: "deployment"
+        name: "Deploy documentation to GitHub Pages"
+        uses: "actions/deploy-pages@v1"
