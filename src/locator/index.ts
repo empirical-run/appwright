@@ -117,6 +117,13 @@ export class Locator {
     }
   }
 
+  /**
+   * Waits for a condition to be true until the specified timeout is reached.
+   *
+   * @param condition function to be evaluated
+   * @param options
+   * @returns
+   */
   private async waitUntil<ReturnValue>(
     condition: () => ReturnValue | Promise<ReturnValue>,
     options: WaitUntilOptions,
@@ -199,6 +206,11 @@ export class Locator {
     }
   }
 
+  /**
+   * Retrieves the element reference based on the `selector`.
+   *
+   * @returns
+   */
   async getElement(): Promise<ElementReference | null> {
     /**
      * Determine whether `path` is a regex or string, and find elements accordingly.

@@ -5,8 +5,23 @@ import { Device } from "../device";
 import { createDeviceProvider } from "../providers";
 
 export const test = base.extend<{
+  /**
+   * Device provider to be used for the test.
+   * This creates and manages the device lifecycle for the test
+   */
   deviceProvider: DeviceProvider;
+
+  /**
+   * The device instance that will be used for running the test.
+   * This provides the functionality to interact with the device
+   * during the test.
+   */
   device: Device;
+
+  /**
+   * Saves the test video after completion and attach it to the test report.
+   * Currently, this functionality is supported only for BrowserStack.
+   */
   saveVideo: void;
 }>({
   deviceProvider: async ({}, use, testInfo) => {
@@ -39,6 +54,14 @@ export const test = base.extend<{
   ],
 });
 
+/**
+ * Function to extend Playwright’s expect assertion capabilities.
+ * This adds a new method `toBeVisible` which checks if an element is visible on the screen.
+ *
+ * @param locator The AppwrightLocator that locates the element on the device screen.
+ * @param options
+ * @returns
+ */
 export const expect = test.expect.extend({
   toBeVisible: async (
     locator: AppwrightLocator,
