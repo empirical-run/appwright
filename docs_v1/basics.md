@@ -1,0 +1,4 @@
+- Basics
+  - Write a test: Built-in fixtures (client)
+  - Run the test
+    - See report
