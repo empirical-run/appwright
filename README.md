@@ -93,4 +93,4 @@ Appwright supports BrowserStack out of the box. To run tests on BrowserStack, up
 - [Configuration](docs/config.md)
 - [Locators](docs/locators.md)
 - [Assertions](docs/assertions.md)
-- [References](docs/reference.md)
+- [References](docs/references.md)
