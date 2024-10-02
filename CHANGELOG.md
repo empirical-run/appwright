@@ -1,5 +1,11 @@
 # appwright
 
+## 0.0.38
+
+### Patch Changes
+
+- 59d9e3d: chore: updated readme and docs
+
 ## 0.0.37
 
 ### Patch Changes
