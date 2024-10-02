@@ -44,6 +44,11 @@ export class Device {
 
   /**
    * Closes the automation session. This is called automatically after each test.
+   *
+   * **Usage:**
+   * ```js
+   * await device.close();
+   * ```
    */
   @boxedStep
   async close() {
@@ -53,6 +58,11 @@ export class Device {
   /**
    * Tap on the screen at the given coordinates, specified as x and y. The top left corner
    * of the screen is { x: 0, y: 0 }.
+   *
+   * **Usage:**
+   * ```js
+   * await device.tap({ x: 100, y: 100 });
+   * ```
    *
    * @param coordinates to tap on
    * @returns
@@ -123,6 +133,11 @@ export class Device {
    * Locate an element on the screen with accessibility identifier. This method defaults to
    * a substring match, and this can be overridden by setting the `exact` option to `true`.
    *
+   * **Usage:**
+   * ```js
+   * const element = await device.getById("signup_button");
+   * ```
+   *
    * @param text string or regular expression to search for
    * @param options
    * @returns
@@ -151,12 +166,29 @@ export class Device {
     );
   }
 
+  /**
+   * Locate an element on the screen with xpath.
+   *
+   * **Usage:**
+   * ```js
+   * const element = await device.getByXpath(`//android.widget.Button[@text="Confirm"]`);
+   * ```
+   *
+   * @param xpath xpath to locate the element
+   * @returns
+   */
   getByXpath(xpath: string): AppwrightLocator {
     return this.locator(xpath, "xpath");
   }
 
   /**
    * Helper method to detect the mobile OS running on the device.
+   *
+   * **Usage:**
+   * ```js
+   * const platform = device.getPlatform();
+   * ```
+   *
    * @returns "android" or "ios"
    */
   getPlatform(): Platform {
@@ -166,9 +198,14 @@ export class Device {
 
   /**
    * Retrieves text content from the clipboard of the mobile device. This is useful
-   * after a "copy to clipboard" action has been performed.
+   * after a "copy to clipboard" action has been performed. This returns base64 encoded string.
    *
-   * @returns Returns the text content of the clipboard.
+   * **Usage:**
+   * ```js
+   * const clipboardText = await device.getClipboardText();
+   * ```
+   *
+   * @returns Returns the text content of the clipboard in base64 encoded string.
    */
   async getClipboardText(): Promise<string> {
     if (this.getPlatform() == Platform.ANDROID) {
@@ -199,6 +236,18 @@ export class Device {
     }
   }
 
+  /**
+   * Sets a mock camera view using the specified image. This injects a mock image into the camera view.
+   * Currently, this functionality is supported only for BrowserStack.
+   *
+   * **Usage:**
+   * ```js
+   * await device.setMockCameraView(`screenshot.png`);
+   * ```
+   *
+   * @param imagePath path to the image file that will be used as the mock camera view.
+   * @returns
+   */
   async setMockCameraView(imagePath: string): Promise<void> {
     if (this.provider == "browserstack") {
       const imageURL = await uploadImageToBS(imagePath);

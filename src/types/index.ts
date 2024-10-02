@@ -1,20 +1,50 @@
 import { Device } from "../device";
 
 export type WaitUntilOptions = {
+  /**
+   * The maximum amount of time (in milliseconds) to wait for the condition to be met.
+   */
   timeout: number;
 };
 
 export type TestInfoOptions = {
+  /**
+   * The maximum amount of time (in milliseconds) to wait for the condition to be met.
+   */
   expectTimeout: number;
 };
 
 export interface DeviceProvider {
+  /**
+   * Global setup validates the configuration.
+   */
   globalSetup?(): Promise<void>;
+
+  /**
+   * Returns a device instance.
+   */
   getDevice(): Promise<Device>;
+
+  /**
+   * Downloads the video of the test.
+   * Currently, this functionality is supported only for BrowserStack.
+   *
+   * @param outputDir directory to save the video
+   * @param fileName name of the downloaded video file
+   * @returns
+   */
   downloadVideo?: (
     outputDir: string,
     fileName: string,
   ) => Promise<{ path: string; contentType: string } | null>;
+
+  /**
+   * Updates test details and test status.
+   *
+   * @param status of the test
+   * @param reason for the test status
+   * @param name of the test
+   */
   syncTestDetails?: (details: {
     status?: string;
     reason?: string;
@@ -35,18 +65,43 @@ export type DeviceConfig =
   | LocalDeviceConfig
   | EmulatorConfig;
 
+/**
+ * Configuration for devices running on Browserstack.
+ */
 export type BrowserstackConfig = {
   provider: "browserstack";
+
+  /**
+   * The name of the device to be used on Browserstack.
+   * Checkout the list of devices supported by BrowserStack: https://www.browserstack.com/list-of-browsers-and-platforms/app_automate
+   * Example: "iPhone 15 Pro Max", "Samsung Galaxy S23 Ultra".
+   */
   name: string;
+
+  /**
+   * The operating system version of the device to be used on Browserstack.
+   * Checkout the list of OS versions supported by BrowserStack: https://www.browserstack.com/list-of-browsers-and-platforms/app_automate
+   * Example: "14.0", "15.0".
+   */
   osVersion: string;
 };
 
+/**
+ * Configuration for locally connected physical devices.
+ */
 export type LocalDeviceConfig = {
   provider: "local-device";
   name?: string;
+
+  /**
+   * The unique device identifier (UDID) of the connected local device.
+   */
   udid?: string;
 };
 
+/**
+ * Configuration for running tests on an Android or iOS emulator.
+ */
 export type EmulatorConfig = {
   provider: "emulator";
   name?: string;
