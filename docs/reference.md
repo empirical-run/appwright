@@ -1,3 +1,0 @@
-- API reference
-  - Driver -> get locators
-  - Locator -> actions

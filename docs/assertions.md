@@ -1,2 +1,0 @@
-- Assertions
-  - await expect().toBeVisible()

@@ -1,4 +1,0 @@
-- Locators
-  - How to select an element
-    - These actions are on `client`
-  - How to take actions on the element
