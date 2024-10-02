@@ -1,5 +1,11 @@
 # appwright
 
+## 0.0.37
+
+### Patch Changes
+
+- afd436d: chore: remove example from npm package
+
 ## 0.0.36
 
 ### Patch Changes
