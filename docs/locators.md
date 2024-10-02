@@ -1,4 +1,67 @@
-- Locators
-  - How to select an element
-    - These actions are on `client`
-  - How to take actions on the element
+# Locators
+
+Locators in Appwright are used to select and interact with elements within your mobile app.
+
+## How to Select an Element
+
+In Appwright, you can select an element on the screen using the `device` object. The `device` object provides various methods to locate elements by text, ID, or XPath. Here's how you can select elements:
+
+### Get an Element by Text
+
+You can use the `getByText` method to select elements by their visible text on the screen.
+
+```ts
+const element = await device.getByText('Submit');
+```
+
+Above method defaults to a substring match, and this can be overridden by setting the `exact` option to `true`.
+
+```ts
+const element = await device.getByText('Submit', { exact: true });
+```
+
+We can also use the `getByText` method to select elements using `Regex` patterns.
+
+```ts
+const counter = device.getByText(/^Counter: \d+/);
+```
+
+### Get an Element by ID
+
+You can use the `getById` method to select elements by their ID on the screen.
+
+```ts
+const element = await device.getById('signup_button');
+```
+
+Above method defaults to a substring match, and this can be overridden by setting the `exact` option to `true`.
+
+```ts
+const element = await device.getById('signup_button', { exact: true });
+```
+
+### Get an Element by XPath
+
+You can use the `getByXpath` method to select elements by their XPath on the screen.
+
+```ts
+const element = await device.getByXpath(`//android.widget.Button[@text="Confirm"]`);
+```
+
+## How to Take Actions on the Element
+
+### Tapping an Element
+
+To tap an element, you can use the `tap` method.
+
+```ts
+await device.getByText('Submit').tap();
+```
+
+### Enter Text into an Element
+
+To enter text into an element, you can use the `fill` method.
+
+```ts
+await device.getByText('Search').fill('Wikipedia');
+```
