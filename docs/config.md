@@ -1,7 +1,7 @@
 # Configuration
 
-- Configuration
-  - Choose which devices to test and device provider (local or BrowserStack)
+Appwright provides a set of configuration options that you can use to customize 
+the test environment and thus the behavior of the tests.
 
 ## Device Providers
 
