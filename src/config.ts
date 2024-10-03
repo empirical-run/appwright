@@ -22,7 +22,7 @@ const defaultConfig: PlaywrightTestConfig<AppwrightConfig> = {
   forbidOnly: false,
   retries: process.env.CI ? 2 : 0,
   workers: 2,
-  reporter: [["list"], ["json"], ["html"]],
+  reporter: [["list"], ["html", { open: "always" }]],
   use: {
     // TODO: Use this for actions
     actionTimeout: 20_000,

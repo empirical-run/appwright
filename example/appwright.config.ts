@@ -2,10 +2,6 @@ import { defineConfig, Platform } from "appwright";
 import { join } from "path";
 
 export default defineConfig({
-  reporter: [
-    ["list"], // For real-time reporting on CI terminal (vs. the default "dot" reporter)
-    ['html', { open: 'always' }],
-  ],
   projects: [
     {
       name: "ios",
