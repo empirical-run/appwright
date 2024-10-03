@@ -1,5 +1,12 @@
 # appwright
 
+## 0.0.41
+
+### Patch Changes
+
+- 6bc5d18: fix: handle already running appium server
+- 93386ad: fix: Move list and html reporter out of example and add them as default in appwright
+
 ## 0.0.40
 
 ### Patch Changes
