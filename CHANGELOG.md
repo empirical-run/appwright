@@ -1,5 +1,11 @@
 # appwright
 
+## 0.1.0
+
+### Minor Changes
+
+- 1e663d4: chore: updated docs and references
+
 ## 0.0.41
 
 ### Patch Changes
