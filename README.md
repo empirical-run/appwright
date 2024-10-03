@@ -99,8 +99,7 @@ the provider in your config.
     platform: Platform.ANDROID,
     device: {
       provider: "browserstack",
-
-// Device to run the tests on
+      // Specify device to run the tests on
       // See supported devices: https://www.browserstack.com/list-of-browsers-and-platforms/app_automate
       name: "Google Pixel 8",
       osVersion: "14.0",
