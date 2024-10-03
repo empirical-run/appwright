@@ -1,5 +1,5 @@
 import { defineConfig, Platform } from "appwright";
-import { join } from "path";
+import path from "path";
 
 export default defineConfig({
   projects: [
@@ -11,7 +11,7 @@ export default defineConfig({
           provider: "emulator",
           name: "iPhone 14 Pro",
         },
-        buildPath: join(process.cwd(), "wikipedia.app"),
+        buildPath: path.join("builds", "Wikipedia.app"),
       },
     },
     {
@@ -21,7 +21,7 @@ export default defineConfig({
         device: {
           provider: "emulator",
         },
-        buildPath: join(process.cwd(), "wikipedia.apk"),
+        buildPath: path.join("builds", "wikipedia.apk"),
       },
     },
   ],

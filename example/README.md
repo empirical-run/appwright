@@ -1,24 +1,27 @@
-# Sample Appwright tests
+# Appwright example
 
-This is a sample project to demonstrate how to use Appwright. We have used the [Wikipedia](https://en.wikipedia.org/wiki/Main_Page) app as the sample app.
+This is a sample project to demonstrate how to use Appwright. This uses mobile apps from Wikipedia 
 
-## Setup
+- [Wikipedia Android app](https://github.com/wikimedia/apps-android-wikipedia) ([Apache 2.0 license](https://github.com/wikimedia/apps-android-wikipedia?tab=Apache-2.0-1-ov-file#readme))
+- [Wikipedia iOS app](https://github.com/wikimedia/wikipedia-ios) ([MIT license](https://github.com/wikimedia/wikipedia-ios?tab=MIT-1-ov-file#readme))
 
-1. Install dependencies
+## Usage
+
+### Install dependencies
 
 ```sh
 npm install
 ```
 
-2. Run the tests
+### Run the tests
 
-To run the tests on Android:
+To run the tests on Android emulator:
 
 ```sh
 npx appwright test --project android
 ```
 
-To run the tests on iOS:
+To run the tests on iOS simulator:
 
 - Unzip the `wikipedia.zip` file
 

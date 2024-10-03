@@ -2,7 +2,31 @@
 
 ![NPM Version](https://img.shields.io/npm/v/appwright?color=4AC61C)
 
-Appwright is a test runner for e2e testing of mobile apps, based on Playwright and Appium.
+Appwright is a test framework for e2e testing of mobile apps. Appwright builds on top of [Appium](https://appium.io/docs/en/latest/), and can
+run tests on local devices, emulators, and remote device farms — for both iOS and Android.
+
+Appwright is one integrated package that combines an automation driver, test runner and test
+reporter. To achieve this, Appwright uses the [Playwright](https://github.com/microsoft/playwright) test runner internally, which is
+purpose-built for the e2e testing workflow.
+
+Appwright exposes an ergonomic API to automate user actions. These actions auto-wait and auto-retry
+for UI elements to be ready and interactable, which makes your tests easier to read and maintain.
+
+```ts
+import { test, expect } from "appwright";
+
+test("User can login", async ({ device }) => {
+  await device.getByText("Username").fill("admin");
+  await device.getByText("Password").fill("password");
+  await device.getByText("Login").tap();
+});
+```
+
+Links to help you get started.
+
+- [Example project](https://github.com/empirical-run/appwright/tree/main/example)
+- [Launch blog post](https://www.empirical.run/blog/appwright)
+- [Documentation](#docs)
 
 ## Usage
 
@@ -63,9 +87,10 @@ npx appwright test --project android
 npx appwright test --project ios
 ```
 
-#### Run tests on browserStack
+#### Run tests on BrowserStack
 
-Appwright supports BrowserStack out of the box. To run tests on BrowserStack, update the provider in above config:
+Appwright supports BrowserStack out of the box. To run tests on BrowserStack, configure
+the provider in your config.
 
 ```ts
 {
@@ -73,13 +98,10 @@ Appwright supports BrowserStack out of the box. To run tests on BrowserStack, up
   use: {
     platform: Platform.ANDROID,
     device: {
-      provider: "browserstack", // <-- add this provider
-
-      //Add the device name on which you want to run the tests, you can find the 
-      //supported devices here: https://www.browserstack.com/list-of-browsers-and-platforms/app_automate
+      provider: "browserstack",
+      // Specify device to run the tests on
+      // See supported devices: https://www.browserstack.com/list-of-browsers-and-platforms/app_automate
       name: "Google Pixel 8",
-
-      //Add the OS version on which you want to run the tests.
       osVersion: "14.0",
     },
     buildPath: "app-release.apk",
@@ -93,4 +115,4 @@ Appwright supports BrowserStack out of the box. To run tests on BrowserStack, up
 - [Configuration](docs/config.md)
 - [Locators](docs/locators.md)
 - [Assertions](docs/assertions.md)
-- [References](docs/references.md)
+- [API reference](docs/api-reference.md)
