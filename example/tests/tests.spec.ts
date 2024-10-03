@@ -4,9 +4,9 @@ test("Navigate to wikipedia dashboard, search for playwright and verify `Microso
   device,
 }) => {
   await device.getByText("Skip").tap();
-  await device.getByText("Search Wikipedia", {exact: true}).tap();
+  await device.getByText(/^Search Wikipedia$/).tap();
   await device
-    .getByText("Search Wikipedia")
+    .getByText(/^Search Wikipedia$/)
     .fill("playwright");
   await device.getByText("Playwright (software)").tap();
   await expect(device.getByText("Microsoft")).toBeVisible();

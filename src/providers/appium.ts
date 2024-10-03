@@ -48,6 +48,15 @@ export async function startAppiumServer(
 
     appiumProcess.stdout.on("data", async (data: Buffer) => {
       const output = data.toString();
+
+      if (output.includes("Error: listen EADDRINUSE")) {
+        // TODO: Kill the appium server if it is already running
+        logger.error(`Appium: ${data}`);
+        throw new Error(
+          `Appium server is already running. Please stop the server before running tests.`,
+        );
+      }
+
       if (output.includes("Could not find online devices")) {
         if (!emulatorStartRequested && provider == "emulator") {
           emulatorStartRequested = true;
