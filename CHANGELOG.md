@@ -1,5 +1,11 @@
 # appwright
 
+## 0.1.1
+
+### Patch Changes
+
+- 415f940: fix: removed check for installed emulator when running on real device
+
 ## 0.1.0
 
 ### Minor Changes
