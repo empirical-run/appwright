@@ -40,7 +40,8 @@ Follow the steps mentioned in ${androidSimulatorConfigDocLink} to run test on An
         );
       }
 
-      if (!androidHome) {
+      const javaHome = process.env.JAVA_HOME;
+      if (!javaHome) {
         throw new Error(
           `The JAVA_HOME environment variable is not set.  
 Follow the steps mentioned in ${androidSimulatorConfigDocLink} to run test on Android emulator.`,

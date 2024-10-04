@@ -30,6 +30,10 @@ Links to help you get started.
 
 ## Usage
 
+### Minimum requirements
+
+- Node 18.20.4 or higher
+
 ### Install
 
 ```sh
@@ -107,6 +111,42 @@ the provider in your config.
     buildPath: "app-release.apk",
   },
 },
+```
+## Run the sample project
+
+To run the sample project:
+
+- Navigate to the `example` directory.
+
+```sh
+cd example
+```
+
+- Install dependencies.
+
+```sh
+npm install
+```
+
+- Run the tests
+
+Run the following command to execute tests on an Android emulator:
+
+```sh
+npx appwright test --project android
+```
+
+To run the tests on iOS simulator:
+
+- Unzip the `wikipedia.zip` file
+
+```sh
+npm run extract:app
+```
+- Run the following command:
+
+```sh
+npx appwright test --project ios
 ```
 
 ## Docs
