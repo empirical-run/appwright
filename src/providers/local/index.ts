@@ -13,7 +13,6 @@ import {
   getAppBundleId,
   getConnectedIOSDeviceUDID,
   installDriver,
-  isEmulatorInstalled,
   startAppiumServer,
 } from "../appium";
 import { validateBuildPath } from "../../utils";
@@ -39,8 +38,6 @@ export class LocalDeviceProvider implements DeviceProvider {
           "The ANDROID_HOME environment variable is not set. This variable is required to locate your Android SDK. Please set it to the correct path of your Android SDK installation. For detailed instructions on how to set up the Android SDK path, visit: https://developer.android.com/tools",
         );
       }
-
-      await isEmulatorInstalled(this.project.use.platform);
     }
   }
 
