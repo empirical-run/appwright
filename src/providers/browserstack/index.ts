@@ -210,7 +210,6 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
         },
         {
           retries: 10,
-          factor: 2,
           minTimeout: 3_000,
         },
       );
