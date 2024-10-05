@@ -9,6 +9,7 @@ import {
 } from "../../types";
 import { FullProject } from "@playwright/test";
 import { Device } from "../../device";
+import { logger } from "../../logger";
 
 type BrowserStackSessionDetails = {
   name: string;
@@ -211,8 +212,14 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
         {
           retries: 10,
           minTimeout: 3_000,
+          onRetry: (err, i) => {
+            if (i > 2) {
+              logger.warn(`Retry attempt ${i} failed: ${err.message}`);
+            }
+          },
         },
       );
+
       return new Promise((resolve, reject) => {
         // Ensure file stream is closed even in case of an error
         fileStream.on("finish", () => {
