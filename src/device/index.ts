@@ -15,13 +15,13 @@ export class Device {
   ) {}
 
   locator(
-    path: string | RegExp,
+    selector: string | RegExp,
     findStrategy: string,
     textToMatch?: string,
   ): AppwrightLocator {
     return new Locator(
       this.webdriverClient,
-      path,
+      selector,
       findStrategy,
       this.testOptions,
       textToMatch,
@@ -116,14 +116,14 @@ export class Device {
         isAndroid ? "-android uiautomator" : "-ios predicate string",
       );
     }
-    let path: string;
+    let selector: string;
     if (isAndroid) {
-      path = exact ? `text("${text}")` : `textContains("${text}")`;
+      selector = exact ? `text("${text}")` : `textContains("${text}")`;
     } else {
-      path = exact ? `label == "${text}"` : `label CONTAINS "${text}"`;
+      selector = exact ? `label == "${text}"` : `label CONTAINS "${text}"`;
     }
     return this.locator(
-      path,
+      selector,
       isAndroid ? "-android uiautomator" : "-ios predicate string",
       text,
     );

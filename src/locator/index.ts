@@ -206,6 +206,16 @@ export class Locator {
     }
   }
 
+  extractContinuousTextFromRegExp(regExp: RegExp): string | null {
+    const regExpText = regExp.source;
+
+    // Define a regex to match continuous text (alphanumeric characters)
+    const match = regExpText.match(/[a-zA-Z0-9]+/);
+
+    // If a match is found, return the continuous text; otherwise, return null
+    return match ? match[0] : null;
+  }
+
   /**
    * Retrieves the element reference based on the `selector`.
    *
@@ -233,7 +243,18 @@ export class Locator {
         this.selector,
       );
     } else if (this.selector instanceof RegExp) {
-      elements = await this.webDriverClient.findElements("xpath", "//*"); // Get all elements
+      const textFromRegex = this.extractContinuousTextFromRegExp(this.selector);
+      if (textFromRegex) {
+        console.log(`=======textFromRegex: ${textFromRegex}`);
+        elements = await this.webDriverClient.findElements(
+          this.findStrategy,
+          this.webDriverClient.isAndroid
+            ? `textContains("${textFromRegex}")`
+            : `label CONTAINS "${textFromRegex}"`,
+        );
+      } else {
+        elements = await this.webDriverClient.findElements("xpath", "//*"); // Get all elements
+      }
     }
 
     // If there is only one element, return it
