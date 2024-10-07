@@ -1,5 +1,17 @@
 # appwright
 
+## 0.1.3
+
+### Patch Changes
+
+- 197c3e2: chore: added-docs-in-npmignore
+
+## 0.1.2
+
+### Patch Changes
+
+- 940ea32: fix: updated playwright version and removed exponential delays between retries
+
 ## 0.1.1
 
 ### Patch Changes
