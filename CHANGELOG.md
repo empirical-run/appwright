@@ -1,5 +1,11 @@
 # appwright
 
+## 0.1.3
+
+### Patch Changes
+
+- 197c3e2: chore: added-docs-in-npmignore
+
 ## 0.1.2
 
 ### Patch Changes
