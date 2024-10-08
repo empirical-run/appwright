@@ -270,6 +270,7 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
       capabilities: {
         appiumVersion: "2.3.0",
         platformName: platformName,
+        queueTimeout: 600,
         deviceName: this.project.use.device?.name,
         platformVersion: (this.project.use.device as LambdatestConfig)
           .osVersion,
