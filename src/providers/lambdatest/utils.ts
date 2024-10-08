@@ -38,7 +38,6 @@ export async function uploadImageToLambdaTest(
   );
 
   const data = (await response.json()) as MediaUploadResponse;
-  console.log(data);
   const imageURL = data.media_url.trim();
   return imageURL;
 }

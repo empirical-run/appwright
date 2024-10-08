@@ -258,7 +258,6 @@ export class Device {
       );
     } else if (this.provider == "lambdatest") {
       const imageURL = await uploadImageToLambdaTest(imagePath);
-      console.log(`Image URL: ${imageURL}`);
       await this.webdriverClient.executeScript(
         `lambda-image-injection=${imageURL}`,
         [],
