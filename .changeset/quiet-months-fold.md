@@ -2,4 +2,4 @@
 "appwright": patch
 ---
 
-fix: increased idle timeout for lambdatest
+fix: increased idle timeout for LambdaTest
