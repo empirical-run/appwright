@@ -1,5 +1,11 @@
 # appwright
 
+## 0.1.5
+
+### Patch Changes
+
+- ef1a2b8: fix: increased idle timeout for LambdaTest
+
 ## 0.1.4
 
 ### Patch Changes
