@@ -25,17 +25,17 @@ These environment variables are required for the BrowserStack
 
 BrowserStack also requires `name` and `osVersion` of the device to be set in the projects in appwright config file.
 
-### Lambdatest
+### LambdaTest
 
-Lambdatest [Real Device Cloud](https://www.lambdatest.com/support/docs/app-testing-on-real-devices/) can be used to provide
+LambdaTest [Real Device Cloud](https://www.lambdatest.com/support/docs/app-testing-on-real-devices/) can be used to provide
 remote devices to Appwright.
 
-These environment variables are required for the Lambdatest
+These environment variables are required for the LambdaTest
 
 - LAMBDATEST_USERNAME
 - LAMBDATEST_ACCESS_KEY
 
-Lambdatest also requires `name` and `osVersion` of the device to be set in the projects in appwright config file.
+LambdaTest also requires `name` and `osVersion` of the device to be set in the projects in appwright config file.
 
 ### Android Emulator
 

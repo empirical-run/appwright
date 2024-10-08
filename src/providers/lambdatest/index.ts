@@ -273,6 +273,7 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
         appiumVersion: "2.3.0",
         platformName: platformName,
         queueTimeout: 600,
+        idleTimeout: 600,
         deviceName: this.project.use.device?.name,
         platformVersion: (this.project.use.device as LambdatestConfig)
           .osVersion,
@@ -290,7 +291,6 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
         autoGrantPermissions: true,
         autoAcceptAlerts: true,
         isRealMobile: true,
-        enableImageInjection: true,
       },
     };
   }

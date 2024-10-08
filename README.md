@@ -113,9 +113,9 @@ the provider in your config.
 },
 ```
 
-#### Run tests on Lambdatest
+#### Run tests on LambdaTest
 
-Appwright supports Lambdatest out of the box. To run tests on Lambdatest, configure
+Appwright supports LambdaTest out of the box. To run tests on LambdaTest, configure
 the provider in your config.
 
 ```ts
