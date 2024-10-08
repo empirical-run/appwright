@@ -232,6 +232,8 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
         Authorization: getAuthHeader(),
         "Content-Type": "application/json",
       },
+      //TODO: Solve it in a way that it waits for the session to be ready and then sends the patch request
+      //while setting the name of the test.
       body: details.name
         ? JSON.stringify({
             name: details.name,
