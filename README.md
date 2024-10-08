@@ -77,7 +77,7 @@ export default defineConfig({
 - `platform`: The platform you want to test on, such as 'android' or 'ios'.
 
 - `provider`: The device provider where you want to run your tests.
-              You can choose between `browserstack`, `emulator`, or `local-device`.
+              You can choose between `browserstack`, `lambdatest`, `emulator`, or `local-device`.
 
 - `buildPath`: The path to your build file. For Android, it should be an APK file.
                For iOS, if you are running tests on real device, it should be an `.ipa` file. For running tests on an emulator, it should be a `.app` file.
@@ -112,6 +112,29 @@ the provider in your config.
   },
 },
 ```
+
+#### Run tests on Lambdatest
+
+Appwright supports Lambdatest out of the box. To run tests on Lambdatest, configure
+the provider in your config.
+
+```ts
+{
+  name: "android",
+  use: {
+    platform: Platform.ANDROID,
+    device: {
+      provider: "lambdatest",
+      // Specify device to run the tests on
+      // See supported devices: https://www.lambdatest.com/list-of-real-devices
+      name: "Pixel 8",
+      osVersion: "14",
+    },
+    buildPath: "app-release.apk",
+  },
+},
+```
+
 ## Run the sample project
 
 To run the sample project:

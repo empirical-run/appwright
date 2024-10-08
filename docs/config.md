@@ -11,6 +11,7 @@ providers are supported:
 - `local-device`
 - `emulator`
 - `browserstack`
+- `lambdatest`
 
 ### BrowserStack
 
@@ -23,6 +24,18 @@ These environment variables are required for the BrowserStack
 - BROWSERSTACK_ACCESS_KEY
 
 BrowserStack also requires `name` and `osVersion` of the device to be set in the projects in appwright config file.
+
+### Lambdatest
+
+Lambdatest [Real Device Cloud](https://www.lambdatest.com/support/docs/app-testing-on-real-devices/) can be used to provide
+remote devices to Appwright.
+
+These environment variables are required for the BrowserStack
+
+- LAMBDATEST_USERNAME
+- LAMBDATEST_ACCESS_KEY
+
+Lambdatest also requires `name` and `osVersion` of the device to be set in the projects in appwright config file.
 
 ### Android Emulator
 
