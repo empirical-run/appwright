@@ -62,6 +62,7 @@ export type AppwrightConfig = {
 
 export type DeviceConfig =
   | BrowserstackConfig
+  | LambdatestConfig
   | LocalDeviceConfig
   | EmulatorConfig;
 
@@ -81,6 +82,24 @@ export type BrowserstackConfig = {
   /**
    * The operating system version of the device to be used on Browserstack.
    * Checkout the list of OS versions supported by BrowserStack: https://www.browserstack.com/list-of-browsers-and-platforms/app_automate
+   * Example: "14.0", "15.0".
+   */
+  osVersion: string;
+};
+
+export type LambdatestConfig = {
+  provider: "lambdatest";
+
+  /**
+   * The name of the device to be used on Lambdatest.
+   * Checkout the list of devices supported by Lambdatest: https://www.lambdatest.com/list-of-real-devices
+   * Example: "iPhone 15 Pro Max", "Galaxy S23 Ultra".
+   */
+  name: string;
+
+  /**
+   * The operating system version of the device to be used on Lambdatest.
+   * Checkout the list of OS versions supported by Lambdatest: https://www.lambdatest.com/list-of-real-devices
    * Example: "14.0", "15.0".
    */
   osVersion: string;
