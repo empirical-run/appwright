@@ -1,5 +1,11 @@
 # appwright
 
+## 0.1.4
+
+### Patch Changes
+
+- 65e2ca7: feat: added lambdatest support in appwright
+
 ## 0.1.3
 
 ### Patch Changes
