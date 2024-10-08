@@ -20,7 +20,7 @@ export const test = base.extend<{
 
   /**
    * Saves the test video after completion and attach it to the test report.
-   * Currently, this functionality is supported only for BrowserStack.
+   * Currently, this functionality is supported only for BrowserStack and Lambdatest.
    */
   saveVideo: void;
 }>({
