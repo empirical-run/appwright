@@ -5,6 +5,7 @@ import { AppwrightLocator, Platform, TestInfoOptions } from "../types";
 import { AppwrightVision, VisionProvider } from "../vision";
 import { boxedStep } from "../utils";
 import { uploadImageToBS } from "../providers/browserstack/utils";
+import { uploadImageToLambdaTest } from "../providers/lambdatest/utils";
 
 export class Device {
   constructor(
@@ -253,6 +254,12 @@ export class Device {
       const imageURL = await uploadImageToBS(imagePath);
       await this.webdriverClient.executeScript(
         `browserstack_executor: {"action":"cameraImageInjection", "arguments": {"imageUrl" : "${imageURL}"}}`,
+        [],
+      );
+    } else if (this.provider == "lambdatest") {
+      const imageURL = await uploadImageToLambdaTest(imagePath);
+      await this.webdriverClient.executeScript(
+        `lambda-image-injection=${imageURL}`,
         [],
       );
     }

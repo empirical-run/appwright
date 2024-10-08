@@ -3,6 +3,7 @@ import { AppwrightConfig, DeviceProvider } from "../types";
 import { LocalDeviceProvider } from "./local";
 import { EmulatorProvider } from "./emulator";
 import { FullProject } from "@playwright/test";
+import { LambdaTestDeviceProvider } from "./lambdatest";
 
 export function createDeviceProvider(
   project: FullProject<AppwrightConfig>,
@@ -11,6 +12,8 @@ export function createDeviceProvider(
   switch (provider) {
     case "browserstack":
       return new BrowserStackDeviceProvider(project);
+    case "lambdatest":
+      return new LambdaTestDeviceProvider(project);
     case "emulator":
       return new EmulatorProvider(project);
     case "local-device":
