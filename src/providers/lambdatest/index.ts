@@ -232,15 +232,14 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
         Authorization: getAuthHeader(),
         "Content-Type": "application/json",
       },
-      //TODO: Solve it in a way that it waits for the session to be ready and then sends the patch request
-      //while setting the name of the test.
-      body: details.name
+      body: details.status
         ? JSON.stringify({
             name: details.name,
-          })
-        : JSON.stringify({
             status_ind: details.status,
             custom_data: details.reason,
+          })
+        : JSON.stringify({
+            name: details.name,
           }),
     });
     if (!response.ok) {
@@ -248,7 +247,6 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
       //sometimes the session is not getting created till then thus this fails.
       //   throw new Error(`Error setting session details: ${response.statusText}`);
     }
-
     const responseData = await response.json();
     return responseData;
   }

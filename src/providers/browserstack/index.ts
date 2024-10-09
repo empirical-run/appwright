@@ -250,13 +250,13 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
           Authorization: getAuthHeader(),
           "Content-Type": "application/json",
         },
-        body: details.name
+        body: details.status
           ? JSON.stringify({
-              name: details.name,
-            })
-          : JSON.stringify({
               status: details.status,
               reason: details.reason,
+            })
+          : JSON.stringify({
+              name: details.name,
             }),
       },
     );

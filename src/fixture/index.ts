@@ -38,17 +38,19 @@ export const test = base.extend<{
     async ({ deviceProvider }, use, testInfo) => {
       await use();
       await deviceProvider.syncTestDetails?.({
+        name: testInfo.title,
         status: testInfo.status,
         reason: testInfo.error?.message,
       });
       const outputDir = testInfo.project.outputDir;
-      const videoData = await deviceProvider.downloadVideo?.(
-        outputDir,
-        testInfo.testId,
-      );
-      if (videoData) {
-        await testInfo.attach("video", videoData);
-      }
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+      deviceProvider
+        .downloadVideo?.(outputDir, testInfo.testId)
+        .then(async (videoData) => {
+          if (videoData) {
+            await testInfo.attach("video", videoData);
+          }
+        });
     },
     { auto: true },
   ],
