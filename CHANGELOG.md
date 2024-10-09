@@ -1,5 +1,11 @@
 # appwright
 
+## 0.1.6
+
+### Patch Changes
+
+- 80a4c6a: fix: remove await while downloading video from provider in saveVideo fixture
+
 ## 0.1.5
 
 ### Patch Changes
