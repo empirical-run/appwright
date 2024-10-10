@@ -1,5 +1,11 @@
 # appwright
 
+## 0.1.7
+
+### Patch Changes
+
+- 961019c: fix: wait to download all videos and attach to report
+
 ## 0.1.6
 
 ### Patch Changes
