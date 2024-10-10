@@ -3,6 +3,7 @@ import { test as base } from "@playwright/test";
 import { AppwrightLocator, DeviceProvider, WaitUntilOptions } from "../types";
 import { Device } from "../device";
 import { createDeviceProvider } from "../providers";
+import { logger } from "../logger";
 
 export const test = base.extend<{
   /**
@@ -43,14 +44,20 @@ export const test = base.extend<{
         reason: testInfo.error?.message,
       });
       const outputDir = testInfo.project.outputDir;
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      deviceProvider
+      const downloadPromise = deviceProvider
         .downloadVideo?.(outputDir, testInfo.testId)
         .then(async (videoData) => {
           if (videoData) {
             await testInfo.attach("video", videoData);
           }
+        })
+        .catch((error) => {
+          logger.error(`saveVideo: ${error}`);
         });
+
+      if (downloadPromise) {
+        await downloadPromise;
+      }
     },
     { auto: true },
   ],
