@@ -46,7 +46,7 @@ export const test = base.extend<{
       const outputDir = testInfo.project.outputDir;
       const downloadPromise = deviceProvider
         .downloadVideo?.(outputDir, testInfo.testId)
-        ?.then(async (videoData) => {
+        .then(async (videoData) => {
           if (videoData) {
             await testInfo.attach("video", videoData);
           }
