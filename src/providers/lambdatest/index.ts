@@ -273,6 +273,7 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
         queueTimeout: 600,
         idleTimeout: 600,
         deviceName: this.project.use.device?.name,
+        deviceOrientation: this.project.use.device?.orientation,
         platformVersion: (this.project.use.device as LambdatestConfig)
           .osVersion,
         app: process.env[envVarKey],
