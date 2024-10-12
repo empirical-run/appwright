@@ -85,6 +85,12 @@ export type BrowserstackConfig = {
    * Example: "14.0", "15.0".
    */
   osVersion: string;
+
+  /**
+   * The orientation of the device on Browserstack.
+   * Default orientation is "portrait".
+   */
+  orientation?: DeviceOrientation;
 };
 
 export type LambdatestConfig = {
@@ -103,6 +109,12 @@ export type LambdatestConfig = {
    * Example: "14.0", "15.0".
    */
   osVersion: string;
+
+  /**
+   * The orientation of the device on LambdaTest.
+   * Default orientation is "portrait".
+   */
+  orientation?: DeviceOrientation;
 };
 
 /**
@@ -116,6 +128,12 @@ export type LocalDeviceConfig = {
    * The unique device identifier (UDID) of the connected local device.
    */
   udid?: string;
+
+  /**
+   * The orientation of the device.
+   * Default orientation is "portrait".
+   */
+  orientation?: DeviceOrientation;
 };
 
 /**
@@ -125,11 +143,22 @@ export type EmulatorConfig = {
   provider: "emulator";
   name?: string;
   osVersion?: string;
+
+  /**
+   * The orientation of the emulator.
+   * Default orientation is "portrait".
+   */
+  orientation?: DeviceOrientation;
 };
 
 export enum Platform {
   ANDROID = "android",
   IOS = "ios",
+}
+
+export enum DeviceOrientation {
+  PORTRAIT = "portrait",
+  LANDSCAPE = "landscape",
 }
 
 export interface AppwrightLocator {

@@ -295,6 +295,7 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
           deviceName: this.project.use.device?.name,
           osVersion: (this.project.use.device as BrowserstackConfig).osVersion,
           platformName: platformName,
+          deviceOrientation: this.project.use.device?.orientation,
           buildName: `${projectName} ${platformName}`,
           sessionName: `${projectName} ${platformName} test`,
           buildIdentifier:

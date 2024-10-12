@@ -102,6 +102,7 @@ Follow the steps mentioned in ${androidSimulatorConfigDocLink} to run test on An
         "appium:app": this.project.use.buildPath,
         "appium:autoAcceptAlerts": true,
         "appium:fullReset": true,
+        "appium:deviceOrientation": this.project.use.device?.orientation,
       },
     };
   }
