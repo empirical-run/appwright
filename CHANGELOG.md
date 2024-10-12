@@ -1,5 +1,11 @@
 # appwright
 
+## 0.1.8
+
+### Patch Changes
+
+- 1b83e1c: feat: support for landscape device orientation
+
 ## 0.1.7
 
 ### Patch Changes
