@@ -207,6 +207,7 @@ export class Locator {
     }
   }
 
+  @boxedStep
   async scroll(direction: ScrollDirection) {
     const element = await this.getElement();
     if (!element) {
@@ -217,7 +218,7 @@ export class Locator {
         {
           elementId: element["element-6066-11e4-a52e-4f735466cecf"],
           direction: direction,
-          percent: 1,
+          percent: 0.8,
         },
       ]);
     } else {

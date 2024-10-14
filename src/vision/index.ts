@@ -3,6 +3,7 @@ import { getBoundingBox, query } from "@empiricalrun/llm/vision";
 import { Client as WebDriverClient } from "webdriver";
 import { Device } from "../device";
 import test from "@playwright/test";
+import { boxedStep } from "../utils";
 
 export interface AppwrightVision {
   /**
@@ -11,13 +12,13 @@ export interface AppwrightVision {
    *
    * **Usage:**
    * ```js
-   * await device.beta.extractText("Extract contact details present in the footer from the screenshot");
+   * await device.beta.query("Extract contact details present in the footer from the screenshot");
    * ```
    *
    * @param prompt that defines the specific area or context from which text should be extracted.
    * @returns
    */
-  extractText(prompt: string): Promise<string>;
+  query(prompt: string): Promise<string>;
 
   /**
    * Performs a tap action on the screen based on the provided prompt.
@@ -39,7 +40,8 @@ export class VisionProvider {
     private webDriverClient: WebDriverClient,
   ) {}
 
-  async extractText(prompt: string): Promise<string> {
+  @boxedStep
+  async query(prompt: string): Promise<string> {
     test.skip(
       !process.env.OPENAI_API_KEY,
       "LLM vision based extract text is not enabled. Set the OPENAI_API_KEY environment variable to enable it",
@@ -48,6 +50,7 @@ export class VisionProvider {
     return await query(base64Screenshot, prompt);
   }
 
+  @boxedStep
   async tap(prompt: string): Promise<void> {
     test.skip(
       !process.env.GOOGLE_API_KEY,
