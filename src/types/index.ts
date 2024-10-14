@@ -161,6 +161,11 @@ export enum DeviceOrientation {
   LANDSCAPE = "landscape",
 }
 
+export enum ScrollDirection {
+  UP = "up",
+  DOWN = "down",
+}
+
 export interface AppwrightLocator {
   /**
    * Taps (clicks) on the element. This method waits for the element to be visible before clicking it.
@@ -223,6 +228,8 @@ export interface AppwrightLocator {
    * @param options Use this to override the timeout for this action
    */
   getText(options?: WaitUntilOptions): Promise<string>;
+
+  scroll(direction: ScrollDirection): Promise<void>;
 }
 
 export enum WebdriverErrors {
