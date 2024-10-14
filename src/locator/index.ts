@@ -218,7 +218,7 @@ export class Locator {
         {
           elementId: element["element-6066-11e4-a52e-4f735466cecf"],
           direction: direction,
-          percent: 0.8,
+          percent: 1,
         },
       ]);
     } else {
