@@ -3,6 +3,7 @@ import { Client as WebDriverClient } from "webdriver";
 import retry from "async-retry";
 import {
   ElementReference,
+  ScrollDirection,
   TestInfoOptions,
   WaitUntilOptions,
   WebdriverErrors,
@@ -203,6 +204,30 @@ export class Locator {
       }
     } else {
       throw new Error(`Element with path "${this.selector}" not visible`);
+    }
+  }
+
+  @boxedStep
+  async scroll(direction: ScrollDirection) {
+    const element = await this.getElement();
+    if (!element) {
+      throw new Error(`Element with path "${this.selector}" not found`);
+    }
+    if (this.webDriverClient.isAndroid) {
+      await this.webDriverClient.executeScript("mobile: scrollGesture", [
+        {
+          elementId: element["element-6066-11e4-a52e-4f735466cecf"],
+          direction: direction,
+          percent: 1,
+        },
+      ]);
+    } else {
+      await this.webDriverClient.executeScript("mobile: scroll", [
+        {
+          elementId: element["element-6066-11e4-a52e-4f735466cecf"],
+          direction: direction,
+        },
+      ]);
     }
   }
 

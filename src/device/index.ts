@@ -38,8 +38,8 @@ export class Device {
       await this.vision().tap(prompt);
     },
 
-    extractText: async (prompt: string): Promise<string> => {
-      return await this.vision().extractText(prompt);
+    query: async (prompt: string): Promise<string> => {
+      return await this.vision().query(prompt);
     },
   };
 
