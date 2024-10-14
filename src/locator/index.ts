@@ -213,16 +213,11 @@ export class Locator {
       throw new Error(`Element with path "${this.selector}" not found`);
     }
     if (this.webDriverClient.isAndroid) {
-      const { height, width } = await this.webDriverClient.getWindowRect();
       await this.webDriverClient.executeScript("mobile: scrollGesture", [
         {
-          // elementId: element["element-6066-11e4-a52e-4f735466cecf"],
+          elementId: element["element-6066-11e4-a52e-4f735466cecf"],
           direction: direction,
           percent: 1,
-          width,
-          height,
-          top: height / 2,
-          left: height / 2,
         },
       ]);
     } else {
