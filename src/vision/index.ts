@@ -39,7 +39,7 @@ export class VisionProvider {
   constructor(
     private device: Device,
     private webDriverClient: WebDriverClient,
-  ) { }
+  ) {}
 
   @boxedStep
   async query(prompt: string): Promise<string> {
@@ -69,7 +69,7 @@ export class VisionProvider {
       console.log("file", file);
       const base64 = bbox.annotatedImage.split(",")[1];
       await fs.promises.writeFile(file, Buffer.from(base64!, "base64"));
-      await test.info().attach("my screenshot", { path: file });
+      await test.info().attach(`${random}`, { path: file });
     }
     const driverSize = await this.webDriverClient.getWindowRect();
     const { container: imageSize, center } = bbox;

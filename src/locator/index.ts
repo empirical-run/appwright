@@ -17,7 +17,7 @@ export class Locator {
     private findStrategy: string,
     private testOptions: TestInfoOptions,
     private textToMatch?: string,
-  ) { }
+  ) {}
 
   @boxedStep
   async fill(value: string, options?: WaitUntilOptions): Promise<void> {

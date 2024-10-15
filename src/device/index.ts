@@ -13,7 +13,7 @@ export class Device {
     private bundleId: string | undefined,
     private testOptions: TestInfoOptions,
     private provider: string,
-  ) { }
+  ) {}
 
   locator(
     path: string | RegExp,

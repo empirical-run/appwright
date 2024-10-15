@@ -16,7 +16,7 @@ import { FullProject } from "@playwright/test";
 import { validateBuildPath } from "../../utils";
 
 export class EmulatorProvider implements DeviceProvider {
-  constructor(private project: FullProject<AppwrightConfig>) { }
+  constructor(private project: FullProject<AppwrightConfig>) {}
 
   async getDevice(): Promise<Device> {
     return await this.createDriver();

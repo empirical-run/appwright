@@ -19,7 +19,7 @@ import { validateBuildPath } from "../../utils";
 import { logger } from "../../logger";
 
 export class LocalDeviceProvider implements DeviceProvider {
-  constructor(private project: FullProject<AppwrightConfig>) { }
+  constructor(private project: FullProject<AppwrightConfig>) {}
 
   async getDevice(): Promise<Device> {
     return await this.createDriver();

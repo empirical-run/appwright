@@ -7,7 +7,7 @@ import {
   DeviceProvider,
   BrowserstackConfig,
 } from "../../types";
-import { FullProject, TestInfo } from "@playwright/test";
+import { FullProject } from "@playwright/test";
 import { Device } from "../../device";
 import { logger } from "../../logger";
 
@@ -105,10 +105,10 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
     process.env[envVarKeyForBuild(this.project.name)] = appUrl;
   }
 
-  async getDevice(testInfo: TestInfo): Promise<Device> {
+  async getDevice(): Promise<Device> {
     this.validateConfig();
     const config = this.createConfig();
-    return await this.createDriver(config, testInfo);
+    return await this.createDriver(config);
   }
 
   private validateConfig() {
@@ -120,7 +120,7 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
     }
   }
 
-  private async createDriver(config: any, testInfo: TestInfo): Promise<Device> {
+  private async createDriver(config: any): Promise<Device> {
     const WebDriver = (await import("webdriver")).default;
     const webDriverClient = await WebDriver.newSession(config);
     this.sessionId = webDriverClient.sessionId;
@@ -252,12 +252,12 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
         },
         body: details.status
           ? JSON.stringify({
-            status: details.status,
-            reason: details.reason,
-          })
+              status: details.status,
+              reason: details.reason,
+            })
           : JSON.stringify({
-            name: details.name,
-          }),
+              name: details.name,
+            }),
       },
     );
     if (!response.ok) {
