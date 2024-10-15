@@ -30,7 +30,7 @@ export const test = base.extend<{
     await use(deviceProvider);
   },
   device: async ({ deviceProvider }, use, testInfo) => {
-    const device = await deviceProvider.getDevice(testInfo);
+    const device = await deviceProvider.getDevice();
     await deviceProvider.syncTestDetails?.({ name: testInfo.title });
     await use(device);
     await device.close();

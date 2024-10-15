@@ -57,7 +57,6 @@ export class LocalDeviceProvider implements DeviceProvider {
     const testOptions: TestInfoOptions = {
       expectTimeout,
     };
-    //@ts-ignore
     return new Device(
       webDriverClient,
       bundleId,

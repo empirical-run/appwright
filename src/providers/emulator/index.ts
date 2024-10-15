@@ -67,7 +67,6 @@ Follow the steps mentioned in ${androidSimulatorConfigDocLink} to run test on An
     const testOptions: TestInfoOptions = {
       expectTimeout,
     };
-    //@ts-ignore
     return new Device(
       webDriverClient,
       undefined,

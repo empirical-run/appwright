@@ -1,8 +1,9 @@
 import { getBoundingBox, query } from "@empiricalrun/llm/vision";
+import fs from "fs";
 // @ts-ignore ts not able to identify the import is just an interface
 import { Client as WebDriverClient } from "webdriver";
 import { Device } from "../device";
-import test, { TestInfo } from "@playwright/test";
+import test from "@playwright/test";
 import { boxedStep } from "../utils";
 
 export interface AppwrightVision {
@@ -38,7 +39,6 @@ export class VisionProvider {
   constructor(
     private device: Device,
     private webDriverClient: WebDriverClient,
-    private testInfo: TestInfo,
   ) { }
 
   @boxedStep
@@ -61,12 +61,16 @@ export class VisionProvider {
     const bbox = await getBoundingBox(base64Screenshot, prompt, {
       debug: true,
     });
-
+    console.log("bbox", bbox);
     if (bbox.annotatedImage) {
       console.log("annotatedImage", bbox.annotatedImage);
-      await this.testInfo.attach("image", { body: bbox.annotatedImage });
+      const random = Math.floor(1000 + Math.random() * 9000);
+      const file = test.info().outputPath(`${random}.png`);
+      console.log("file", file);
+      const base64 = bbox.annotatedImage.split(",")[1];
+      await fs.promises.writeFile(file, Buffer.from(base64!, "base64"));
+      await test.info().attach("my screenshot", { path: file });
     }
-
     const driverSize = await this.webDriverClient.getWindowRect();
     const { container: imageSize, center } = bbox;
     const scaleFactorWidth = imageSize.width / driverSize.width;

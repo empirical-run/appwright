@@ -125,7 +125,6 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
     const testOptions = {
       expectTimeout: this.project.use.expectTimeout!,
     };
-    //@ts-ignore
     return new Device(
       webDriverClient,
       bundleId,

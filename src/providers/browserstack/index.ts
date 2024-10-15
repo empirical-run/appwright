@@ -129,7 +129,6 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
       expectTimeout: this.project.use.expectTimeout!,
     };
     return new Device(
-      testInfo,
       webDriverClient,
       bundleId,
       testOptions,

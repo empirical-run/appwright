@@ -6,11 +6,9 @@ import { AppwrightVision, VisionProvider } from "../vision";
 import { boxedStep } from "../utils";
 import { uploadImageToBS } from "../providers/browserstack/utils";
 import { uploadImageToLambdaTest } from "../providers/lambdatest/utils";
-import { TestInfo } from "@playwright/test";
 
 export class Device {
   constructor(
-    private testInfo: TestInfo,
     private webdriverClient: WebDriverClient,
     private bundleId: string | undefined,
     private testOptions: TestInfoOptions,
@@ -32,7 +30,7 @@ export class Device {
   }
 
   private vision(): AppwrightVision {
-    return new VisionProvider(this, this.webdriverClient, this.testInfo);
+    return new VisionProvider(this, this.webdriverClient);
   }
 
   beta = {
