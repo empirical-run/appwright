@@ -1,5 +1,11 @@
 # appwright
 
+## 0.1.11
+
+### Patch Changes
+
+- c86db58: feat: attach annotated images from vision calls to the report
+
 ## 0.1.10
 
 ### Patch Changes
