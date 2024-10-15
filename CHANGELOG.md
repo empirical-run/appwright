@@ -1,5 +1,11 @@
 # appwright
 
+## 0.1.10
+
+### Patch Changes
+
+- bbba9c5: fix: removed LambdaTest network capability
+
 ## 0.1.9
 
 ### Patch Changes
