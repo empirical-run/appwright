@@ -125,6 +125,7 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
     const testOptions = {
       expectTimeout: this.project.use.expectTimeout!,
     };
+    //@ts-ignore
     return new Device(
       webDriverClient,
       bundleId,
@@ -234,13 +235,13 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
       },
       body: details.status
         ? JSON.stringify({
-            name: details.name,
-            status_ind: details.status,
-            custom_data: details.reason,
-          })
+          name: details.name,
+          status_ind: details.status,
+          custom_data: details.reason,
+        })
         : JSON.stringify({
-            name: details.name,
-          }),
+          name: details.name,
+        }),
     });
     if (!response.ok) {
       //TODO: Check whether add retry here or leave it as is because while setting the name of test
@@ -279,11 +280,10 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
         app: process.env[envVarKey],
         devicelog: true,
         video: true,
-        build: `${this.projectName} ${platformName} ${
-          process.env.GITHUB_ACTIONS === "true"
+        build: `${this.projectName} ${platformName} ${process.env.GITHUB_ACTIONS === "true"
             ? `CI ${process.env.GITHUB_RUN_ID}`
             : process.env.USER
-        }`,
+          }`,
         project: this.projectName,
         autoGrantPermissions: true,
         autoAcceptAlerts: true,

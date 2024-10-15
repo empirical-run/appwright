@@ -16,7 +16,7 @@ import { FullProject } from "@playwright/test";
 import { validateBuildPath } from "../../utils";
 
 export class EmulatorProvider implements DeviceProvider {
-  constructor(private project: FullProject<AppwrightConfig>) {}
+  constructor(private project: FullProject<AppwrightConfig>) { }
 
   async getDevice(): Promise<Device> {
     return await this.createDriver();
@@ -67,6 +67,7 @@ Follow the steps mentioned in ${androidSimulatorConfigDocLink} to run test on An
     const testOptions: TestInfoOptions = {
       expectTimeout,
     };
+    //@ts-ignore
     return new Device(
       webDriverClient,
       undefined,

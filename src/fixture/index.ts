@@ -25,12 +25,12 @@ export const test = base.extend<{
    */
   saveVideo: void;
 }>({
-  deviceProvider: async ({}, use, testInfo) => {
+  deviceProvider: async ({ }, use, testInfo) => {
     const deviceProvider = createDeviceProvider(testInfo.project);
     await use(deviceProvider);
   },
   device: async ({ deviceProvider }, use, testInfo) => {
-    const device = await deviceProvider.getDevice();
+    const device = await deviceProvider.getDevice(testInfo);
     await deviceProvider.syncTestDetails?.({ name: testInfo.title });
     await use(device);
     await device.close();

@@ -1,3 +1,4 @@
+import { TestInfo } from "@playwright/test";
 import { Device } from "../device";
 
 export type WaitUntilOptions = {
@@ -23,7 +24,7 @@ export interface DeviceProvider {
   /**
    * Returns a device instance.
    */
-  getDevice(): Promise<Device>;
+  getDevice(testInfo: TestInfo): Promise<Device>;
 
   /**
    * Downloads the video of the test.
