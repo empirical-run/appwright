@@ -278,8 +278,6 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
           .osVersion,
         app: process.env[envVarKey],
         devicelog: true,
-        visual: true,
-        network: true,
         video: true,
         build: `${this.projectName} ${platformName} ${
           process.env.GITHUB_ACTIONS === "true"
