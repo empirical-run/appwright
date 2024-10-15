@@ -39,7 +39,7 @@ export class VisionProvider {
   constructor(
     private device: Device,
     private webDriverClient: WebDriverClient,
-  ) {}
+  ) { }
 
   @boxedStep
   async query(prompt: string): Promise<string> {
@@ -61,12 +61,9 @@ export class VisionProvider {
     const bbox = await getBoundingBox(base64Screenshot, prompt, {
       debug: true,
     });
-    console.log("bbox", bbox);
     if (bbox.annotatedImage) {
-      console.log("annotatedImage", bbox.annotatedImage);
       const random = Math.floor(1000 + Math.random() * 9000);
       const file = test.info().outputPath(`${random}.png`);
-      console.log("file", file);
       const base64 = bbox.annotatedImage.split(",")[1];
       await fs.promises.writeFile(file, Buffer.from(base64!, "base64"));
       await test.info().attach(`${random}`, { path: file });
