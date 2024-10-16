@@ -59,3 +59,28 @@ export function getLatestBuildToolsVersions(
 ): string | undefined {
   return versions.sort((a, b) => (a > b ? -1 : 1))[0];
 }
+
+export function longestDeterministicGroup(pattern: RegExp): string | undefined {
+  const patternToString = pattern.toString();
+  const matches = [...patternToString.matchAll(/\(([^)]+)\)/g)].map(
+    (match) => match[1],
+  );
+  if (!matches || !matches.length) {
+    return undefined;
+  }
+  const noSpecialChars: string[] = matches.filter((match): match is string => {
+    if (!match) {
+      return false;
+    }
+    const regexSpecialCharsPattern = /[.*+?^${}()|[\]\\]/;
+    return !regexSpecialCharsPattern.test(match);
+  });
+  const longestString = noSpecialChars.reduce(
+    (max, str) => (str.length > max.length ? str : max),
+    "",
+  );
+  if (longestString == "") {
+    return undefined;
+  }
+  return longestString;
+}

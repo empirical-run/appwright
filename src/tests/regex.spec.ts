@@ -1,5 +1,20 @@
-import { expect, test } from "vitest";
+import { test, expect } from "vitest";
+import { longestDeterministicGroup } from "../utils";
 
-test("adds 1 + 2 to equal 3", () => {
-  expect(1 + 2).toBe(3);
+test("longest deterministic group with one group", () => {
+  const pattern = /.*(Copy to clipboard)$/;
+  const substring = longestDeterministicGroup(pattern);
+  expect(substring).toBe("Copy to clipboard");
+});
+
+test("longest deterministic group with no groups", () => {
+  const pattern = /.*Copy to clipboard$/;
+  const substring = longestDeterministicGroup(pattern);
+  expect(substring).toBe(undefined);
+});
+
+test("longest deterministic group with group that has special chars", () => {
+  const pattern = /.*(Copy .* to clipboard)$/;
+  const substring = longestDeterministicGroup(pattern);
+  expect(substring).toBe(undefined);
 });

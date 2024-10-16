@@ -13,10 +13,12 @@ import { boxedStep } from "../utils";
 export class Locator {
   constructor(
     private webDriverClient: WebDriverClient,
-    private selector: string | RegExp,
+    // Used for find elements request that is sent to Appium server
+    private selector: string,
     private findStrategy: string,
     private testOptions: TestInfoOptions,
-    private textToMatch?: string,
+    // Used to filter elements received from Appium server
+    private textToMatch?: string | RegExp,
   ) {}
 
   @boxedStep
@@ -250,27 +252,19 @@ export class Locator {
      * - Apply regex to clean extra characters from the matched element’s text
      * - Return the first element that matches
      */
-
-    let elements: ElementReference[] = [];
-    if (typeof this.selector === "string") {
-      elements = await this.webDriverClient.findElements(
-        this.findStrategy,
-        this.selector,
-      );
-    } else if (this.selector instanceof RegExp) {
-      elements = await this.webDriverClient.findElements("xpath", "//*"); // Get all elements
-    }
-
+    let elements: ElementReference[] = await this.webDriverClient.findElements(
+      this.findStrategy,
+      this.selector,
+    );
     // If there is only one element, return it
     if (elements.length === 1) {
       return elements[0]!;
     }
-
-    //If there are multiple elements, we reverse the order since the probability
-    //of finding the element is higher at higher depth
+    // If there are multiple elements, we reverse the order since the probability
+    // of finding the element is higher at higher depth
     const reversedElements = elements.reverse();
     for (const element of reversedElements) {
-      let text = await this.webDriverClient.getElementText(
+      let elementText = await this.webDriverClient.getElementText(
         element["element-6066-11e4-a52e-4f735466cecf"],
       );
 
@@ -278,14 +272,19 @@ export class Locator {
         return element;
       }
 
-      if (this.selector instanceof RegExp && this.selector.test(text)) {
-        return element;
-      }
-      if (
-        typeof this.selector === "string" &&
-        text.includes(this.textToMatch!)
-      ) {
-        return element;
+      if (this.textToMatch) {
+        if (
+          this.textToMatch instanceof RegExp &&
+          this.textToMatch.test(elementText)
+        ) {
+          return element;
+        }
+        if (
+          typeof this.textToMatch === "string" &&
+          elementText.includes(this.textToMatch!)
+        ) {
+          return element;
+        }
       }
     }
 
