@@ -5,7 +5,7 @@
 ### Patch Changes
 
 - 49dc470: feat: add persistentDevice as worker-level fixture
-  feat: add methods for terminateApp and activateApp
+- 49dc470: feat: add methods for terminateApp and activateApp
 
 ## 0.1.12
 
