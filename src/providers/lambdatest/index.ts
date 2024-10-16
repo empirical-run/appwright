@@ -2,7 +2,7 @@ import retry from "async-retry";
 import fs from "fs";
 import FormData from "form-data";
 import path from "path";
-import { AppwrightConfig, DeviceProvider, LambdatestConfig } from "../../types";
+import { AppwrightConfig, DeviceProvider, LambdaTestConfig } from "../../types";
 import { FullProject } from "@playwright/test";
 import { Device } from "../../device";
 import { logger } from "../../logger";
@@ -113,7 +113,7 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
   }
 
   private validateConfig() {
-    const device = this.project.use.device as LambdatestConfig;
+    const device = this.project.use.device as LambdaTestConfig;
     if (!device.name || !device.osVersion) {
       throw new Error(
         "Device name and osVersion are required for running tests on LambdaTest. Please set the device name and osVersion in the `appwright.config.ts` file.",
@@ -277,7 +277,7 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
         idleTimeout: 600,
         deviceName: this.project.use.device?.name,
         deviceOrientation: this.project.use.device?.orientation,
-        platformVersion: (this.project.use.device as LambdatestConfig)
+        platformVersion: (this.project.use.device as LambdaTestConfig)
           .osVersion,
         app: process.env[envVarKey],
         devicelog: true,
