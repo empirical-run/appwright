@@ -150,11 +150,6 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
     this.sessionDetails = data.data;
   }
 
-  //   private async getAppBundleIdFromSession(): Promise<string> {
-  //     await this.getSessionDetails();
-  //     return this.sessionDetails?.app_details.app_name ?? "";
-  //   }
-
   async downloadVideo(
     outputDir: string,
     fileName: string,
