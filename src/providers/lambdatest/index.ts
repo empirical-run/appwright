@@ -37,11 +37,17 @@ const envVarKeyForBuild = (projectName: string) =>
 export class LambdaTestDeviceProvider implements DeviceProvider {
   private sessionDetails?: LambdatestSessionDetails;
   private sessionId?: string;
-  private project: FullProject<AppwrightConfig>;
   private projectName = path.basename(process.cwd());
 
-  constructor(project: FullProject<AppwrightConfig>) {
-    this.project = project;
+  constructor(
+    private project: FullProject<AppwrightConfig>,
+    private appBundleId: string | undefined,
+  ) {
+    if (!appBundleId) {
+      throw new Error(
+        "App Bundle ID is required for running tests on LambdaTest. Set the `appBundleId` for your projects that run on this provider.",
+      );
+    }
   }
 
   async globalSetup() {
@@ -119,15 +125,12 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
     const WebDriver = (await import("webdriver")).default;
     const webDriverClient = await WebDriver.newSession(config);
     this.sessionId = webDriverClient.sessionId;
-    //TODO: Find a way to get bundleID from the session
-    const bundleId = "test";
-    // await this.getAppBundleIdFromSession();
     const testOptions = {
       expectTimeout: this.project.use.expectTimeout!,
     };
     return new Device(
       webDriverClient,
-      bundleId,
+      this.appBundleId,
       testOptions,
       this.project.use.device?.provider!,
     );

@@ -52,8 +52,16 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
   private sessionId?: string;
   private project: FullProject<AppwrightConfig>;
 
-  constructor(project: FullProject<AppwrightConfig>) {
+  constructor(
+    project: FullProject<AppwrightConfig>,
+    appBundleId: string | undefined,
+  ) {
     this.project = project;
+    if (appBundleId) {
+      console.log(
+        `Bundle id is specified (${appBundleId}) but ignored for BrowserStack provider.`,
+      );
+    }
   }
 
   async globalSetup() {

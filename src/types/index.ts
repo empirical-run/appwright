@@ -56,6 +56,7 @@ export type AppwrightConfig = {
   platform: Platform;
   device: DeviceConfig;
   buildPath: string;
+  appBundleId: string;
   // TODO: use expect timeout from playwright config
   expectTimeout: number;
 };
