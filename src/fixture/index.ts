@@ -40,18 +40,6 @@ export const test = base.extend<TestLevelFixtures, WorkerLevelFixtures>({
     await deviceProvider.syncTestDetails?.({ name: testInfo.title });
     await use(device);
     await device.close();
-  },
-  persistentDevice: [
-    async ({}, use, testInfo) => {
-      const deviceProvider = createDeviceProvider(testInfo.project);
-      const device = await deviceProvider.getDevice();
-      await use(device);
-      await device.close();
-    },
-    { scope: "worker" },
-  ],
-  saveVideo: async ({ deviceProvider }, use, testInfo) => {
-    await use();
     await deviceProvider.syncTestDetails?.({
       name: testInfo.title,
       status: testInfo.status,
@@ -73,6 +61,15 @@ export const test = base.extend<TestLevelFixtures, WorkerLevelFixtures>({
       await downloadPromise;
     }
   },
+  persistentDevice: [
+    async ({}, use, testInfo) => {
+      const deviceProvider = createDeviceProvider(testInfo.project);
+      const device = await deviceProvider.getDevice();
+      await use(device);
+      await device.close();
+    },
+    { scope: "worker" },
+  ],
 });
 
 /**
