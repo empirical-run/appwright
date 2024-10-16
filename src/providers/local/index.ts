@@ -3,7 +3,7 @@ import {
   DeviceProvider,
   LocalDeviceConfig,
   Platform,
-  TestInfoOptions,
+  TimeoutOptions,
 } from "../../types";
 import { Device } from "../../device";
 import { FullProject } from "@playwright/test";
@@ -63,7 +63,7 @@ export class LocalDeviceProvider implements DeviceProvider {
     );
     const bundleId = await getAppBundleId(this.project.use.buildPath!);
     const expectTimeout = this.project.use.expectTimeout!;
-    const testOptions: TestInfoOptions = {
+    const testOptions: TimeoutOptions = {
       expectTimeout,
     };
     return new Device(

@@ -5,7 +5,7 @@ import {
   AppwrightLocator,
   ExtractType,
   Platform,
-  TestInfoOptions,
+  TimeoutOptions,
 } from "../types";
 import { AppwrightVision, VisionProvider } from "../vision";
 import { boxedStep, longestDeterministicGroup } from "../utils";
@@ -18,7 +18,7 @@ export class Device {
   constructor(
     private webdriverClient: WebDriverClient,
     private bundleId: string | undefined,
-    private testOptions: TestInfoOptions,
+    private timeoutOpts: TimeoutOptions,
     private provider: string,
   ) {}
 
@@ -33,7 +33,7 @@ export class Device {
   }): AppwrightLocator {
     return new Locator(
       this.webdriverClient,
-      this.testOptions,
+      this.timeoutOpts,
       selector,
       findStrategy,
       textToMatch,
@@ -68,7 +68,8 @@ export class Device {
    * await device.close();
    * ```
    */
-  @boxedStep
+  // TODO: Add @boxedStep decorator here; disabled because it breaks persistentDevice
+  // as test.step will throw
   async close() {
     await this.webdriverClient.deleteSession();
   }
@@ -227,6 +228,32 @@ export class Device {
     return isAndroid ? Platform.ANDROID : Platform.IOS;
   }
 
+  async terminateApp(bundleId?: string) {
+    if (!this.bundleId && !bundleId) {
+      throw new Error("bundleId is required to terminate the app.");
+    }
+    const keyName =
+      this.getPlatform() == Platform.ANDROID ? "appId" : "bundleId";
+    await this.webdriverClient.executeScript("mobile: terminateApp", [
+      {
+        [keyName]: bundleId || this.bundleId,
+      },
+    ]);
+  }
+
+  async activateApp(bundleId?: string) {
+    if (!this.bundleId && !bundleId) {
+      throw new Error("bundleId is required to activate the app.");
+    }
+    const keyName =
+      this.getPlatform() == Platform.ANDROID ? "appId" : "bundleId";
+    await this.webdriverClient.executeScript("mobile: activateApp", [
+      {
+        [keyName]: bundleId || this.bundleId,
+      },
+    ]);
+  }
+
   /**
    * Retrieves text content from the clipboard of the mobile device. This is useful
    * after a "copy to clipboard" action has been performed. This returns base64 encoded string.
@@ -251,17 +278,9 @@ export class Device {
             "bundleId is required to retrieve clipboard data on a real device.",
           );
         }
-        await this.webdriverClient.executeScript("mobile: activateApp", [
-          {
-            bundleId: "com.facebook.WebDriverAgentRunner.xctrunner",
-          },
-        ]);
+        await this.activateApp("com.facebook.WebDriverAgentRunner.xctrunner");
         const clipboardDataBase64 = await this.webdriverClient.getClipboard();
-        await this.webdriverClient.executeScript("mobile: activateApp", [
-          {
-            bundleId: this.bundleId,
-          },
-        ]);
+        await this.activateApp(this.bundleId);
         return clipboardDataBase64;
       }
     }
