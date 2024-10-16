@@ -3,7 +3,7 @@ import type { Client as WebDriverClient } from "webdriver";
 import { Locator } from "../locator";
 import { AppwrightLocator, Platform, TestInfoOptions } from "../types";
 import { AppwrightVision, VisionProvider } from "../vision";
-import { boxedStep } from "../utils";
+import { boxedStep, longestDeterministicGroup } from "../utils";
 import { uploadImageToBS } from "../providers/browserstack/utils";
 import { uploadImageToLambdaTest } from "../providers/lambdatest/utils";
 
@@ -15,16 +15,20 @@ export class Device {
     private provider: string,
   ) {}
 
-  locator(
-    path: string | RegExp,
-    findStrategy: string,
-    textToMatch?: string,
-  ): AppwrightLocator {
+  locator({
+    selector,
+    findStrategy,
+    textToMatch,
+  }: {
+    selector: string;
+    findStrategy: string;
+    textToMatch?: string | RegExp;
+  }): AppwrightLocator {
     return new Locator(
       this.webdriverClient,
-      path,
-      findStrategy,
       this.testOptions,
+      selector,
+      findStrategy,
       textToMatch,
     );
   }
@@ -112,10 +116,25 @@ export class Device {
   ): AppwrightLocator {
     const isAndroid = this.getPlatform() == Platform.ANDROID;
     if (text instanceof RegExp) {
-      return this.locator(
-        text,
-        isAndroid ? "-android uiautomator" : "-ios predicate string",
-      );
+      const substringForContains = longestDeterministicGroup(text);
+      if (!substringForContains) {
+        return this.locator({
+          selector: "//*",
+          findStrategy: "xpath",
+          textToMatch: text,
+        });
+      } else {
+        const selector = isAndroid
+          ? `textContains("${substringForContains}")`
+          : `label CONTAINS "${substringForContains}"`;
+        return this.locator({
+          selector: selector,
+          findStrategy: isAndroid
+            ? "-android uiautomator"
+            : "-ios predicate string",
+          textToMatch: text,
+        });
+      }
     }
     let path: string;
     if (isAndroid) {
@@ -123,11 +142,13 @@ export class Device {
     } else {
       path = exact ? `label == "${text}"` : `label CONTAINS "${text}"`;
     }
-    return this.locator(
-      path,
-      isAndroid ? "-android uiautomator" : "-ios predicate string",
-      text,
-    );
+    return this.locator({
+      selector: path,
+      findStrategy: isAndroid
+        ? "-android uiautomator"
+        : "-ios predicate string",
+      textToMatch: text,
+    });
   }
 
   /**
@@ -139,32 +160,28 @@ export class Device {
    * const element = await device.getById("signup_button");
    * ```
    *
-   * @param text string or regular expression to search for
+   * @param text string to search for
    * @param options
    * @returns
    */
   getById(
-    text: string | RegExp,
+    text: string,
     { exact = false }: { exact?: boolean } = {},
   ): AppwrightLocator {
     const isAndroid = this.getPlatform() == Platform.ANDROID;
-    if (text instanceof RegExp) {
-      return this.locator(
-        text,
-        isAndroid ? "-android uiautomator" : "-ios predicate string",
-      );
-    }
     let path: string;
     if (isAndroid) {
       path = exact ? `resourceId("${text}")` : `resourceIdMatches("${text}")`;
     } else {
       path = exact ? `name == "${text}"` : `name CONTAINS "${text}"`;
     }
-    return this.locator(
-      path,
-      isAndroid ? "-android uiautomator" : "-ios predicate string",
-      text,
-    );
+    return this.locator({
+      selector: path,
+      findStrategy: isAndroid
+        ? "-android uiautomator"
+        : "-ios predicate string",
+      textToMatch: text,
+    });
   }
 
   /**
@@ -179,7 +196,7 @@ export class Device {
    * @returns
    */
   getByXpath(xpath: string): AppwrightLocator {
-    return this.locator(xpath, "xpath");
+    return this.locator({ selector: xpath, findStrategy: "xpath" });
   }
 
   /**

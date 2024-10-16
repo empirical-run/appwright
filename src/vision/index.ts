@@ -39,7 +39,7 @@ export class VisionProvider {
   constructor(
     private device: Device,
     private webDriverClient: WebDriverClient,
-  ) { }
+  ) {}
 
   @boxedStep
   async query(prompt: string): Promise<string> {
