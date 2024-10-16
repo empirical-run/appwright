@@ -8,6 +8,7 @@ import test from "@playwright/test";
 import { boxedStep } from "../utils";
 import { z } from "zod";
 import { LLMModel } from "@empiricalrun/llm";
+import { ExtractType } from "../types";
 
 export interface AppwrightVision {
   /**
@@ -28,7 +29,7 @@ export interface AppwrightVision {
       responseFormat?: T;
       model?: LLMModel;
     },
-  ): Promise<T>;
+  ): Promise<ExtractType<T>>;
 
   /**
    * Performs a tap action on the screen based on the provided prompt.
@@ -57,7 +58,7 @@ export class VisionProvider {
       responseFormat?: T;
       model?: LLMModel;
     },
-  ): Promise<T> {
+  ): Promise<ExtractType<T>> {
     test.skip(
       !process.env.OPENAI_API_KEY,
       "LLM vision based extract text is not enabled. Set the OPENAI_API_KEY environment variable to enable it",

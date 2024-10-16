@@ -1,7 +1,12 @@
 // @ts-ignore ts not able to identify the import is just an interface
 import type { Client as WebDriverClient } from "webdriver";
 import { Locator } from "../locator";
-import { AppwrightLocator, Platform, TestInfoOptions } from "../types";
+import {
+  AppwrightLocator,
+  ExtractType,
+  Platform,
+  TestInfoOptions,
+} from "../types";
 import { AppwrightVision, VisionProvider } from "../vision";
 import { boxedStep } from "../utils";
 import { uploadImageToBS } from "../providers/browserstack/utils";
@@ -46,7 +51,7 @@ export class Device {
         responseFormat?: T;
         model?: LLMModel;
       },
-    ): Promise<T> => {
+    ): Promise<ExtractType<T>> => {
       return await this.vision().query(prompt, options);
     },
   };
