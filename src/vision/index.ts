@@ -28,7 +28,7 @@ export interface AppwrightVision {
       responseFormat?: T;
       model?: LLMModel;
     },
-  ): Promise<string>;
+  ): Promise<T>;
 
   /**
    * Performs a tap action on the screen based on the provided prompt.
@@ -57,7 +57,7 @@ export class VisionProvider {
       responseFormat?: T;
       model?: LLMModel;
     },
-  ): Promise<string> {
+  ): Promise<T> {
     test.skip(
       !process.env.OPENAI_API_KEY,
       "LLM vision based extract text is not enabled. Set the OPENAI_API_KEY environment variable to enable it",

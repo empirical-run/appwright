@@ -46,7 +46,7 @@ export class Device {
         responseFormat?: T;
         model?: LLMModel;
       },
-    ): Promise<string> => {
+    ): Promise<T> => {
       return await this.vision().query(prompt, options);
     },
   };
