@@ -1,5 +1,14 @@
 # appwright
 
+## 0.1.12
+
+### Patch Changes
+
+- 44f9a4a: feat: added capability to select model in vision methods
+- b8ff829: feat: optimize regex locator by identify simple groups in the pattern
+- 5626697: feat: add appBundleId to config and make it mandatory for lambdatest
+- 21a4b2c: chore: setup tests with vitest
+
 ## 0.1.11
 
 ### Patch Changes
