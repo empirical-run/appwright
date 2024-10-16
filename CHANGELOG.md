@@ -1,5 +1,12 @@
 # appwright
 
+## 0.1.13
+
+### Patch Changes
+
+- 49dc470: feat: add persistentDevice as worker-level fixture
+- 49dc470: feat: add methods for terminateApp and activateApp
+
 ## 0.1.12
 
 ### Patch Changes
