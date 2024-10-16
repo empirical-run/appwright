@@ -1,4 +1,4 @@
 module.exports = {
     extends: ["@empiricalrun/eslint-config/playwright"],
-    ignorePatterns: ["example/builds/**"],
+    ignorePatterns: ["example/**"],
 };
