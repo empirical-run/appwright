@@ -42,7 +42,19 @@ export interface AppwrightVision {
    *
    * @param prompt that defines where on the screen the tap action should occur
    */
-  tap(prompt: string): Promise<void>;
+  tap(prompt: string, image?: string): Promise<void>;
+
+  /**
+   * Provides a bounding box around the content present in the screenshot based on the specified prompt.
+   * Ensure the `GOOGLE_API_KEY` environment variable is set to authenticate the API request.
+   *
+   * **Usage:**
+   * ```js
+   * await device.beta.getAnnotatedImage("Give a box around the search button");
+   * ```
+   * @param prompt
+   */
+  getAnnotatedImage(prompt: string): Promise<string | undefined>;
 }
 
 export class VisionProvider {
@@ -68,12 +80,14 @@ export class VisionProvider {
   }
 
   @boxedStep
-  async tap(prompt: string): Promise<void> {
+  async tap(prompt: string, image?: string): Promise<void> {
     test.skip(
       !process.env.GOOGLE_API_KEY,
       "LLM vision based tap is not enabled. Set the GOOGLE_API_KEY environment variable to enable it",
     );
-    const base64Screenshot = await this.webDriverClient.takeScreenshot();
+    const base64Screenshot = image
+      ? image
+      : await this.webDriverClient.takeScreenshot();
     const bbox = await getBoundingBox(base64Screenshot, prompt, {
       debug: true,
     });
@@ -97,5 +111,22 @@ export class VisionProvider {
       x: center.x / scaleFactorWidth,
       y: center.y / scaleFactorWidth,
     });
+  }
+
+  @boxedStep
+  async getAnnotatedImage(prompt: string): Promise<string | undefined> {
+    test.skip(
+      !process.env.GOOGLE_API_KEY,
+      "LLM vision based tap is not enabled. Set the GOOGLE_API_KEY environment variable to enable it",
+    );
+    const base64Screenshot = await this.webDriverClient.takeScreenshot();
+    const bbox = await getBoundingBox(base64Screenshot, prompt, {
+      debug: true,
+    });
+    if (bbox.annotatedImage) {
+      return bbox.annotatedImage;
+    } else {
+      return undefined;
+    }
   }
 }

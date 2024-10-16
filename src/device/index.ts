@@ -45,8 +45,8 @@ export class Device {
   }
 
   beta = {
-    tap: async (prompt: string): Promise<void> => {
-      await this.vision().tap(prompt);
+    tap: async (prompt: string, image?: string): Promise<void> => {
+      await this.vision().tap(prompt, image);
     },
 
     query: async <T extends z.ZodType>(
@@ -57,6 +57,10 @@ export class Device {
       },
     ): Promise<ExtractType<T>> => {
       return await this.vision().query(prompt, options);
+    },
+
+    getAnnotatedImage: async (prompt: string): Promise<string | undefined> => {
+      return await this.vision().getAnnotatedImage(prompt);
     },
   };
 
