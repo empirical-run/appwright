@@ -1,11 +1,18 @@
 // @ts-ignore ts not able to identify the import is just an interface
 import type { Client as WebDriverClient } from "webdriver";
 import { Locator } from "../locator";
-import { AppwrightLocator, Platform, TestInfoOptions } from "../types";
+import {
+  AppwrightLocator,
+  ExtractType,
+  Platform,
+  TestInfoOptions,
+} from "../types";
 import { AppwrightVision, VisionProvider } from "../vision";
 import { boxedStep, longestDeterministicGroup } from "../utils";
 import { uploadImageToBS } from "../providers/browserstack/utils";
 import { uploadImageToLambdaTest } from "../providers/lambdatest/utils";
+import { z } from "zod";
+import { LLMModel } from "@empiricalrun/llm";
 
 export class Device {
   constructor(
@@ -42,8 +49,14 @@ export class Device {
       await this.vision().tap(prompt);
     },
 
-    query: async (prompt: string): Promise<string> => {
-      return await this.vision().query(prompt);
+    query: async <T extends z.ZodType>(
+      prompt: string,
+      options?: {
+        responseFormat?: T;
+        model?: LLMModel;
+      },
+    ): Promise<ExtractType<T>> => {
+      return await this.vision().query(prompt, options);
     },
   };
 

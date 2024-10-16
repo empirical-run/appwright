@@ -1,4 +1,7 @@
 import { Device } from "../device";
+import { z } from "zod";
+
+export type ExtractType<T> = T extends z.ZodType ? z.infer<T> : never;
 
 export type WaitUntilOptions = {
   /**
