@@ -56,20 +56,21 @@ export type AppwrightConfig = {
   platform: Platform;
   device: DeviceConfig;
   buildPath: string;
+  appBundleId: string;
   // TODO: use expect timeout from playwright config
   expectTimeout: number;
 };
 
 export type DeviceConfig =
-  | BrowserstackConfig
-  | LambdatestConfig
+  | BrowserStackConfig
+  | LambdaTestConfig
   | LocalDeviceConfig
   | EmulatorConfig;
 
 /**
  * Configuration for devices running on Browserstack.
  */
-export type BrowserstackConfig = {
+export type BrowserStackConfig = {
   provider: "browserstack";
 
   /**
@@ -93,7 +94,7 @@ export type BrowserstackConfig = {
   orientation?: DeviceOrientation;
 };
 
-export type LambdatestConfig = {
+export type LambdaTestConfig = {
   provider: "lambdatest";
 
   /**
