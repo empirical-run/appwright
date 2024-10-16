@@ -1,10 +1,13 @@
-import { getBoundingBox, query } from "@empiricalrun/llm/vision";
+import { query } from "@empiricalrun/llm/vision";
+import { getBoundingBox } from "@empiricalrun/llm/vision/bbox";
 import fs from "fs";
 // @ts-ignore ts not able to identify the import is just an interface
 import { Client as WebDriverClient } from "webdriver";
 import { Device } from "../device";
 import test from "@playwright/test";
 import { boxedStep } from "../utils";
+import { z } from "zod";
+import { LLMModel } from "@empiricalrun/llm";
 
 export interface AppwrightVision {
   /**
@@ -19,7 +22,13 @@ export interface AppwrightVision {
    * @param prompt that defines the specific area or context from which text should be extracted.
    * @returns
    */
-  query(prompt: string): Promise<string>;
+  query<T extends z.ZodType>(
+    prompt: string,
+    options?: {
+      responseFormat?: T;
+      model?: LLMModel;
+    },
+  ): Promise<string>;
 
   /**
    * Performs a tap action on the screen based on the provided prompt.
@@ -39,16 +48,22 @@ export class VisionProvider {
   constructor(
     private device: Device,
     private webDriverClient: WebDriverClient,
-  ) { }
+  ) {}
 
   @boxedStep
-  async query(prompt: string): Promise<string> {
+  async query<T extends z.ZodType>(
+    prompt: string,
+    options?: {
+      responseFormat?: T;
+      model?: LLMModel;
+    },
+  ): Promise<string> {
     test.skip(
       !process.env.OPENAI_API_KEY,
       "LLM vision based extract text is not enabled. Set the OPENAI_API_KEY environment variable to enable it",
     );
     const base64Screenshot = await this.webDriverClient.takeScreenshot();
-    return await query(base64Screenshot, prompt);
+    return await query(base64Screenshot, prompt, options);
   }
 
   @boxedStep

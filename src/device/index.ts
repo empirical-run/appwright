@@ -6,6 +6,8 @@ import { AppwrightVision, VisionProvider } from "../vision";
 import { boxedStep } from "../utils";
 import { uploadImageToBS } from "../providers/browserstack/utils";
 import { uploadImageToLambdaTest } from "../providers/lambdatest/utils";
+import { z } from "zod";
+import { LLMModel } from "@empiricalrun/llm";
 
 export class Device {
   constructor(
@@ -38,8 +40,14 @@ export class Device {
       await this.vision().tap(prompt);
     },
 
-    query: async (prompt: string): Promise<string> => {
-      return await this.vision().query(prompt);
+    query: async <T extends z.ZodType>(
+      prompt: string,
+      options?: {
+        responseFormat?: T;
+        model?: LLMModel;
+      },
+    ): Promise<string> => {
+      return await this.vision().query(prompt, options);
     },
   };
 
