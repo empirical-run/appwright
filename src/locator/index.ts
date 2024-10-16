@@ -13,13 +13,13 @@ import { boxedStep } from "../utils";
 export class Locator {
   constructor(
     private webDriverClient: WebDriverClient,
+    private testOptions: TestInfoOptions,
     // Used for find elements request that is sent to Appium server
     private selector: string,
     private findStrategy: string,
-    private testOptions: TestInfoOptions,
     // Used to filter elements received from Appium server
     private textToMatch?: string | RegExp,
-  ) {}
+  ) { }
 
   @boxedStep
   async fill(value: string, options?: WaitUntilOptions): Promise<void> {
@@ -267,11 +267,6 @@ export class Locator {
       let elementText = await this.webDriverClient.getElementText(
         element["element-6066-11e4-a52e-4f735466cecf"],
       );
-
-      if (this.findStrategy == "xpath") {
-        return element;
-      }
-
       if (this.textToMatch) {
         if (
           this.textToMatch instanceof RegExp &&
@@ -285,9 +280,12 @@ export class Locator {
         ) {
           return element;
         }
+      } else {
+        // This is returned for cases where xpath is findStrategy and we want
+        // to return the last element found in the list
+        return element;
       }
     }
-
     return null;
   }
 }

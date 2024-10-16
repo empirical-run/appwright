@@ -26,9 +26,9 @@ export class Device {
   }): AppwrightLocator {
     return new Locator(
       this.webdriverClient,
+      this.testOptions,
       selector,
       findStrategy,
-      this.testOptions,
       textToMatch,
     );
   }
@@ -124,8 +124,11 @@ export class Device {
           textToMatch: text,
         });
       } else {
+        const selector = isAndroid
+          ? `textContains("${substringForContains}")`
+          : `label CONTAINS "${substringForContains}"`;
         return this.locator({
-          selector: substringForContains,
+          selector: selector,
           findStrategy: isAndroid
             ? "-android uiautomator"
             : "-ios predicate string",
