@@ -5,7 +5,7 @@ import {
   AppwrightLocator,
   ExtractType,
   Platform,
-  TestInfoOptions,
+  TimeoutOptions,
 } from "../types";
 import { AppwrightVision, VisionProvider } from "../vision";
 import { boxedStep, longestDeterministicGroup } from "../utils";
