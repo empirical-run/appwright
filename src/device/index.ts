@@ -1,7 +1,7 @@
 // @ts-ignore ts not able to identify the import is just an interface
 import type { Client as WebDriverClient } from "webdriver";
 import { Locator } from "../locator";
-import { AppwrightLocator, Platform, TestInfoOptions } from "../types";
+import { AppwrightLocator, Platform, TimeoutOptions } from "../types";
 import { AppwrightVision, VisionProvider } from "../vision";
 import { boxedStep, longestDeterministicGroup } from "../utils";
 import { uploadImageToBS } from "../providers/browserstack/utils";
@@ -11,9 +11,9 @@ export class Device {
   constructor(
     private webdriverClient: WebDriverClient,
     private bundleId: string | undefined,
-    private testOptions: TestInfoOptions,
+    private timeoutOpts: TimeoutOptions,
     private provider: string,
-  ) {}
+  ) { }
 
   locator({
     selector,
@@ -26,7 +26,7 @@ export class Device {
   }): AppwrightLocator {
     return new Locator(
       this.webdriverClient,
-      this.testOptions,
+      this.timeoutOpts,
       selector,
       findStrategy,
       textToMatch,
@@ -55,7 +55,7 @@ export class Device {
    * await device.close();
    * ```
    */
-  @boxedStep
+  // @boxedStep
   async close() {
     await this.webdriverClient.deleteSession();
   }
@@ -214,6 +214,28 @@ export class Device {
     return isAndroid ? Platform.ANDROID : Platform.IOS;
   }
 
+  async terminateApp(bundleId?: string) {
+    if (!this.bundleId && !bundleId) {
+      throw new Error("bundleId is required to terminate the app.");
+    }
+    await this.webdriverClient.executeScript("mobile: terminateApp", [
+      {
+        bundleId: bundleId || this.bundleId,
+      },
+    ]);
+  }
+
+  async activateApp(bundleId?: string) {
+    if (!this.bundleId && !bundleId) {
+      throw new Error("bundleId is required to activate the app.");
+    }
+    await this.webdriverClient.executeScript("mobile: activateApp", [
+      {
+        bundleId: bundleId || this.bundleId,
+      },
+    ]);
+  }
+
   /**
    * Retrieves text content from the clipboard of the mobile device. This is useful
    * after a "copy to clipboard" action has been performed. This returns base64 encoded string.
@@ -238,17 +260,9 @@ export class Device {
             "bundleId is required to retrieve clipboard data on a real device.",
           );
         }
-        await this.webdriverClient.executeScript("mobile: activateApp", [
-          {
-            bundleId: "com.facebook.WebDriverAgentRunner.xctrunner",
-          },
-        ]);
+        await this.activateApp("com.facebook.WebDriverAgentRunner.xctrunner");
         const clipboardDataBase64 = await this.webdriverClient.getClipboard();
-        await this.webdriverClient.executeScript("mobile: activateApp", [
-          {
-            bundleId: this.bundleId,
-          },
-        ]);
+        await this.activateApp(this.bundleId);
         return clipboardDataBase64;
       }
     }

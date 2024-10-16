@@ -3,7 +3,7 @@ import {
   DeviceProvider,
   LocalDeviceConfig,
   Platform,
-  TestInfoOptions,
+  TimeoutOptions,
 } from "../../types";
 import { Device } from "../../device";
 import { FullProject } from "@playwright/test";
@@ -19,7 +19,7 @@ import { validateBuildPath } from "../../utils";
 import { logger } from "../../logger";
 
 export class LocalDeviceProvider implements DeviceProvider {
-  constructor(private project: FullProject<AppwrightConfig>) {}
+  constructor(private project: FullProject<AppwrightConfig>) { }
 
   async getDevice(): Promise<Device> {
     return await this.createDriver();
@@ -54,7 +54,7 @@ export class LocalDeviceProvider implements DeviceProvider {
     );
     const bundleId = await getAppBundleId(this.project.use.buildPath!);
     const expectTimeout = this.project.use.expectTimeout!;
-    const testOptions: TestInfoOptions = {
+    const testOptions: TimeoutOptions = {
       expectTimeout,
     };
     return new Device(

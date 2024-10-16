@@ -18,7 +18,9 @@ const resolveGlobalSetup = () => {
 const defaultConfig: PlaywrightTestConfig<AppwrightConfig> = {
   globalSetup: resolveGlobalSetup(),
   testDir: "./tests",
-  fullyParallel: true,
+  // This is turned off so that a persistent device fixture can be
+  // used across tests in a file where they run sequentially
+  fullyParallel: false,
   forbidOnly: false,
   retries: process.env.CI ? 2 : 0,
   workers: 2,

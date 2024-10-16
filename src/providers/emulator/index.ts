@@ -3,7 +3,7 @@ import {
   DeviceProvider,
   EmulatorConfig,
   Platform,
-  TestInfoOptions,
+  TimeoutOptions,
 } from "../../types";
 import { Device } from "../../device";
 import {
@@ -16,7 +16,7 @@ import { FullProject } from "@playwright/test";
 import { validateBuildPath } from "../../utils";
 
 export class EmulatorProvider implements DeviceProvider {
-  constructor(private project: FullProject<AppwrightConfig>) {}
+  constructor(private project: FullProject<AppwrightConfig>) { }
 
   async getDevice(): Promise<Device> {
     return await this.createDriver();
@@ -64,7 +64,7 @@ Follow the steps mentioned in ${androidSimulatorConfigDocLink} to run test on An
       await this.createConfig(),
     );
     const expectTimeout = this.project.use.expectTimeout!;
-    const testOptions: TestInfoOptions = {
+    const testOptions: TimeoutOptions = {
       expectTimeout,
     };
     return new Device(

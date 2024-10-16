@@ -4,7 +4,7 @@ import retry from "async-retry";
 import {
   ElementReference,
   ScrollDirection,
-  TestInfoOptions,
+  TimeoutOptions,
   WaitUntilOptions,
   WebdriverErrors,
 } from "../types";
@@ -13,13 +13,13 @@ import { boxedStep } from "../utils";
 export class Locator {
   constructor(
     private webDriverClient: WebDriverClient,
-    private testOptions: TestInfoOptions,
+    private timeoutOpts: TimeoutOptions,
     // Used for find elements request that is sent to Appium server
     private selector: string,
     private findStrategy: string,
     // Used to filter elements received from Appium server
     private textToMatch?: string | RegExp,
-  ) {}
+  ) { }
 
   @boxedStep
   async fill(value: string, options?: WaitUntilOptions): Promise<void> {
@@ -77,7 +77,7 @@ export class Locator {
   }
 
   async isVisible(options?: WaitUntilOptions): Promise<boolean> {
-    const timeout = this.testOptions.expectTimeout;
+    const timeout = this.timeoutOpts.expectTimeout;
     try {
       const isVisible = await this.waitUntil(
         async () => {

@@ -7,7 +7,7 @@ export type WaitUntilOptions = {
   timeout: number;
 };
 
-export type TestInfoOptions = {
+export type TimeoutOptions = {
   /**
    * The maximum amount of time (in milliseconds) to wait for the condition to be met.
    */
