@@ -5,7 +5,7 @@ import path from "path";
 import {
   AppwrightConfig,
   DeviceProvider,
-  BrowserstackConfig,
+  BrowserStackConfig,
 } from "../../types";
 import { FullProject } from "@playwright/test";
 import { Device } from "../../device";
@@ -52,8 +52,16 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
   private sessionId?: string;
   private project: FullProject<AppwrightConfig>;
 
-  constructor(project: FullProject<AppwrightConfig>) {
+  constructor(
+    project: FullProject<AppwrightConfig>,
+    appBundleId: string | undefined,
+  ) {
     this.project = project;
+    if (appBundleId) {
+      console.log(
+        `Bundle id is specified (${appBundleId}) but ignored for BrowserStack provider.`,
+      );
+    }
   }
 
   async globalSetup() {
@@ -112,7 +120,7 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
   }
 
   private validateConfig() {
-    const device = this.project.use.device as BrowserstackConfig;
+    const device = this.project.use.device as BrowserStackConfig;
     if (!device.name || !device.osVersion) {
       throw new Error(
         "Device name and osVersion are required for running tests on BrowserStack",
@@ -293,7 +301,7 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
           appiumVersion: "2.6.0",
           enableCameraImageInjection: true,
           deviceName: this.project.use.device?.name,
-          osVersion: (this.project.use.device as BrowserstackConfig).osVersion,
+          osVersion: (this.project.use.device as BrowserStackConfig).osVersion,
           platformName: platformName,
           deviceOrientation: this.project.use.device?.orientation,
           buildName: `${projectName} ${platformName}`,

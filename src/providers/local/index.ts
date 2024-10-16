@@ -19,7 +19,16 @@ import { validateBuildPath } from "../../utils";
 import { logger } from "../../logger";
 
 export class LocalDeviceProvider implements DeviceProvider {
-  constructor(private project: FullProject<AppwrightConfig>) {}
+  constructor(
+    private project: FullProject<AppwrightConfig>,
+    appBundleId: string | undefined,
+  ) {
+    if (appBundleId) {
+      console.log(
+        `Bundle id is specified (${appBundleId}) but ignored for local device provider.`,
+      );
+    }
+  }
 
   async getDevice(): Promise<Device> {
     return await this.createDriver();

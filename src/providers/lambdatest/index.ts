@@ -2,7 +2,7 @@ import retry from "async-retry";
 import fs from "fs";
 import FormData from "form-data";
 import path from "path";
-import { AppwrightConfig, DeviceProvider, LambdatestConfig } from "../../types";
+import { AppwrightConfig, DeviceProvider, LambdaTestConfig } from "../../types";
 import { FullProject } from "@playwright/test";
 import { Device } from "../../device";
 import { logger } from "../../logger";
@@ -37,11 +37,17 @@ const envVarKeyForBuild = (projectName: string) =>
 export class LambdaTestDeviceProvider implements DeviceProvider {
   private sessionDetails?: LambdatestSessionDetails;
   private sessionId?: string;
-  private project: FullProject<AppwrightConfig>;
   private projectName = path.basename(process.cwd());
 
-  constructor(project: FullProject<AppwrightConfig>) {
-    this.project = project;
+  constructor(
+    private project: FullProject<AppwrightConfig>,
+    private appBundleId: string | undefined,
+  ) {
+    if (!appBundleId) {
+      throw new Error(
+        "App Bundle ID is required for running tests on LambdaTest. Set the `appBundleId` for your projects that run on this provider.",
+      );
+    }
   }
 
   async globalSetup() {
@@ -107,7 +113,7 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
   }
 
   private validateConfig() {
-    const device = this.project.use.device as LambdatestConfig;
+    const device = this.project.use.device as LambdaTestConfig;
     if (!device.name || !device.osVersion) {
       throw new Error(
         "Device name and osVersion are required for running tests on LambdaTest. Please set the device name and osVersion in the `appwright.config.ts` file.",
@@ -119,15 +125,12 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
     const WebDriver = (await import("webdriver")).default;
     const webDriverClient = await WebDriver.newSession(config);
     this.sessionId = webDriverClient.sessionId;
-    //TODO: Find a way to get bundleID from the session
-    const bundleId = "test";
-    // await this.getAppBundleIdFromSession();
     const testOptions = {
       expectTimeout: this.project.use.expectTimeout!,
     };
     return new Device(
       webDriverClient,
-      bundleId,
+      this.appBundleId,
       testOptions,
       this.project.use.device?.provider!,
     );
@@ -146,11 +149,6 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
     const data = await response.json();
     this.sessionDetails = data.data;
   }
-
-  //   private async getAppBundleIdFromSession(): Promise<string> {
-  //     await this.getSessionDetails();
-  //     return this.sessionDetails?.app_details.app_name ?? "";
-  //   }
 
   async downloadVideo(
     outputDir: string,
@@ -274,7 +272,7 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
         idleTimeout: 600,
         deviceName: this.project.use.device?.name,
         deviceOrientation: this.project.use.device?.orientation,
-        platformVersion: (this.project.use.device as LambdatestConfig)
+        platformVersion: (this.project.use.device as LambdaTestConfig)
           .osVersion,
         app: process.env[envVarKey],
         devicelog: true,
