@@ -119,7 +119,7 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
     const WebDriver = (await import("webdriver")).default;
     const webDriverClient = await WebDriver.newSession(config);
     this.sessionId = webDriverClient.sessionId;
-    //TODO: Find a way to get bundleID from the session
+    // TODO: Find a way to get bundleID from the session
     const bundleId = "test";
     // await this.getAppBundleIdFromSession();
     const testOptions = {

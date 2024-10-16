@@ -5,7 +5,7 @@ import { Device } from "../device";
 import { createDeviceProvider } from "../providers";
 import { logger } from "../logger";
 
-export const test = base.extend<{
+type TestLevelFixtures = {
   /**
    * Device provider to be used for the test.
    * This creates and manages the device lifecycle for the test
@@ -24,7 +24,13 @@ export const test = base.extend<{
    * Currently, this functionality is supported only for BrowserStack and LambdaTest.
    */
   saveVideo: void;
-}>({
+};
+
+type WorkerLevelFixtures = {
+  persistentDevice: Device;
+};
+
+export const test = base.extend<TestLevelFixtures, WorkerLevelFixtures>({
   deviceProvider: async ({}, use, testInfo) => {
     const deviceProvider = createDeviceProvider(testInfo.project);
     await use(deviceProvider);
@@ -35,32 +41,38 @@ export const test = base.extend<{
     await use(device);
     await device.close();
   },
-  saveVideo: [
-    async ({ deviceProvider }, use, testInfo) => {
-      await use();
-      await deviceProvider.syncTestDetails?.({
-        name: testInfo.title,
-        status: testInfo.status,
-        reason: testInfo.error?.message,
-      });
-      const outputDir = testInfo.project.outputDir;
-      const downloadPromise = deviceProvider
-        .downloadVideo?.(outputDir, testInfo.testId)
-        .then(async (videoData) => {
-          if (videoData) {
-            await testInfo.attach("video", videoData);
-          }
-        })
-        .catch((error) => {
-          logger.error(`saveVideo: ${error}`);
-        });
-
-      if (downloadPromise) {
-        await downloadPromise;
-      }
+  persistentDevice: [
+    async ({}, use, testInfo) => {
+      const deviceProvider = createDeviceProvider(testInfo.project);
+      const device = await deviceProvider.getDevice();
+      await use(device);
+      await device.close();
     },
-    { auto: true },
+    { scope: "worker" },
   ],
+  saveVideo: async ({ deviceProvider }, use, testInfo) => {
+    await use();
+    await deviceProvider.syncTestDetails?.({
+      name: testInfo.title,
+      status: testInfo.status,
+      reason: testInfo.error?.message,
+    });
+    const outputDir = testInfo.project.outputDir;
+    const downloadPromise = deviceProvider
+      .downloadVideo?.(outputDir, testInfo.testId)
+      .then(async (videoData) => {
+        if (videoData) {
+          await testInfo.attach("video", videoData);
+        }
+      })
+      .catch((error) => {
+        logger.error(`saveVideo: ${error}`);
+      });
+
+    if (downloadPromise) {
+      await downloadPromise;
+    }
+  },
 });
 
 /**

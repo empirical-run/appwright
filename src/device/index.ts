@@ -13,7 +13,7 @@ export class Device {
     private bundleId: string | undefined,
     private timeoutOpts: TimeoutOptions,
     private provider: string,
-  ) { }
+  ) {}
 
   locator({
     selector,
@@ -55,7 +55,8 @@ export class Device {
    * await device.close();
    * ```
    */
-  // @boxedStep
+  // TODO: Add @boxedStep decorator here; disabled because it breaks persistentDevice
+  // as test.step will throw
   async close() {
     await this.webdriverClient.deleteSession();
   }
@@ -218,9 +219,11 @@ export class Device {
     if (!this.bundleId && !bundleId) {
       throw new Error("bundleId is required to terminate the app.");
     }
+    const keyName =
+      this.getPlatform() == Platform.ANDROID ? "appId" : "bundleId";
     await this.webdriverClient.executeScript("mobile: terminateApp", [
       {
-        bundleId: bundleId || this.bundleId,
+        [keyName]: bundleId || this.bundleId,
       },
     ]);
   }
@@ -229,9 +232,11 @@ export class Device {
     if (!this.bundleId && !bundleId) {
       throw new Error("bundleId is required to activate the app.");
     }
+    const keyName =
+      this.getPlatform() == Platform.ANDROID ? "appId" : "bundleId";
     await this.webdriverClient.executeScript("mobile: activateApp", [
       {
-        bundleId: bundleId || this.bundleId,
+        [keyName]: bundleId || this.bundleId,
       },
     ]);
   }

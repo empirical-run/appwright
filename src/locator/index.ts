@@ -19,7 +19,7 @@ export class Locator {
     private findStrategy: string,
     // Used to filter elements received from Appium server
     private textToMatch?: string | RegExp,
-  ) { }
+  ) {}
 
   @boxedStep
   async fill(value: string, options?: WaitUntilOptions): Promise<void> {
