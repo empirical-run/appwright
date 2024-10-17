@@ -18,7 +18,7 @@ class VideoDownloader implements Reporter {
     }
   }
 
-  onTestBegin() {}
+  onTestBegin() { }
 
   onTestEnd(test: TestCase, result: TestResult) {
     const sessionIdAnnotation = test.annotations.find(
@@ -110,7 +110,7 @@ class VideoDownloader implements Reporter {
     }
   }
   async onEnd() {
-    await Promise.all(this.downloadPromises);
+    await Promise.allSettled(this.downloadPromises);
   }
 }
 
