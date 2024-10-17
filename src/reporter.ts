@@ -11,10 +11,10 @@ class VideoDownloader implements Reporter {
   onTestEnd(test: TestCase, result: TestResult) {
     const sessionIdAnnotation = test.annotations.find(
       ({ type }) => type === "sessionId",
-    )!;
+    );
     const providerNameAnnotation = test.annotations.find(
       ({ type }) => type === "providerName",
-    )!;
+    );
     if (sessionIdAnnotation && providerNameAnnotation) {
       const sessionId = sessionIdAnnotation.description;
       const providerName = providerNameAnnotation.description!;
@@ -40,6 +40,10 @@ class VideoDownloader implements Reporter {
           );
       });
       this.downloadPromises.push(downloadPromise);
+      const otherAnnotations = test.annotations.filter(
+        ({ type }) => type !== "sessionId" && type !== "providerName",
+      );
+      test.annotations = otherAnnotations;
     }
   }
 
