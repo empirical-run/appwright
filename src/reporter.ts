@@ -1,9 +1,4 @@
-import type {
-  FullResult,
-  Reporter,
-  TestCase,
-  TestResult,
-} from "@playwright/test/reporter";
+import type { Reporter, TestCase, TestResult } from "@playwright/test/reporter";
 import { getProviderClass } from "./providers";
 import fs from "fs";
 import path from "path";
@@ -26,11 +21,11 @@ class VideoDownloader implements Reporter {
   onTestEnd(test: TestCase, result: TestResult) {
     const sessionIdAnnotation = test.annotations.find(
       ({ type }) => type === "sessionId",
-    )!;
+    );
     const providerNameAnnotation = test.annotations.find(
       ({ type }) => type === "providerName",
-    )!;
-    const outputDir = `${process.cwd()}/playwright-report`;
+    );
+    const outputDir = `${process.cwd()}/playwright-report/videos-store`;
     if (sessionIdAnnotation && providerNameAnnotation) {
       // This is a test that ran with the `device` fixture
       const sessionId = sessionIdAnnotation.description;
@@ -44,11 +39,9 @@ class VideoDownloader implements Reporter {
           .then(
             (downloadedVideo: { path: string; contentType: string } | null) => {
               if (!downloadedVideo) {
-                console.log(`No video found for test: ${test.title}`);
                 resolve(null);
                 return;
               }
-              console.log(`Downloaded video:`, downloadedVideo);
               result.attachments.push({
                 ...downloadedVideo,
                 name: "video",
@@ -58,6 +51,10 @@ class VideoDownloader implements Reporter {
           );
       });
       this.downloadPromises.push(downloadPromise);
+      const otherAnnotations = test.annotations.filter(
+        ({ type }) => type !== "sessionId" && type !== "providerName",
+      );
+      test.annotations = otherAnnotations;
     } else {
       // This is a test that ran on `persistentDevice` fixture
       const { workerIndex, startTime, duration } = result;
@@ -104,12 +101,8 @@ class VideoDownloader implements Reporter {
       this.downloadPromises.push(waitForWorkerToFinish);
     }
   }
-
-  async onEnd(result: FullResult) {
-    console.log(`Finished the run: ${result.status}`);
-    console.log(`Downloading videos at: ${new Date().toISOString()}`);
+  async onEnd() {
     await Promise.all(this.downloadPromises);
-    console.log(`Finished downloading at: ${new Date().toISOString()}`);
   }
 }
 
