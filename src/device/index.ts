@@ -3,6 +3,7 @@ import type { Client as WebDriverClient } from "webdriver";
 import { Locator } from "../locator";
 import {
   AppwrightLocator,
+  BoundingBox,
   ExtractType,
   Platform,
   TimeoutOptions,
@@ -45,8 +46,15 @@ export class Device {
   }
 
   beta = {
-    tap: async (prompt: string): Promise<void> => {
-      await this.vision().tap(prompt);
+    tap: async (
+      prompt: string,
+      options?: {
+        debug?: boolean;
+        focusArea?: BoundingBox;
+        verifier?: boolean;
+      },
+    ): Promise<void> => {
+      await this.vision().tap(prompt, options);
     },
 
     query: async <T extends z.ZodType>(
@@ -57,6 +65,10 @@ export class Device {
       },
     ): Promise<ExtractType<T>> => {
       return await this.vision().query(prompt, options);
+    },
+
+    queryBoundingBox: async (prompt: string): Promise<BoundingBox> => {
+      return await this.vision().queryBoundingBox(prompt);
     },
   };
 

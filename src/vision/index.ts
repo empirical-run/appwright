@@ -8,7 +8,7 @@ import test from "@playwright/test";
 import { boxedStep } from "../utils";
 import { z } from "zod";
 import { LLMModel } from "@empiricalrun/llm";
-import { ExtractType } from "../types";
+import { BoundingBox, ExtractType } from "../types";
 
 export interface AppwrightVision {
   /**
@@ -42,7 +42,26 @@ export interface AppwrightVision {
    *
    * @param prompt that defines where on the screen the tap action should occur
    */
-  tap(prompt: string): Promise<void>;
+  tap(
+    prompt: string,
+    options?: {
+      debug?: boolean;
+      focusArea?: BoundingBox;
+      verifier?: boolean;
+    },
+  ): Promise<void>;
+
+  /**
+   * Provides a bounding box around the content present in the screenshot based on the specified prompt.
+   * Ensure the `GOOGLE_API_KEY` environment variable is set to authenticate the API request.
+   *
+   * **Usage:**
+   * ```js
+   * await device.beta.getAnnotatedImage("Give a box around the search button");
+   * ```
+   * @param prompt
+   */
+  queryBoundingBox(prompt: string): Promise<BoundingBox>;
 }
 
 export class VisionProvider {
@@ -68,14 +87,23 @@ export class VisionProvider {
   }
 
   @boxedStep
-  async tap(prompt: string): Promise<void> {
+  async tap(
+    prompt: string,
+    options?: {
+      debug?: boolean;
+      focusArea?: BoundingBox;
+      verifier?: boolean;
+    },
+  ): Promise<void> {
     test.skip(
       !process.env.GOOGLE_API_KEY,
       "LLM vision based tap is not enabled. Set the GOOGLE_API_KEY environment variable to enable it",
     );
     const base64Screenshot = await this.webDriverClient.takeScreenshot();
     const bbox = await getBoundingBox(base64Screenshot, prompt, {
-      debug: true,
+      focusArea: options?.focusArea,
+      verifier: options?.verifier,
+      debug: options?.debug,
     });
     if (bbox.annotatedImage) {
       const random = Math.floor(1000 + Math.random() * 9000);
@@ -97,5 +125,16 @@ export class VisionProvider {
       x: center.x / scaleFactorWidth,
       y: center.y / scaleFactorWidth,
     });
+  }
+
+  @boxedStep
+  async queryBoundingBox(prompt: string): Promise<BoundingBox> {
+    test.skip(
+      !process.env.GOOGLE_API_KEY,
+      "LLM vision based tap is not enabled. Set the GOOGLE_API_KEY environment variable to enable it",
+    );
+    const base64Screenshot = await this.webDriverClient.takeScreenshot();
+    const bbox = await getBoundingBox(base64Screenshot, prompt);
+    return bbox;
   }
 }
