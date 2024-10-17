@@ -1,5 +1,13 @@
 # appwright
 
+## 0.1.15
+
+### Patch Changes
+
+- 2be3c09: test: locator tests for isVisible method
+- 32b5e24: chore: rename error log messages and ActionOptions
+- 0c0c0df: chore: add custom errors for timeout and retryable
+
 ## 0.1.14
 
 ### Patch Changes
