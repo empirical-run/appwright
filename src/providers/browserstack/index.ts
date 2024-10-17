@@ -177,6 +177,7 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
     const sessionDetails = sessionData?.automation_session;
     const videoURL = sessionDetails?.video_url;
     const pathToTestVideo = path.join(outputDir, `${fileName}.mp4`);
+    const tempPathForWriting = `${pathToTestVideo}.part`;
     const dir = path.dirname(pathToTestVideo);
     fs.mkdirSync(dir, { recursive: true });
     /**
@@ -189,7 +190,7 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
      * of 10 retries, whichever comes first.
      */
     await new Promise((resolve) => setTimeout(resolve, 10_000));
-    const fileStream = fs.createWriteStream(pathToTestVideo);
+    const fileStream = fs.createWriteStream(tempPathForWriting);
     if (videoURL) {
       await retry(
         async () => {
@@ -230,6 +231,7 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
       return new Promise((resolve, reject) => {
         // Ensure file stream is closed even in case of an error
         fileStream.on("finish", () => {
+          fs.renameSync(tempPathForWriting, pathToTestVideo);
           console.log(`Download finished and file closed: ${pathToTestVideo}`);
           resolve({ path: pathToTestVideo, contentType: "video/mp4" });
         });
