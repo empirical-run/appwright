@@ -109,6 +109,9 @@ export class Locator {
       return isVisible;
     } catch (error) {
       if (error instanceof TimeoutError) {
+        console.log(
+          `isVisible timed out for "${this.selector}" in ${timeout}ms`,
+        );
         return false;
       }
       throw error;
