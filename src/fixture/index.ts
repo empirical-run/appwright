@@ -1,6 +1,6 @@
 import { test as base } from "@playwright/test";
 
-import { AppwrightLocator, DeviceProvider, WaitUntilOptions } from "../types";
+import { AppwrightLocator, DeviceProvider, ActionOptions } from "../types";
 import { Device } from "../device";
 import { createDeviceProvider } from "../providers";
 import { logger } from "../logger";
@@ -81,10 +81,7 @@ export const test = base.extend<TestLevelFixtures, WorkerLevelFixtures>({
  * @returns
  */
 export const expect = test.expect.extend({
-  toBeVisible: async (
-    locator: AppwrightLocator,
-    options?: WaitUntilOptions,
-  ) => {
+  toBeVisible: async (locator: AppwrightLocator, options?: ActionOptions) => {
     const isVisible = await locator.isVisible(options);
     return {
       message: () => (isVisible ? "" : `Element was not found on the screen`),

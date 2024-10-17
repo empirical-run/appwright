@@ -5,7 +5,7 @@ import {
   ElementReference,
   ScrollDirection,
   TimeoutOptions,
-  WaitUntilOptions,
+  ActionOptions,
   WebdriverErrors,
 } from "../types";
 import { boxedStep } from "../utils";
@@ -22,7 +22,7 @@ export class Locator {
   ) {}
 
   @boxedStep
-  async fill(value: string, options?: WaitUntilOptions): Promise<void> {
+  async fill(value: string, options?: ActionOptions): Promise<void> {
     const isElementDisplayed = await this.isVisible(options);
     if (isElementDisplayed) {
       const element = await this.getElement();
@@ -32,18 +32,17 @@ export class Locator {
           value,
         );
       } else {
-        throw new Error(`Element with path "${this.selector}" is not found`);
+        throw new Error(
+          `Failed to fill: Element "${this.selector}" is not found`,
+        );
       }
     } else {
-      throw new Error(`Element with path "${this.selector}" not visible`);
+      throw new Error(`Failed to fill: Element "${this.selector}" not visible`);
     }
   }
 
   @boxedStep
-  async sendKeyStrokes(
-    value: string,
-    options?: WaitUntilOptions,
-  ): Promise<void> {
+  async sendKeyStrokes(value: string, options?: ActionOptions): Promise<void> {
     const isElementDisplayed = await this.isVisible(options);
     if (isElementDisplayed) {
       const element = await this.getElement();
@@ -69,14 +68,18 @@ export class Locator {
 
         await this.webDriverClient.releaseActions();
       } else {
-        throw new Error(`Element with path "${this.selector}" is not found`);
+        throw new Error(
+          `Failed to sendKeyStrokes: Element "${this.selector}" is not found`,
+        );
       }
     } else {
-      throw new Error(`Element with path "${this.selector}" not visible`);
+      throw new Error(
+        `Failed to sendKeyStrokes: Element "${this.selector}" not visible`,
+      );
     }
   }
 
-  async isVisible(options?: WaitUntilOptions): Promise<boolean> {
+  async isVisible(options?: ActionOptions): Promise<boolean> {
     const timeout = this.timeoutOpts.expectTimeout;
     try {
       const isVisible = await this.waitUntil(
@@ -129,7 +132,7 @@ export class Locator {
    */
   private async waitUntil<ReturnValue>(
     condition: () => ReturnValue | Promise<ReturnValue>,
-    options: WaitUntilOptions,
+    options: ActionOptions,
   ): Promise<Exclude<ReturnValue, boolean>> {
     if (typeof condition !== "function") {
       throw new Error("Condition is not a function");
@@ -170,30 +173,24 @@ export class Locator {
   }
 
   @boxedStep
-  async tap(options?: WaitUntilOptions) {
-    try {
-      const isElementDisplayed = await this.isVisible(options);
-      if (isElementDisplayed) {
-        const element = await this.getElement();
-        if (element) {
-          await this.webDriverClient.elementClick(
-            element!["element-6066-11e4-a52e-4f735466cecf"],
-          );
-        } else {
-          throw new Error(`Element with path "${this.selector}" not found`);
-        }
+  async tap(options?: ActionOptions) {
+    const isElementDisplayed = await this.isVisible(options);
+    if (isElementDisplayed) {
+      const element = await this.getElement();
+      if (element) {
+        await this.webDriverClient.elementClick(
+          element!["element-6066-11e4-a52e-4f735466cecf"],
+        );
       } else {
-        throw new Error(`Element with path "${this.selector}" not visible`);
+        throw new Error(`Failed to tap: Element "${this.selector}" not found`);
       }
-    } catch (error) {
-      throw new Error(
-        `Failed to click on the element with path "${this.selector}": ${error}`,
-      );
+    } else {
+      throw new Error(`Failed to tap: Element "${this.selector}" not visible`);
     }
   }
 
   @boxedStep
-  async getText(options?: WaitUntilOptions): Promise<string> {
+  async getText(options?: ActionOptions): Promise<string> {
     const isElementDisplayed = await this.isVisible(options);
     if (isElementDisplayed) {
       const element = await this.getElement();
@@ -202,10 +199,14 @@ export class Locator {
           element!["element-6066-11e4-a52e-4f735466cecf"],
         );
       } else {
-        throw new Error(`Element with path "${this.selector}" is not found`);
+        throw new Error(
+          `Failed to getText: Element "${this.selector}" is not found`,
+        );
       }
     } else {
-      throw new Error(`Element with path "${this.selector}" not visible`);
+      throw new Error(
+        `Failed to getText: Element "${this.selector}" not visible`,
+      );
     }
   }
 
@@ -213,7 +214,7 @@ export class Locator {
   async scroll(direction: ScrollDirection) {
     const element = await this.getElement();
     if (!element) {
-      throw new Error(`Element with path "${this.selector}" not found`);
+      throw new Error(`Failed to scroll: Element "${this.selector}" not found`);
     }
     if (this.webDriverClient.isAndroid) {
       await this.webDriverClient.executeScript("mobile: scrollGesture", [
