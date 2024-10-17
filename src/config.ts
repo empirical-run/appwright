@@ -5,10 +5,6 @@ import {
 import { AppwrightConfig } from "./types";
 import path from "path";
 
-// This import ensures global-setup is built by TypeScript
-// eslint-disable-next-line unused-imports/no-unused-imports, no-unused-vars
-import globalSetup from "./global-setup";
-
 const resolveGlobalSetup = () => {
   const pathToInstalledAppwright = require.resolve(".");
   const directory = path.dirname(pathToInstalledAppwright);

@@ -36,7 +36,16 @@ can skew worker utilization to just one worker. This can be solved by
 - Track worker utilization of the test run and make changes if required
 
 If your suite does not use `persistentDevice` you can set `fullyParallel: true` in
-your Appwright config file.
+your Appwright config file. This can be also configured for a file (e.g. a file that
+does not use `persistentDevice`).
+
+```ts
+// Set fullyParallel behavior for a file
+test.describe.configure({ mode: "parallel" });
+
+// Your tests go below
+// ...
+```
 
 ### Structuring tests
 
