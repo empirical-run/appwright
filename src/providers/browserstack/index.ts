@@ -221,7 +221,7 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
           retries: 10,
           minTimeout: 3_000,
           onRetry: (err, i) => {
-            if (i > 2) {
+            if (i > 5) {
               logger.warn(`Retry attempt ${i} failed: ${err.message}`);
             }
           },
