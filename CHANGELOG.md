@@ -1,5 +1,15 @@
 # appwright
 
+## 0.1.16
+
+### Patch Changes
+
+- 13e5451: feat: move video downloader into a reporter
+- 40540b1: feat: download and attach video for persistentDevice
+- 3ed1b65: docs: persistent device
+- 551b1dc: chore: minor docs and logging changes
+- 289f2b4: feat: trim video for persistentDevice report with local ffmpeg
+
 ## 0.1.15
 
 ### Patch Changes
