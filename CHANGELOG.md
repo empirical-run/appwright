@@ -1,5 +1,12 @@
 # appwright
 
+## 0.1.17
+
+### Patch Changes
+
+- 6aae307: feat: find ffmpeg path or install it
+- a620d3c: fix: use promise.allSettled in reporter
+
 ## 0.1.16
 
 ### Patch Changes
