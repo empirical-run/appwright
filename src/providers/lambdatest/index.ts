@@ -159,9 +159,10 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
     const sessionDetails = sessionData?.data;
     const videoURL = sessionDetails?.video_url;
     const pathToTestVideo = path.join(outputDir, `${fileName}.mp4`);
+    const tempPathForWriting = `${pathToTestVideo}.part`;
     const dir = path.dirname(pathToTestVideo);
     fs.mkdirSync(dir, { recursive: true });
-    const fileStream = fs.createWriteStream(pathToTestVideo);
+    const fileStream = fs.createWriteStream(tempPathForWriting);
     if (videoURL) {
       await retry(
         async () => {
@@ -202,6 +203,7 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
       return new Promise((resolve, reject) => {
         // Ensure file stream is closed even in case of an error
         fileStream.on("finish", () => {
+          fs.renameSync(tempPathForWriting, pathToTestVideo);
           console.log(`Download finished and file closed: ${pathToTestVideo}`);
           resolve({ path: pathToTestVideo, contentType: "video/mp4" });
         });

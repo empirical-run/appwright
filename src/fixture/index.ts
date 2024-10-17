@@ -1,4 +1,6 @@
 import { test as base, FullProject } from "@playwright/test";
+import fs from "fs";
+import path from "path";
 
 import {
   AppwrightLocator,
@@ -64,14 +66,23 @@ export const test = base.extend<TestLevelFixtures, WorkerLevelFixtures>({
       const deviceProvider = createDeviceProvider(workerInfo.project);
       const device = await deviceProvider.getDevice();
       const sessionId = deviceProvider.sessionId;
+      // Save session start time to disk for the reporter to use (to trim video)
+      const startTime = new Date();
+      const basePath = `${process.cwd()}/playwright-report/videos-store`;
+      if (!fs.existsSync(basePath)) {
+        fs.mkdirSync(basePath);
+      }
+      fs.writeFileSync(
+        path.join(basePath, `worker-${workerInfo.workerIndex}-start-time`),
+        startTime.toISOString(),
+      );
       await use(device);
       await device.close();
       const providerName = (workerInfo.project as FullProject<AppwrightConfig>)
         .use.device?.provider;
       const providerClass = getProviderClass(providerName!);
-      const videoDir = `${process.cwd()}/playwright-report/videos-store`;
       const fileName = `worker-${workerInfo.workerIndex}-video`;
-      await providerClass.downloadVideo(sessionId, videoDir, fileName);
+      await providerClass.downloadVideo(sessionId, basePath, fileName);
     },
     { scope: "worker" },
   ],
