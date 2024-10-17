@@ -56,7 +56,6 @@ class VideoDownloader implements Reporter {
       );
       const waitForWorkerToFinish = new Promise((resolve) => {
         const interval = setInterval(() => {
-          console.log(`Checking if video exists at: ${expectedVideoPath}`);
           if (fs.existsSync(expectedVideoPath)) {
             result.attachments.push({
               path: expectedVideoPath,
