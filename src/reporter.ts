@@ -1,9 +1,4 @@
-import type {
-  FullResult,
-  Reporter,
-  TestCase,
-  TestResult,
-} from "@playwright/test/reporter";
+import type { Reporter, TestCase, TestResult } from "@playwright/test/reporter";
 import { getProviderClass } from "./providers";
 
 class VideoDownloader implements Reporter {
@@ -14,14 +9,15 @@ class VideoDownloader implements Reporter {
   onTestBegin() {}
 
   onTestEnd(test: TestCase, result: TestResult) {
-    console.log(test.annotations);
-    const { description: sessionId } = test.annotations.find(
+    const sessionIdAnnotation = test.annotations.find(
       ({ type }) => type === "sessionId",
     )!;
-    const { description: providerName } = test.annotations.find(
+    const providerNameAnnotation = test.annotations.find(
       ({ type }) => type === "providerName",
     )!;
-    if (sessionId && providerName) {
+    if (sessionIdAnnotation && providerNameAnnotation) {
+      const sessionId = sessionIdAnnotation.description;
+      const providerName = providerNameAnnotation.description!;
       const provider = getProviderClass(providerName);
       const random = Math.floor(1000 + Math.random() * 9000);
       const videoFileName = `${test.id}-${random}`;
@@ -32,11 +28,9 @@ class VideoDownloader implements Reporter {
           .then(
             (downloadedVideo: { path: string; contentType: string } | null) => {
               if (!downloadedVideo) {
-                console.log(`No video found for test: ${test.title}`);
                 resolve(null);
                 return;
               }
-              console.log(`Downloaded video:`, downloadedVideo);
               result.attachments.push({
                 ...downloadedVideo,
                 name: "video",
@@ -49,8 +43,7 @@ class VideoDownloader implements Reporter {
     }
   }
 
-  async onEnd(result: FullResult) {
-    console.log(`Finished the run: ${result.status} `);
+  async onEnd() {
     await Promise.all(this.downloadPromises);
   }
 }
