@@ -16,6 +16,8 @@ import { FullProject } from "@playwright/test";
 import { validateBuildPath } from "../../utils";
 
 export class EmulatorProvider implements DeviceProvider {
+  sessionId?: string;
+
   constructor(
     private project: FullProject<AppwrightConfig>,
     appBundleId: string | undefined,
@@ -72,6 +74,7 @@ Follow the steps mentioned in ${androidSimulatorConfigDocLink} to run test on An
     const webDriverClient = await WebDriver.newSession(
       await this.createConfig(),
     );
+    this.sessionId = webDriverClient.sessionId;
     const expectTimeout = this.project.use.expectTimeout!;
     const testOptions: TimeoutOptions = {
       expectTimeout,

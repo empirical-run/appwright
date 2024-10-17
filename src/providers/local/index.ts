@@ -19,6 +19,8 @@ import { validateBuildPath } from "../../utils";
 import { logger } from "../../logger";
 
 export class LocalDeviceProvider implements DeviceProvider {
+  sessionId?: string;
+
   constructor(
     private project: FullProject<AppwrightConfig>,
     appBundleId: string | undefined,
@@ -61,6 +63,7 @@ export class LocalDeviceProvider implements DeviceProvider {
     const webDriverClient = await WebDriver.newSession(
       await this.createConfig(),
     );
+    this.sessionId = webDriverClient.sessionId;
     const bundleId = await getAppBundleId(this.project.use.buildPath!);
     const expectTimeout = this.project.use.expectTimeout!;
     const testOptions: TimeoutOptions = {

@@ -34,9 +34,23 @@ const API_BASE_URL =
 const envVarKeyForBuild = (projectName: string) =>
   `LAMBDATEST_APP_URL_${projectName.toUpperCase()}`;
 
+async function getSessionDetails(sessionId: string) {
+  const response = await fetch(`${API_BASE_URL}/sessions/${sessionId}`, {
+    method: "GET",
+    headers: {
+      Authorization: getAuthHeader(),
+    },
+  });
+  if (!response.ok) {
+    throw new Error(`Error fetching session details: ${response.statusText}`);
+  }
+  const data = await response.json();
+  return data;
+}
+
 export class LambdaTestDeviceProvider implements DeviceProvider {
   private sessionDetails?: LambdatestSessionDetails;
-  private sessionId?: string;
+  sessionId?: string;
   private projectName = path.basename(process.cwd());
 
   constructor(
@@ -136,26 +150,14 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
     );
   }
 
-  private async getSessionDetails() {
-    const response = await fetch(`${API_BASE_URL}/sessions/${this.sessionId}`, {
-      method: "GET",
-      headers: {
-        Authorization: getAuthHeader(),
-      },
-    });
-    if (!response.ok) {
-      throw new Error(`Error fetching session details: ${response.statusText}`);
-    }
-    const data = await response.json();
-    this.sessionDetails = data.data;
-  }
-
-  async downloadVideo(
+  static async downloadVideo(
+    sessionId: string,
     outputDir: string,
     fileName: string,
   ): Promise<{ path: string; contentType: string } | null> {
-    await this.getSessionDetails();
-    const videoURL = this.sessionDetails?.video_url;
+    const sessionData = await getSessionDetails(sessionId);
+    const sessionDetails = sessionData?.data;
+    const videoURL = sessionDetails?.video_url;
     const pathToTestVideo = path.join(
       outputDir,
       "videos-store",
@@ -173,7 +175,7 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
           if (response.status !== 200) {
             // Retry if not 200
             throw new Error(
-              `Video not found: ${response.status} (URL: ${this.sessionDetails?.video_url})`,
+              `Video not found: ${response.status} (URL: ${videoURL})`,
             );
           }
           const reader = response.body?.getReader();
@@ -201,7 +203,6 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
           },
         },
       );
-
       return new Promise((resolve, reject) => {
         // Ensure file stream is closed even in case of an error
         fileStream.on("finish", () => {

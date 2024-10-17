@@ -1,9 +1,13 @@
-import { test as base } from "@playwright/test";
+import { test as base, FullProject } from "@playwright/test";
 
-import { AppwrightLocator, DeviceProvider, ActionOptions } from "../types";
+import {
+  AppwrightLocator,
+  DeviceProvider,
+  ActionOptions,
+  AppwrightConfig,
+} from "../types";
 import { Device } from "../device";
 import { createDeviceProvider } from "../providers";
-import { logger } from "../logger";
 
 type TestLevelFixtures = {
   /**
@@ -37,6 +41,15 @@ export const test = base.extend<TestLevelFixtures, WorkerLevelFixtures>({
   },
   device: async ({ deviceProvider }, use, testInfo) => {
     const device = await deviceProvider.getDevice();
+    testInfo.annotations.push({
+      type: "providerName",
+      description: (testInfo.project as FullProject<AppwrightConfig>).use.device
+        ?.provider,
+    });
+    testInfo.annotations.push({
+      type: "sessionId",
+      description: deviceProvider.sessionId,
+    });
     await deviceProvider.syncTestDetails?.({ name: testInfo.title });
     await use(device);
     await device.close();
@@ -45,25 +58,10 @@ export const test = base.extend<TestLevelFixtures, WorkerLevelFixtures>({
       status: testInfo.status,
       reason: testInfo.error?.message,
     });
-    const outputDir = testInfo.project.outputDir;
-    const downloadPromise = deviceProvider
-      .downloadVideo?.(outputDir, testInfo.testId)
-      .then(async (videoData) => {
-        if (videoData) {
-          await testInfo.attach("video", videoData);
-        }
-      })
-      .catch((error) => {
-        logger.error(`saveVideo: ${error}`);
-      });
-
-    if (downloadPromise) {
-      await downloadPromise;
-    }
   },
   persistentDevice: [
-    async ({}, use, testInfo) => {
-      const deviceProvider = createDeviceProvider(testInfo.project);
+    async ({}, use, workerInfo) => {
+      const deviceProvider = createDeviceProvider(workerInfo.project);
       const device = await deviceProvider.getDevice();
       await use(device);
       await device.close();
