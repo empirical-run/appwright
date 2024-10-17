@@ -1,6 +1,7 @@
 import type { Reporter, TestCase, TestResult } from "@playwright/test/reporter";
 import { getProviderClass } from "./providers";
 import fs from "fs";
+import path from "path";
 
 class VideoDownloader implements Reporter {
   private downloadPromises: Promise<any>[] = [];
@@ -16,7 +17,7 @@ class VideoDownloader implements Reporter {
     const providerNameAnnotation = test.annotations.find(
       ({ type }) => type === "providerName",
     );
-    const outputDir = `${process.cwd()}/playwright-report`;
+    const outputDir = `${process.cwd()}/playwright-report/videos-store`;
     if (sessionIdAnnotation && providerNameAnnotation) {
       // This is a test that ran with the `device` fixture
       const sessionId = sessionIdAnnotation.description;
@@ -49,7 +50,10 @@ class VideoDownloader implements Reporter {
     } else {
       // This is a test that ran on `persistentDevice` fixture
       const { workerIndex } = result;
-      const expectedVideoPath = `${outputDir}/videos-store/worker-${workerIndex}-video.mp4`;
+      const expectedVideoPath = path.join(
+        outputDir,
+        `worker-${workerIndex}-video.mp4`,
+      );
       const waitForWorkerToFinish = new Promise((resolve) => {
         const interval = setInterval(() => {
           console.log(`Checking if video exists at: ${expectedVideoPath}`);

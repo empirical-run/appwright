@@ -158,11 +158,7 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
     const sessionData = await getSessionDetails(sessionId);
     const sessionDetails = sessionData?.data;
     const videoURL = sessionDetails?.video_url;
-    const pathToTestVideo = path.join(
-      outputDir,
-      "videos-store",
-      `${fileName}.mp4`,
-    );
+    const pathToTestVideo = path.join(outputDir, `${fileName}.mp4`);
     const dir = path.dirname(pathToTestVideo);
     fs.mkdirSync(dir, { recursive: true });
     const fileStream = fs.createWriteStream(pathToTestVideo);

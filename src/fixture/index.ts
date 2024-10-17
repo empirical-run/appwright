@@ -69,8 +69,7 @@ export const test = base.extend<TestLevelFixtures, WorkerLevelFixtures>({
       const providerName = (workerInfo.project as FullProject<AppwrightConfig>)
         .use.device?.provider;
       const providerClass = getProviderClass(providerName!);
-      const videoDir = `${process.cwd()}/playwright-report`;
-      console.log(`Downloading video for worker: ${workerInfo.workerIndex}`);
+      const videoDir = `${process.cwd()}/playwright-report/videos-store`;
       const fileName = `worker-${workerInfo.workerIndex}-video`;
       await providerClass.downloadVideo(sessionId, videoDir, fileName);
     },
