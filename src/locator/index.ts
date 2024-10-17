@@ -9,7 +9,7 @@ import {
   WebdriverErrors,
 } from "../types";
 import { boxedStep } from "../utils";
-import { RetryError, TimeoutError } from "../types/errors";
+import { RetryableError, TimeoutError } from "../types/errors";
 
 export class Locator {
   constructor(
@@ -103,7 +103,7 @@ export class Locator {
             error.name.includes(WebdriverErrors.StaleElementReferenceError)
           ) {
             console.log(`Stale element detected. Error: ${error}`);
-            throw error;
+            throw new RetryableError(`Stale element detected: ${error}`);
           }
           console.log(`isVisible failed for "${this.selector}": ${error}`);
           return false;
@@ -129,7 +129,7 @@ export class Locator {
         async () => {
           const result = await fn();
           if (result === false) {
-            throw new RetryError(`waitUntil condition returned false.`);
+            throw new RetryableError(`waitUntil condition returned false.`);
           }
           return result as Exclude<ReturnValue, boolean>;
         },
@@ -140,7 +140,8 @@ export class Locator {
         },
       );
     } catch (err: unknown) {
-      if (err instanceof RetryError) {
+      if (err instanceof RetryableError) {
+        // Retryable erorr is now a timeout error since we have finished retrying
         throw new TimeoutError(
           `waitUntil condition timed out after ${timeout}ms`,
         );
