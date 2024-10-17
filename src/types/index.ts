@@ -3,10 +3,7 @@ import { z } from "zod";
 
 export type ExtractType<T> = T extends z.ZodType ? z.infer<T> : never;
 
-export type WaitUntilOptions = {
-  /**
-   * The maximum amount of time (in milliseconds) to wait for the condition to be met.
-   */
+export type ActionOptions = {
   timeout: number;
 };
 
@@ -181,7 +178,7 @@ export interface AppwrightLocator {
    *
    * @param options Use this to override the timeout for this action
    */
-  tap(options?: WaitUntilOptions): Promise<void>;
+  tap(options?: ActionOptions): Promise<void>;
 
   /**
    * Fills the input element with the given value. This method waits for the element to be visible before filling it.
@@ -194,7 +191,7 @@ export interface AppwrightLocator {
    * @param value The value to fill in the input field
    * @param options Use this to override the timeout for this action
    */
-  fill(value: string, optionasds?: WaitUntilOptions): Promise<void>;
+  fill(value: string, options?: ActionOptions): Promise<void>;
 
   /**
    * Sends key strokes to the element. This method waits for the element to be visible before sending the key strokes.
@@ -207,7 +204,7 @@ export interface AppwrightLocator {
    * @param value The string to send as key strokes.
    * @param options Use this to override the timeout for this action
    */
-  sendKeyStrokes(value: string, options?: WaitUntilOptions): Promise<void>;
+  sendKeyStrokes(value: string, options?: ActionOptions): Promise<void>;
 
   /**
    * Checks if the element is visible on the page, while attempting for the `timeout` duration. Returns `true` if the element is visible, `false` otherwise.
@@ -219,7 +216,7 @@ export interface AppwrightLocator {
    *
    * @param options Use this to override the timeout for this action
    */
-  isVisible(options?: WaitUntilOptions): Promise<boolean>;
+  isVisible(options?: ActionOptions): Promise<boolean>;
 
   /**
    * Returns the text content of the element. This method waits for the element to be visible before getting the text.
@@ -231,7 +228,7 @@ export interface AppwrightLocator {
    *
    * @param options Use this to override the timeout for this action
    */
-  getText(options?: WaitUntilOptions): Promise<string>;
+  getText(options?: ActionOptions): Promise<string>;
 
   scroll(direction: ScrollDirection): Promise<void>;
 }
