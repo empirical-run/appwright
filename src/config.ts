@@ -1,6 +1,7 @@
 import {
   defineConfig as defineConfigPlaywright,
   PlaywrightTestConfig,
+  ReporterDescription,
 } from "@playwright/test";
 import { AppwrightConfig } from "./types";
 import path from "path";
@@ -9,6 +10,12 @@ const resolveGlobalSetup = () => {
   const pathToInstalledAppwright = require.resolve(".");
   const directory = path.dirname(pathToInstalledAppwright);
   return path.join(directory, "global-setup.js");
+};
+
+const resolveVideoReporter = () => {
+  const pathToInstalledAppwright = require.resolve(".");
+  const directory = path.dirname(pathToInstalledAppwright);
+  return path.join(directory, "reporter.js");
 };
 
 const defaultConfig: PlaywrightTestConfig<AppwrightConfig> = {
@@ -41,9 +48,16 @@ export function defineConfig(config: PlaywrightTestConfig<AppwrightConfig>) {
     );
     delete config.globalSetup;
   }
+  let reporterConfig: ReporterDescription[];
+  if (config.reporter) {
+    reporterConfig = config.reporter as ReporterDescription[];
+  } else {
+    reporterConfig = [["list"], ["html", { open: "always" }]];
+  }
   return defineConfigPlaywright<AppwrightConfig>({
     ...defaultConfig,
     ...config,
+    reporter: [[resolveVideoReporter()], ...reporterConfig],
     use: {
       ...defaultConfig.use,
       expectTimeout: config.use?.expectTimeout

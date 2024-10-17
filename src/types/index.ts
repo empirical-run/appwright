@@ -16,6 +16,11 @@ export type TimeoutOptions = {
 
 export interface DeviceProvider {
   /**
+   * Identifier for the Appium session. Can be undefined if the session was not created.
+   */
+  sessionId?: string;
+
+  /**
    * Global setup validates the configuration.
    */
   globalSetup?(): Promise<void>;
