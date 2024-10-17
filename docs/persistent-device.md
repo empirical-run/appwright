@@ -71,7 +71,15 @@ We will use Playwright's [fixtures](https://playwright.dev/docs/test-fixtures) t
 import { test as base } from "@playwright/test";
 import { Device } from "appwright";
 
-export const test = base.extend<{}, { loggedInDevice: Device }>({
+type WorkerFixtures = {
+  userDevice: Device;
+}
+type TestFixtures = {
+  userDeviceForFoo: Device;
+}
+
+export const test = base.extend<TestFixtures, WorkerFixtures>({
+
   // Worker fixture that knows how to login
   // This will be called for every worker
   userDevice: [async ({ persistentDevice }, use, workerInfo) => {
@@ -93,7 +101,8 @@ export const test = base.extend<{}, { loggedInDevice: Device }>({
     // Or restart the app on the device
     await userDevice.terminateApp();
     await userDevice.activateApp();
-  }
+  },
+
 });
 ```
 
