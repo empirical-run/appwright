@@ -7,7 +7,7 @@ import {
   AppwrightConfig,
 } from "../types";
 import { Device } from "../device";
-import { createDeviceProvider } from "../providers";
+import { createDeviceProvider, getProviderClass } from "../providers";
 
 type TestLevelFixtures = {
   /**
@@ -63,8 +63,16 @@ export const test = base.extend<TestLevelFixtures, WorkerLevelFixtures>({
     async ({}, use, workerInfo) => {
       const deviceProvider = createDeviceProvider(workerInfo.project);
       const device = await deviceProvider.getDevice();
+      const sessionId = deviceProvider.sessionId;
       await use(device);
       await device.close();
+      const providerName = (workerInfo.project as FullProject<AppwrightConfig>)
+        .use.device?.provider;
+      const providerClass = getProviderClass(providerName!);
+      const videoDir = `${process.cwd()}/playwright-report`;
+      console.log(`Downloading video for worker: ${workerInfo.workerIndex}`);
+      const fileName = `worker-${workerInfo.workerIndex}-video`;
+      await providerClass.downloadVideo(sessionId, videoDir, fileName);
     },
     { scope: "worker" },
   ],
