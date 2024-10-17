@@ -6,7 +6,7 @@ import {
   ScrollDirection,
   TimeoutOptions,
   ActionOptions,
-  WebdriverErrors,
+  WebDriverErrors,
 } from "../types";
 import { boxedStep } from "../utils";
 
@@ -97,7 +97,7 @@ export class Locator {
           } catch (error) {
             if (
               //@ts-ignore
-              error.name.includes(WebdriverErrors.StaleElementReferenceError)
+              error.name.includes(WebDriverErrors.StaleElementReferenceError)
             ) {
               console.log(`Stale element detected. Error: ${error}`);
               throw error;

@@ -233,7 +233,7 @@ export interface AppwrightLocator {
   scroll(direction: ScrollDirection): Promise<void>;
 }
 
-export enum WebdriverErrors {
+export enum WebDriverErrors {
   StaleElementReferenceError = "stale element reference",
 }
 
