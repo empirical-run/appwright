@@ -4,13 +4,14 @@ import fs from "fs";
 import path from "path";
 import ffmpeg from "fluent-ffmpeg";
 
+const videoStoreBasePath = `${process.cwd()}/playwright-report/videos-store`;
+
 class VideoDownloader implements Reporter {
   private downloadPromises: Promise<any>[] = [];
 
   onBegin() {
-    const videoStorePath = `${process.cwd()}/playwright-report/videos-store`;
-    if (fs.existsSync(videoStorePath)) {
-      fs.rmSync(videoStorePath, {
+    if (fs.existsSync(videoStoreBasePath)) {
+      fs.rmSync(videoStoreBasePath, {
         recursive: true,
       });
     }
@@ -25,7 +26,6 @@ class VideoDownloader implements Reporter {
     const providerNameAnnotation = test.annotations.find(
       ({ type }) => type === "providerName",
     );
-    const outputDir = `${process.cwd()}/playwright-report/videos-store`;
     if (sessionIdAnnotation && providerNameAnnotation) {
       // This is a test that ran with the `device` fixture
       const sessionId = sessionIdAnnotation.description;
@@ -35,7 +35,7 @@ class VideoDownloader implements Reporter {
       const videoFileName = `${test.id}-${random}`;
       const downloadPromise = new Promise((resolve) => {
         provider
-          .downloadVideo(sessionId, outputDir, videoFileName)
+          .downloadVideo(sessionId, videoStoreBasePath, videoFileName)
           .then(
             (downloadedVideo: { path: string; contentType: string } | null) => {
               if (!downloadedVideo) {
@@ -62,12 +62,18 @@ class VideoDownloader implements Reporter {
         // Skipped tests
         return;
       }
-      const expectedVideoPath = `${outputDir}/videos-store/worker-${workerIndex}-video.mp4`;
+      const expectedVideoPath = `${videoStoreBasePath}/worker-${workerIndex}-video.mp4`;
       const waitForWorkerToFinish = new Promise((resolve) => {
+        let maxIntervalTime = 60 * 60 * 1000; // 1 hour in ms
         const interval = setInterval(async () => {
+          maxIntervalTime -= 500;
+          if (maxIntervalTime <= 0) {
+            clearInterval(interval);
+            console.error("Timed out waiting for worker to finish");
+            resolve(null);
+          }
           if (fs.existsSync(expectedVideoPath)) {
             clearInterval(interval);
-            console.log(`Trimming video at: ${expectedVideoPath}`);
             const trimmedFileName = `worker-${workerIndex}-trimmed-${test.id}.mp4`;
             const workerStart = workerStartTime(workerIndex);
             let pathToAttach = expectedVideoPath;
@@ -76,19 +82,20 @@ class VideoDownloader implements Reporter {
               // before worker (session) start time. This would have been manageable
               // if the `duration` included the worker setup time, but it doesn't.
               // So in this case, we are not going to trim.
+              // TODO: We can use the startTime of the second test in the worker
               const trimSkipPoint =
                 (startTime.getTime() - workerStart.getTime()) / 1000;
-              console.log(
-                `skip point: ${trimSkipPoint} duration: ${duration / 1000} `,
-              );
-              pathToAttach = await trimVideo({
-                originalVideoPath: expectedVideoPath,
-                startSecs: trimSkipPoint,
-                durationSecs: duration / 1000,
-                outputPath: trimmedFileName,
-              });
+              try {
+                pathToAttach = await trimVideo({
+                  originalVideoPath: expectedVideoPath,
+                  startSecs: trimSkipPoint,
+                  durationSecs: duration / 1000,
+                  outputPath: trimmedFileName,
+                });
+              } catch (e) {
+                console.error("Failed to trim video:", e);
+              }
             }
-            console.log(`attaching: ${pathToAttach}`);
             result.attachments.push({
               path: pathToAttach,
               contentType: "video/mp4",
@@ -117,6 +124,7 @@ function trimVideo({
   durationSecs: number;
   outputPath: string;
 }): Promise<string> {
+  console.log(`Attemping to trim video: ${originalVideoPath}`);
   const copyName = `draft-for-${outputPath}`;
   const dirPath = path.dirname(originalVideoPath);
   const copyFullPath = path.join(dirPath, copyName);
@@ -138,8 +146,7 @@ function trimVideo({
 
 function workerStartTime(idx: number): Date {
   const fileName = `worker-${idx}-start-time`;
-  const basePath = `${process.cwd()}/playwright-report/videos-store`;
-  const filePath = path.join(basePath, fileName);
+  const filePath = path.join(videoStoreBasePath, fileName);
   const content = fs.readFileSync(filePath, "utf-8");
   return new Date(content);
 }
