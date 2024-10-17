@@ -3,6 +3,7 @@ import { getProviderClass } from "./providers";
 import fs from "fs";
 import path from "path";
 import ffmpeg from "fluent-ffmpeg";
+import ffmpegInstaller from "@ffmpeg-installer/ffmpeg";
 
 const videoStoreBasePath = `${process.cwd()}/playwright-report/videos-store`;
 
@@ -132,6 +133,7 @@ function trimVideo({
   fs.copyFileSync(originalVideoPath, copyFullPath);
   return new Promise((resolve) => {
     ffmpeg(copyFullPath)
+      .setFfmpegPath(ffmpegInstaller.path)
       .setStartTime(startSecs)
       .setDuration(durationSecs)
       .output(fullOutputPath)
