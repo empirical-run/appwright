@@ -1,5 +1,7 @@
 import type { Reporter, TestCase, TestResult } from "@playwright/test/reporter";
 import { getProviderClass } from "./providers";
+import fs from "fs";
+import path from "path";
 
 class VideoDownloader implements Reporter {
   private downloadPromises: Promise<any>[] = [];
@@ -15,13 +17,14 @@ class VideoDownloader implements Reporter {
     const providerNameAnnotation = test.annotations.find(
       ({ type }) => type === "providerName",
     );
+    const outputDir = `${process.cwd()}/playwright-report/videos-store`;
     if (sessionIdAnnotation && providerNameAnnotation) {
+      // This is a test that ran with the `device` fixture
       const sessionId = sessionIdAnnotation.description;
-      const providerName = providerNameAnnotation.description!;
-      const provider = getProviderClass(providerName);
+      const providerName = providerNameAnnotation.description;
+      const provider = getProviderClass(providerName!);
       const random = Math.floor(1000 + Math.random() * 9000);
       const videoFileName = `${test.id}-${random}`;
-      const outputDir = `${process.cwd()}/playwright-report`;
       const downloadPromise = new Promise((resolve) => {
         provider
           .downloadVideo(sessionId, outputDir, videoFileName)
@@ -44,6 +47,27 @@ class VideoDownloader implements Reporter {
         ({ type }) => type !== "sessionId" && type !== "providerName",
       );
       test.annotations = otherAnnotations;
+    } else {
+      // This is a test that ran on `persistentDevice` fixture
+      const { workerIndex } = result;
+      const expectedVideoPath = path.join(
+        outputDir,
+        `worker-${workerIndex}-video.mp4`,
+      );
+      const waitForWorkerToFinish = new Promise((resolve) => {
+        const interval = setInterval(() => {
+          if (fs.existsSync(expectedVideoPath)) {
+            result.attachments.push({
+              path: expectedVideoPath,
+              contentType: "video/mp4",
+              name: "video",
+            });
+            clearInterval(interval);
+            resolve(expectedVideoPath);
+          }
+        }, 500);
+      });
+      this.downloadPromises.push(waitForWorkerToFinish);
     }
   }
 
