@@ -117,13 +117,13 @@ import { test } from './fixtures';
 test("do first thing", async ({ userDeviceForFoo }) => {
   // This will run first
   // ...
-  // And then do the reset steps in the loggedInDevice fixture
+  // And then do the reset steps in the userDeviceForFoo fixture
 });
 
 test("do second thing", async ({ userDeviceForFoo }) => {
   // This will run next
   // ...
-  // And then do the reset steps in the loggedInDevice fixture
+  // And then do the reset steps in the userDeviceForFoo fixture
 });
 ```
 
