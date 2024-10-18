@@ -1,5 +1,11 @@
 # appwright
 
+## 0.1.19
+
+### Patch Changes
+
+- f43c977: chore: add log for worker teardown
+
 ## 0.1.18
 
 ### Patch Changes
