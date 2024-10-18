@@ -212,7 +212,25 @@ export interface AppwrightLocator {
   sendKeyStrokes(value: string, options?: ActionOptions): Promise<void>;
 
   /**
-   * Checks if the element is visible on the page, while attempting for the `timeout` duration. Returns `true` if the element is visible, `false` otherwise.
+   * Wait for the element to be visible or attached, while attempting for the `timeout` duration.
+   * Throws TimeoutError if element is not found within the timeout.
+   *
+   * **Usage:**
+   * ```js
+   * await device.getByText("Search").waitFor({ state: "visible" });
+   * ```
+   *
+   * @param state The state to wait for
+   * @param options Use this to override the timeout for this action
+   */
+  waitFor(
+    state: "attached" | "visible",
+    options?: ActionOptions,
+  ): Promise<void>;
+
+  /**
+   * Waits for the element to be visible, while attempting for the `timeout` duration.
+   * Returns boolean based on the visibility of the element.
    *
    * **Usage:**
    * ```js
