@@ -1,5 +1,11 @@
 # appwright
 
+## 0.1.18
+
+### Patch Changes
+
+- 168425b: feat: add locator.waitFor to check for attached or visible state
+
 ## 0.1.17
 
 ### Patch Changes
