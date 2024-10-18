@@ -18,7 +18,9 @@ class VideoDownloader implements Reporter {
     }
   }
 
-  onTestBegin() {}
+  onTestBegin(test: TestCase, result: TestResult) {
+    console.log(`Starting test: ${test.title} on worker ${result.workerIndex}`);
+  }
 
   onTestEnd(test: TestCase, result: TestResult) {
     const sessionIdAnnotation = test.annotations.find(

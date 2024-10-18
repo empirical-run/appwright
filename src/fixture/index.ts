@@ -63,7 +63,8 @@ export const test = base.extend<TestLevelFixtures, WorkerLevelFixtures>({
   },
   persistentDevice: [
     async ({}, use, workerInfo) => {
-      const deviceProvider = createDeviceProvider(workerInfo.project);
+      const { project, workerIndex } = workerInfo;
+      const deviceProvider = createDeviceProvider(project);
       const device = await deviceProvider.getDevice();
       const sessionId = deviceProvider.sessionId;
       // Save session start time to disk for the reporter to use (to trim video)
@@ -73,15 +74,16 @@ export const test = base.extend<TestLevelFixtures, WorkerLevelFixtures>({
         fs.mkdirSync(basePath);
       }
       fs.writeFileSync(
-        path.join(basePath, `worker-${workerInfo.workerIndex}-start-time`),
+        path.join(basePath, `worker-${workerIndex}-start-time`),
         startTime.toISOString(),
       );
       await use(device);
       await device.close();
-      const providerName = (workerInfo.project as FullProject<AppwrightConfig>)
-        .use.device?.provider;
+      console.log(`Teardown for worker ${workerIndex}, will download video`);
+      const providerName = (project as FullProject<AppwrightConfig>).use.device
+        ?.provider;
       const providerClass = getProviderClass(providerName!);
-      const fileName = `worker-${workerInfo.workerIndex}-video`;
+      const fileName = `worker-${workerIndex}-video`;
       await providerClass.downloadVideo(sessionId, basePath, fileName);
     },
     { scope: "worker" },
