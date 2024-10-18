@@ -81,12 +81,29 @@ export class Locator {
   }
 
   async isVisible(options?: ActionOptions): Promise<boolean> {
+    try {
+      await this.waitFor("visible", options);
+      return true;
+    } catch (err) {
+      if (err instanceof TimeoutError) {
+        return false;
+      }
+      throw err;
+    }
+  }
+
+  async waitFor(
+    state: "attached" | "visible",
+    options?: ActionOptions,
+  ): Promise<void> {
     const timeoutFromConfig = this.timeoutOpts.expectTimeout;
     const timeout = options?.timeout || timeoutFromConfig;
-    try {
-      const isVisible = await this.waitUntil(async () => {
-        const element = await this.getElement();
-        if (element && element["element-6066-11e4-a52e-4f735466cecf"]) {
+    const result = await this.waitUntil(async () => {
+      const element = await this.getElement();
+      if (element && element["element-6066-11e4-a52e-4f735466cecf"]) {
+        if (state === "attached") {
+          return true;
+        } else if (state === "visible") {
           try {
             const isDisplayed = await this.webDriverClient.isElementDisplayed(
               element["element-6066-11e4-a52e-4f735466cecf"],
@@ -104,18 +121,10 @@ export class Locator {
             throw error;
           }
         }
-        return false;
-      }, timeout);
-      return isVisible;
-    } catch (error) {
-      if (error instanceof TimeoutError) {
-        console.log(
-          `isVisible timed out for "${this.selector}" in ${timeout}ms`,
-        );
-        return false;
       }
-      throw error;
-    }
+      return false;
+    }, timeout);
+    return result;
   }
 
   private async waitUntil<ReturnValue>(
