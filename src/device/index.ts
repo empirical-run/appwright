@@ -49,7 +49,6 @@ export class Device {
     tap: async (
       prompt: string,
       options?: {
-        debug?: boolean;
         focusArea?: BoundingBox;
         verifier?: boolean;
       },

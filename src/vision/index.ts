@@ -1,5 +1,4 @@
 import { query } from "@empiricalrun/llm/vision";
-import { getBoundingBox } from "@empiricalrun/llm/vision/bbox";
 import fs from "fs";
 // @ts-ignore ts not able to identify the import is just an interface
 import { Client as WebDriverClient } from "webdriver";
@@ -9,6 +8,7 @@ import { boxedStep } from "../utils";
 import { z } from "zod";
 import { LLMModel } from "@empiricalrun/llm";
 import { BoundingBox, ExtractType } from "../types";
+import { getBoundingBox } from "@empiricalrun/llm/vision/bbox";
 
 export interface AppwrightVision {
   /**
@@ -45,7 +45,6 @@ export interface AppwrightVision {
   tap(
     prompt: string,
     options?: {
-      debug?: boolean;
       focusArea?: BoundingBox;
       verifier?: boolean;
     },
@@ -90,7 +89,6 @@ export class VisionProvider {
   async tap(
     prompt: string,
     options?: {
-      debug?: boolean;
       focusArea?: BoundingBox;
       verifier?: boolean;
     },
@@ -103,7 +101,6 @@ export class VisionProvider {
     const bbox = await getBoundingBox(base64Screenshot, prompt, {
       focusArea: options?.focusArea,
       verifier: options?.verifier,
-      debug: options?.debug,
     });
     if (bbox.annotatedImage) {
       const random = Math.floor(1000 + Math.random() * 9000);

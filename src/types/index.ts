@@ -243,12 +243,15 @@ export enum WebdriverErrors {
 export type ElementReference = Record<ElementReferenceId, string>;
 export type ElementReferenceId = "element-6066-11e4-a52e-4f735466cecf";
 
-export interface BoundingBox {
+interface BoundingBoxWithoutImage {
   corners: {
     min: { x: number; y: number };
     max: { x: number; y: number };
   };
   center: { x: number; y: number };
   container: { width: number; height: number };
-  annotatedImage?: string;
+}
+
+export interface BoundingBox extends BoundingBoxWithoutImage {
+  annotatedImage: string;
 }
