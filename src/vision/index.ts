@@ -1,5 +1,5 @@
 import { query } from "@empiricalrun/llm/vision";
-import { getBoundingBox } from "@empiricalrun/llm/vision/bbox";
+import { getCoordinatesFor } from "@empiricalrun/llm/vision/point";
 import fs from "fs";
 // @ts-ignore ts not able to identify the import is just an interface
 import { Client as WebDriverClient } from "webdriver";
@@ -70,22 +70,22 @@ export class VisionProvider {
   @boxedStep
   async tap(prompt: string): Promise<void> {
     test.skip(
-      !process.env.GOOGLE_API_KEY,
-      "LLM vision based tap is not enabled. Set the GOOGLE_API_KEY environment variable to enable it",
+      !process.env.VISION_MODEL_ENDPOINT,
+      "LLM vision based tap is not enabled. Set the VISION_MODEL_ENDPOINT environment variable to enable it",
     );
-    const base64Screenshot = await this.webDriverClient.takeScreenshot();
-    const bbox = await getBoundingBox(base64Screenshot, prompt, {
-      debug: true,
-    });
-    if (bbox.annotatedImage) {
+    const base64Image = await this.webDriverClient.takeScreenshot();
+    const coordinates = await getCoordinatesFor(prompt, base64Image);
+    if (coordinates.annotatedImage) {
       const random = Math.floor(1000 + Math.random() * 9000);
       const file = test.info().outputPath(`${random}.png`);
-      const base64 = bbox.annotatedImage.split(",")[1];
-      await fs.promises.writeFile(file, Buffer.from(base64!, "base64"));
+      await fs.promises.writeFile(
+        file,
+        Buffer.from(coordinates.annotatedImage!, "base64"),
+      );
       await test.info().attach(`${random}`, { path: file });
     }
     const driverSize = await this.webDriverClient.getWindowRect();
-    const { container: imageSize, center } = bbox;
+    const { container: imageSize, x: x, y: y } = coordinates;
     const scaleFactorWidth = imageSize.width / driverSize.width;
     const scaleFactorHeight = imageSize.height / driverSize.height;
     if (scaleFactorWidth !== scaleFactorHeight) {
@@ -94,8 +94,8 @@ export class VisionProvider {
       );
     }
     await this.device.tap({
-      x: center.x / scaleFactorWidth,
-      y: center.y / scaleFactorWidth,
+      x: x / scaleFactorWidth,
+      y: y / scaleFactorWidth,
     });
   }
 }
