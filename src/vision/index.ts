@@ -85,7 +85,7 @@ export class VisionProvider {
       await test.info().attach(`${random}`, { path: file });
     }
     const driverSize = await this.webDriverClient.getWindowRect();
-    const { container: imageSize, x: x, y: y } = coordinates;
+    const { container: imageSize, x, y } = coordinates;
     const scaleFactorWidth = imageSize.width / driverSize.width;
     const scaleFactorHeight = imageSize.height / driverSize.height;
     if (scaleFactorWidth !== scaleFactorHeight) {
