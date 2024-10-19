@@ -33,7 +33,7 @@ export interface AppwrightVision {
 
   /**
    * Performs a tap action on the screen based on the provided prompt.
-   * Ensure the `GOOGLE_API_KEY` environment variable is set to authenticate the API request.
+   * Ensure the `VISION_MODEL_ENDPOINT` environment variable is set to authenticate the API request.
    *
    * **Usage:**
    * ```js
