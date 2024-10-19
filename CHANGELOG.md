@@ -1,5 +1,11 @@
 # appwright
 
+## 0.1.20
+
+### Patch Changes
+
+- c91b815: fix: vision tap precision
+
 ## 0.1.19
 
 ### Patch Changes
