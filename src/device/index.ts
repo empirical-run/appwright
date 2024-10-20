@@ -45,8 +45,8 @@ export class Device {
   }
 
   beta = {
-    tap: async (prompt: string): Promise<void> => {
-      await this.vision().tap(prompt);
+    tap: async (prompt: string): Promise<{ x: number; y: number }> => {
+      return await this.vision().tap(prompt);
     },
 
     query: async <T extends z.ZodType>(
@@ -54,6 +54,7 @@ export class Device {
       options?: {
         responseFormat?: T;
         model?: LLMModel;
+        screenshot?: string;
       },
     ): Promise<ExtractType<T>> => {
       return await this.vision().query(prompt, options);
@@ -312,5 +313,12 @@ export class Device {
         [],
       );
     }
+  }
+
+  /**
+   * Get a screenshot of the current screen as a base64 encoded string.
+   */
+  async screenshot(): Promise<string> {
+    return await this.webdriverClient.takeScreenshot();
   }
 }
