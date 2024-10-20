@@ -5,7 +5,7 @@ import path from "path";
 import ffmpeg from "fluent-ffmpeg";
 import ffmpegInstaller from "@ffmpeg-installer/ffmpeg";
 
-const videoStoreBasePath = `${process.cwd()}/playwright-report/videos-store`;
+const videoStoreBasePath = `${process.cwd()}/playwright-report/data/videos-store`;
 
 class VideoDownloader implements Reporter {
   private downloadPromises: Promise<any>[] = [];
@@ -149,6 +149,8 @@ function trimVideo({
 }
 
 function workerStartTime(idx: number): Date {
+  // TODO: can we make this unique for a session? avoids ios/android running
+  // into issues when running concurrently on local
   const fileName = `worker-${idx}-start-time`;
   const filePath = path.join(videoStoreBasePath, fileName);
   const content = fs.readFileSync(filePath, "utf-8");
