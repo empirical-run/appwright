@@ -321,4 +321,8 @@ export class Device {
       await this.webDriverClient.takeScreenshot();
     }
   }
+
+  async waitForTimeout(timeout: number) {
+    await new Promise((resolve) => setTimeout(resolve, timeout));
+  }
 }

@@ -2,4 +2,4 @@
 "appwright": patch
 ---
 
-feat: add device.pause() method
+feat: add device.pause() and device.waitForTimeout() methods
