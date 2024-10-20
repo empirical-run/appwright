@@ -69,7 +69,7 @@ export const test = base.extend<TestLevelFixtures, WorkerLevelFixtures>({
       const sessionId = deviceProvider.sessionId;
       // Save session start time to disk for the reporter to use (to trim video)
       const startTime = new Date();
-      const basePath = `${process.cwd()}/playwright-report/videos-store`;
+      const basePath = `${process.cwd()}/playwright-report/data/videos-store`;
       if (!fs.existsSync(basePath)) {
         fs.mkdirSync(basePath);
       }
