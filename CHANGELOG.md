@@ -1,5 +1,11 @@
 # appwright
 
+## 0.1.23
+
+### Patch Changes
+
+- 3930289: feat: use drag method for ios scroll
+
 ## 0.1.22
 
 ### Patch Changes
