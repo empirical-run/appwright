@@ -1,5 +1,11 @@
 # appwright
 
+## 0.1.21
+
+### Patch Changes
+
+- 029a708: fix: move assets location
+
 ## 0.1.20
 
 ### Patch Changes
