@@ -1,5 +1,12 @@
 # appwright
 
+## 0.1.22
+
+### Patch Changes
+
+- bccffd2: feat: add device.pause() and device.waitForTimeout() methods
+- e1e3750: feat: vision.tap returns tap coordinates, vision.query accepts screenshot as option
+
 ## 0.1.21
 
 ### Patch Changes
