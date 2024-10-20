@@ -16,7 +16,7 @@ import { LLMModel } from "@empiricalrun/llm";
 
 export class Device {
   constructor(
-    private webdriverClient: WebDriverClient,
+    private webDriverClient: WebDriverClient,
     private bundleId: string | undefined,
     private timeoutOpts: TimeoutOptions,
     private provider: string,
@@ -32,7 +32,7 @@ export class Device {
     textToMatch?: string | RegExp;
   }): AppwrightLocator {
     return new Locator(
-      this.webdriverClient,
+      this.webDriverClient,
       this.timeoutOpts,
       selector,
       findStrategy,
@@ -41,7 +41,7 @@ export class Device {
   }
 
   private vision(): AppwrightVision {
-    return new VisionProvider(this, this.webdriverClient);
+    return new VisionProvider(this, this.webDriverClient);
   }
 
   beta = {
@@ -72,7 +72,7 @@ export class Device {
   // TODO: Add @boxedStep decorator here; disabled because it breaks persistentDevice
   // as test.step will throw
   async close() {
-    await this.webdriverClient.deleteSession();
+    await this.webDriverClient.deleteSession();
   }
 
   /**
@@ -90,7 +90,7 @@ export class Device {
   @boxedStep
   async tap({ x, y }: { x: number; y: number }) {
     if (this.getPlatform() == Platform.ANDROID) {
-      await this.webdriverClient.executeScript("mobile: clickGesture", [
+      await this.webDriverClient.executeScript("mobile: clickGesture", [
         {
           x: x,
           y: y,
@@ -99,7 +99,7 @@ export class Device {
         },
       ]);
     } else {
-      await this.webdriverClient.executeScript("mobile: tap", [
+      await this.webDriverClient.executeScript("mobile: tap", [
         {
           x: x,
           y: y,
@@ -225,7 +225,7 @@ export class Device {
    * @returns "android" or "ios"
    */
   getPlatform(): Platform {
-    const isAndroid = this.webdriverClient.isAndroid;
+    const isAndroid = this.webDriverClient.isAndroid;
     return isAndroid ? Platform.ANDROID : Platform.IOS;
   }
 
@@ -235,7 +235,7 @@ export class Device {
     }
     const keyName =
       this.getPlatform() == Platform.ANDROID ? "appId" : "bundleId";
-    await this.webdriverClient.executeScript("mobile: terminateApp", [
+    await this.webDriverClient.executeScript("mobile: terminateApp", [
       {
         [keyName]: bundleId || this.bundleId,
       },
@@ -248,7 +248,7 @@ export class Device {
     }
     const keyName =
       this.getPlatform() == Platform.ANDROID ? "appId" : "bundleId";
-    await this.webdriverClient.executeScript("mobile: activateApp", [
+    await this.webDriverClient.executeScript("mobile: activateApp", [
       {
         [keyName]: bundleId || this.bundleId,
       },
@@ -268,11 +268,11 @@ export class Device {
    */
   async getClipboardText(): Promise<string> {
     if (this.getPlatform() == Platform.ANDROID) {
-      return await this.webdriverClient.getClipboard();
+      return await this.webDriverClient.getClipboard();
     } else {
       if (this.provider == "emulator") {
         // iOS simulator supports clipboard sharing
-        return await this.webdriverClient.getClipboard();
+        return await this.webDriverClient.getClipboard();
       } else {
         if (!this.bundleId) {
           throw new Error(
@@ -280,7 +280,7 @@ export class Device {
           );
         }
         await this.activateApp("com.facebook.WebDriverAgentRunner.xctrunner");
-        const clipboardDataBase64 = await this.webdriverClient.getClipboard();
+        const clipboardDataBase64 = await this.webDriverClient.getClipboard();
         await this.activateApp(this.bundleId);
         return clipboardDataBase64;
       }
@@ -302,23 +302,35 @@ export class Device {
   async setMockCameraView(imagePath: string): Promise<void> {
     if (this.provider == "browserstack") {
       const imageURL = await uploadImageToBS(imagePath);
-      await this.webdriverClient.executeScript(
+      await this.webDriverClient.executeScript(
         `browserstack_executor: {"action":"cameraImageInjection", "arguments": {"imageUrl" : "${imageURL}"}}`,
         [],
       );
     } else if (this.provider == "lambdatest") {
       const imageURL = await uploadImageToLambdaTest(imagePath);
-      await this.webdriverClient.executeScript(
+      await this.webDriverClient.executeScript(
         `lambda-image-injection=${imageURL}`,
         [],
       );
     }
   }
 
+  async pause() {
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      await new Promise((resolve) => setTimeout(resolve, 20_000));
+      await this.webDriverClient.takeScreenshot();
+    }
+  }
+
+  async waitForTimeout(timeout: number) {
+    await new Promise((resolve) => setTimeout(resolve, timeout));
+  }
+
   /**
    * Get a screenshot of the current screen as a base64 encoded string.
    */
   async screenshot(): Promise<string> {
-    return await this.webdriverClient.takeScreenshot();
+    return await this.webDriverClient.takeScreenshot();
   }
 }
