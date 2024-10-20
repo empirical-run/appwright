@@ -20,7 +20,7 @@ export class Device {
     private bundleId: string | undefined,
     private timeoutOpts: TimeoutOptions,
     private provider: string,
-  ) { }
+  ) {}
 
   locator({
     selector,
