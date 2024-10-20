@@ -333,4 +333,14 @@ export class Device {
   async screenshot(): Promise<string> {
     return await this.webDriverClient.takeScreenshot();
   }
+
+  async scroll(): Promise<void> {
+    const driverSize = await this.webDriverClient.getWindowRect();
+    // Scrolls from 0.8 to 0.2 of the screen height
+    const from = { x: driverSize.width / 2, y: driverSize.height * 0.8 };
+    const to = { x: driverSize.width / 2, y: driverSize.height * 0.2 };
+    await this.webDriverClient.executeScript("mobile: dragFromToForDuration", [
+      { duration: 2, fromX: from.x, fromY: from.y, toX: to.x, toY: to.y },
+    ]);
+  }
 }
