@@ -28,6 +28,7 @@ export interface AppwrightVision {
     options?: {
       responseFormat?: T;
       model?: LLMModel;
+      screenshot?: string;
     },
   ): Promise<ExtractType<T>>;
 
@@ -42,7 +43,7 @@ export interface AppwrightVision {
    *
    * @param prompt that defines where on the screen the tap action should occur
    */
-  tap(prompt: string): Promise<void>;
+  tap(prompt: string): Promise<{ x: number; y: number }>;
 }
 
 export class VisionProvider {
@@ -57,18 +58,22 @@ export class VisionProvider {
     options?: {
       responseFormat?: T;
       model?: LLMModel;
+      screenshot?: string;
     },
   ): Promise<ExtractType<T>> {
     test.skip(
       !process.env.OPENAI_API_KEY,
       "LLM vision based extract text is not enabled. Set the OPENAI_API_KEY environment variable to enable it",
     );
-    const base64Screenshot = await this.webDriverClient.takeScreenshot();
+    let base64Screenshot = options?.screenshot;
+    if (!base64Screenshot) {
+      base64Screenshot = await this.webDriverClient.takeScreenshot();
+    }
     return await query(base64Screenshot, prompt, options);
   }
 
   @boxedStep
-  async tap(prompt: string): Promise<void> {
+  async tap(prompt: string): Promise<{ x: number; y: number }> {
     test.skip(
       !process.env.VISION_MODEL_ENDPOINT,
       "LLM vision based tap is not enabled. Set the VISION_MODEL_ENDPOINT environment variable to enable it",
@@ -93,9 +98,12 @@ export class VisionProvider {
         `Scale factors are different: ${scaleFactorWidth} vs ${scaleFactorHeight}`,
       );
     }
+    const tapTargetX = x / scaleFactorWidth;
+    const tapTargetY = y / scaleFactorHeight;
     await this.device.tap({
-      x: x / scaleFactorWidth,
-      y: y / scaleFactorWidth,
+      x: tapTargetX,
+      y: tapTargetY,
     });
+    return { x: tapTargetX, y: tapTargetY };
   }
 }
