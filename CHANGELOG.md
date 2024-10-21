@@ -1,5 +1,11 @@
 # appwright
 
+## 0.1.31
+
+### Patch Changes
+
+- b65f3db: fix: increased idle timeout in bs to 180 seconds
+
 ## 0.1.30
 
 ### Patch Changes
