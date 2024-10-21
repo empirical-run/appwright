@@ -342,7 +342,7 @@ export class Device {
   /**
    * [iOS Only]
    * Scroll the screen from 0.2 to 0.8 of the screen height.
-   * This can be used for controlled scroll, for auto scroll checkout locator.scroll()
+   * This can be used for controlled scroll, for auto scroll checkout `scroll` method from locator.
    *
    * **Usage:**
    * ```js
