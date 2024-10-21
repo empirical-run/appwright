@@ -360,4 +360,29 @@ export class Device {
       { duration: 2, fromX: from.x, fromY: from.y, toX: to.x, toY: to.y },
     ]);
   }
+
+  /**
+   * Send keys to already focused input field.
+   * To fill input fields using the selectors use `sendKeyStrokes` method from locator
+   */
+  @boxedStep
+  async sendKeyStrokes(value: string): Promise<void> {
+    const actions = value
+      .split("")
+      .map((char) => [
+        { type: "keyDown", value: char },
+        { type: "keyUp", value: char },
+      ])
+      .flat();
+
+    await this.webDriverClient.performActions([
+      {
+        type: "key",
+        id: "keyboard",
+        actions: actions,
+      },
+    ]);
+
+    await this.webDriverClient.releaseActions();
+  }
 }
