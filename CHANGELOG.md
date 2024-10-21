@@ -1,5 +1,11 @@
 # appwright
 
+## 0.1.30
+
+### Patch Changes
+
+- 1b89ea4: fix: updated check for http url
+
 ## 0.1.29
 
 ### Patch Changes
