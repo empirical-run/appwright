@@ -1,5 +1,11 @@
 # appwright
 
+## 0.1.28
+
+### Patch Changes
+
+- 5bbd6e2: fix: increase maxDepth to 62
+
 ## 0.1.27
 
 ### Patch Changes
