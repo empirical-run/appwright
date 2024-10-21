@@ -1,5 +1,12 @@
 # appwright
 
+## 0.1.27
+
+### Patch Changes
+
+- 8fa6fca: fix: scale tap coordinates only by width for lambdatest getWindowRect() behavior
+- 202ad6d: feat: added method to fill input fields using device
+
 ## 0.1.26
 
 ### Patch Changes
