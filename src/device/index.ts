@@ -339,6 +339,7 @@ export class Device {
     return await this.webDriverClient.takeScreenshot();
   }
 
+  @boxedStep
   async scroll(): Promise<void> {
     const driverSize = await this.webDriverClient.getWindowRect();
     // Scrolls from 0.8 to 0.2 of the screen height
