@@ -94,35 +94,42 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
       );
     }
     const buildPath = this.project.use.buildPath!;
-    logger.log(`Uploading: ${buildPath}`);
-    const isUrl = buildPath.startsWith("http");
-    let body;
-    let headers = {
-      Authorization: getAuthHeader(),
-    };
-    if (isUrl) {
-      body = new URLSearchParams({
-        url: buildPath,
-      });
+    const isHttpUrl = buildPath.startsWith("http://");
+    const isBrowserStackUrl = buildPath.startsWith("bs://");
+    let appUrl: string | undefined = undefined;
+    if (isBrowserStackUrl) {
+      appUrl = buildPath;
     } else {
-      if (!fs.existsSync(buildPath)) {
-        throw new Error(`Build file not found: ${buildPath}`);
+      // Upload the file to BrowserStack and get the appUrl
+      let body;
+      let headers = {
+        Authorization: getAuthHeader(),
+      };
+      if (isHttpUrl) {
+        body = new URLSearchParams({
+          url: buildPath,
+        });
+      } else {
+        if (!fs.existsSync(buildPath)) {
+          throw new Error(`Build file not found: ${buildPath}`);
+        }
+        const form = new FormData();
+        form.append("file", fs.createReadStream(buildPath));
+        headers = { ...headers, ...form.getHeaders() };
+        body = form;
       }
-      const form = new FormData();
-      form.append("file", fs.createReadStream(buildPath));
-      headers = { ...headers, ...form.getHeaders() };
-      body = form;
-    }
-    const fetch = (await import("node-fetch")).default;
-    const response = await fetch(`${API_BASE_URL}/upload`, {
-      method: "POST",
-      headers,
-      body,
-    });
-    const data = await response.json();
-    const appUrl = (data as any).app_url;
-    if (!appUrl) {
-      logger.error("Uploading the build failed:", data);
+      const fetch = (await import("node-fetch")).default;
+      logger.log(`Uploading: ${buildPath}`);
+      const response = await fetch(`${API_BASE_URL}/upload`, {
+        method: "POST",
+        headers,
+        body,
+      });
+      const data = await response.json();
+      appUrl = (data as any).app_url;
+      if (!appUrl) {
+        logger.error("Uploading the build failed:", data);
+      }
     }
     process.env[envVarKeyForBuild(this.project.name)] = appUrl;
   }

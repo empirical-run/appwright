@@ -90,44 +90,50 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
       );
     }
     const buildPath = this.project.use.buildPath!;
-    logger.log(`Uploading: ${buildPath}`);
-    const isUrl = buildPath.startsWith("http");
-    let body;
-    let headers = {
-      Authorization: getAuthHeader(),
-    };
-    if (isUrl) {
-      body = new URLSearchParams({
-        url: buildPath,
-        visibility: "team",
-        storage: "url",
-        name: this.projectName,
-      });
+    const isHttpUrl = buildPath.startsWith("http");
+    const isLambdaTestUrl = buildPath.startsWith("lt://");
+    let appUrl: string | undefined = undefined;
+    if (isLambdaTestUrl) {
+      appUrl = buildPath;
     } else {
-      if (!fs.existsSync(buildPath)) {
-        throw new Error(`Build file not found: ${buildPath}`);
+      let body;
+      let headers = {
+        Authorization: getAuthHeader(),
+      };
+      if (isHttpUrl) {
+        body = new URLSearchParams({
+          url: buildPath,
+          visibility: "team",
+          storage: "url",
+          name: this.projectName,
+        });
+      } else {
+        if (!fs.existsSync(buildPath)) {
+          throw new Error(`Build file not found: ${buildPath}`);
+        }
+        const form = new FormData();
+        form.append("visibility", "team");
+        form.append("storage", "file");
+        form.append("appFile", fs.createReadStream(buildPath));
+        form.append("name", this.projectName);
+        headers = { ...headers, ...form.getHeaders() };
+        body = form;
       }
-      const form = new FormData();
-      form.append("visibility", "team");
-      form.append("storage", "file");
-      form.append("appFile", fs.createReadStream(buildPath));
-      form.append("name", this.projectName);
-      headers = { ...headers, ...form.getHeaders() };
-      body = form;
-    }
-    const fetch = (await import("node-fetch")).default;
-    const response = await fetch(
-      `https://manual-api.lambdatest.com/app/upload/realDevice`,
-      {
-        method: "POST",
-        headers,
-        body,
-      },
-    );
-    const data = await response.json();
-    const appUrl = (data as any).app_url;
-    if (!appUrl) {
-      logger.error("Uploading the build failed:", data);
+      logger.log(`Uploading: ${buildPath}`);
+      const fetch = (await import("node-fetch")).default;
+      const response = await fetch(
+        `https://manual-api.lambdatest.com/app/upload/realDevice`,
+        {
+          method: "POST",
+          headers,
+          body,
+        },
+      );
+      const data = await response.json();
+      appUrl = (data as any).app_url;
+      if (!appUrl) {
+        logger.error("Uploading the build failed:", data);
+      }
     }
     process.env[envVarKeyForBuild(this.project.name)] = appUrl;
   }
