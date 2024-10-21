@@ -317,7 +317,7 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
         autoGrantPermissions: true,
         autoAcceptAlerts: true,
         isRealMobile: true,
-        "appium:settings[snapshotMaxDepth]": 62,
+        snapshotMaxDepth: 62,
       },
     };
   }
