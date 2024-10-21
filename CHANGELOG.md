@@ -1,5 +1,11 @@
 # appwright
 
+## 0.1.24
+
+### Patch Changes
+
+- 89afbf5: fix: added try catch in close session
+
 ## 0.1.23
 
 ### Patch Changes
