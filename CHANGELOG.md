@@ -1,5 +1,11 @@
 # appwright
 
+## 0.1.25
+
+### Patch Changes
+
+- ed5f069: chore: upgrade llm/vision to 0.9.12
+
 ## 0.1.24
 
 ### Patch Changes
