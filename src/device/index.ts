@@ -339,6 +339,17 @@ export class Device {
     return await this.webDriverClient.takeScreenshot();
   }
 
+  /**
+   * [iOS Only]
+   * Scroll the screen from 0.2 to 0.8 of the screen height.
+   * This can be used for controlled scroll, for auto scroll checkout locator.scroll()
+   *
+   * **Usage:**
+   * ```js
+   * await device.scroll();
+   * ```
+   *
+   */
   @boxedStep
   async scroll(): Promise<void> {
     const driverSize = await this.webDriverClient.getWindowRect();

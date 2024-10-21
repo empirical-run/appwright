@@ -89,3 +89,11 @@ To check if an element is visible on the screen, you can use the `isVisible` met
 ```ts
 const isVisible = await device.getByText('Playwright').isVisible();
 ```
+
+## Scroll screen
+
+To scroll the screen, you can use the `scroll` method.
+
+```ts
+await device.getByText("Playwright").scroll(ScrollDirection.DOWN);
+```
