@@ -13,6 +13,7 @@ import { uploadImageToBS } from "../providers/browserstack/utils";
 import { uploadImageToLambdaTest } from "../providers/lambdatest/utils";
 import { z } from "zod";
 import { LLMModel } from "@empiricalrun/llm";
+import { logger } from "../logger";
 
 export class Device {
   constructor(
@@ -72,7 +73,11 @@ export class Device {
   // TODO: Add @boxedStep decorator here; disabled because it breaks persistentDevice
   // as test.step will throw
   async close() {
-    await this.webDriverClient.deleteSession();
+    try {
+      await this.webDriverClient.deleteSession();
+    } catch (e) {
+      logger.error(`close:`, e);
+    }
   }
 
   /**

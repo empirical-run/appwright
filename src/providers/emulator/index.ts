@@ -14,6 +14,7 @@ import {
 } from "../appium";
 import { FullProject } from "@playwright/test";
 import { validateBuildPath } from "../../utils";
+import { logger } from "../../logger";
 
 export class EmulatorProvider implements DeviceProvider {
   sessionId?: string;
@@ -23,7 +24,7 @@ export class EmulatorProvider implements DeviceProvider {
     appBundleId: string | undefined,
   ) {
     if (appBundleId) {
-      console.log(
+      logger.log(
         `Bundle id is specified (${appBundleId}) but ignored for Emulator provider.`,
       );
     }

@@ -78,7 +78,7 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
       );
     }
     const buildPath = this.project.use.buildPath!;
-    console.log(`Uploading: ${buildPath}`);
+    logger.log(`Uploading: ${buildPath}`);
     const isUrl = buildPath.startsWith("http");
     let body;
     let headers = {
@@ -204,7 +204,7 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
         // Ensure file stream is closed even in case of an error
         fileStream.on("finish", () => {
           fs.renameSync(tempPathForWriting, pathToTestVideo);
-          console.log(`Download finished and file closed: ${pathToTestVideo}`);
+          logger.log(`Download finished and file closed: ${pathToTestVideo}`);
           resolve({ path: pathToTestVideo, contentType: "video/mp4" });
         });
 

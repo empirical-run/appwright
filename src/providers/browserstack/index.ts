@@ -72,7 +72,7 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
   ) {
     this.project = project;
     if (appBundleId) {
-      console.log(
+      logger.log(
         `Bundle id is specified (${appBundleId}) but ignored for BrowserStack provider.`,
       );
     }
@@ -94,7 +94,7 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
       );
     }
     const buildPath = this.project.use.buildPath!;
-    console.log(`Uploading: ${buildPath}`);
+    logger.log(`Uploading: ${buildPath}`);
     const isUrl = buildPath.startsWith("http");
     let body;
     let headers = {
@@ -122,7 +122,7 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
     const data = await response.json();
     const appUrl = (data as any).app_url;
     if (!appUrl) {
-      console.error("Uploading the build failed:", data);
+      logger.error("Uploading the build failed:", data);
     }
     process.env[envVarKeyForBuild(this.project.name)] = appUrl;
   }
@@ -232,12 +232,12 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
         // Ensure file stream is closed even in case of an error
         fileStream.on("finish", () => {
           fs.renameSync(tempPathForWriting, pathToTestVideo);
-          console.log(`Download finished and file closed: ${pathToTestVideo}`);
+          logger.log(`Download finished and file closed: ${pathToTestVideo}`);
           resolve({ path: pathToTestVideo, contentType: "video/mp4" });
         });
 
         fileStream.on("error", (err) => {
-          console.error(`Failed to write file: ${err.message}`);
+          logger.error(`Failed to write file: ${err.message}`);
           reject(err);
         });
       });
