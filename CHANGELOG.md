@@ -1,5 +1,11 @@
 # appwright
 
+## 0.1.26
+
+### Patch Changes
+
+- c86131d: fix: added boxed step in scroll
+
 ## 0.1.25
 
 ### Patch Changes
