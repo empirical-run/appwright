@@ -4,6 +4,7 @@ import fs from "fs";
 import path from "path";
 import ffmpeg from "fluent-ffmpeg";
 import ffmpegInstaller from "@ffmpeg-installer/ffmpeg";
+import { logger } from "./logger";
 
 const videoStoreBasePath = `${process.cwd()}/playwright-report/data/videos-store`;
 
@@ -19,10 +20,11 @@ class VideoDownloader implements Reporter {
   }
 
   onTestBegin(test: TestCase, result: TestResult) {
-    console.log(`Starting test: ${test.title} on worker ${result.workerIndex}`);
+    logger.log(`Starting test: ${test.title} on worker ${result.workerIndex}`);
   }
 
   onTestEnd(test: TestCase, result: TestResult) {
+    logger.log(`Ending test: ${test.title} on worker ${result.workerIndex}`);
     const sessionIdAnnotation = test.annotations.find(
       ({ type }) => type === "sessionId",
     );
@@ -72,7 +74,7 @@ class VideoDownloader implements Reporter {
           maxIntervalTime -= 500;
           if (maxIntervalTime <= 0) {
             clearInterval(interval);
-            console.error("Timed out waiting for worker to finish");
+            logger.error("Timed out waiting for worker to finish");
             resolve(null);
           }
           if (fs.existsSync(expectedVideoPath)) {
@@ -96,7 +98,7 @@ class VideoDownloader implements Reporter {
                   outputPath: trimmedFileName,
                 });
               } catch (e) {
-                console.error("Failed to trim video:", e);
+                logger.error("Failed to trim video:", e);
               }
             }
             result.attachments.push({
@@ -112,6 +114,7 @@ class VideoDownloader implements Reporter {
     }
   }
   async onEnd() {
+    logger.log(`Triggered onEnd`);
     await Promise.allSettled(this.downloadPromises);
   }
 }
@@ -127,7 +130,7 @@ function trimVideo({
   durationSecs: number;
   outputPath: string;
 }): Promise<string> {
-  console.log(`Attemping to trim video: ${originalVideoPath}`);
+  logger.log(`Attemping to trim video: ${originalVideoPath}`);
   const copyName = `draft-for-${outputPath}`;
   const dirPath = path.dirname(originalVideoPath);
   const copyFullPath = path.join(dirPath, copyName);
@@ -140,7 +143,7 @@ function trimVideo({
       .setDuration(durationSecs)
       .output(fullOutputPath)
       .on("end", () => {
-        console.log(`Trimmed video saved at: ${fullOutputPath}`);
+        logger.log(`Trimmed video saved at: ${fullOutputPath}`);
         fs.unlinkSync(copyFullPath);
         resolve(fullOutputPath);
       })

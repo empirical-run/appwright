@@ -315,7 +315,7 @@ export async function getApkDetails(buildPath: string): Promise<{
     const { stdout, stderr } = await execPromise(command);
 
     if (stderr) {
-      console.error(`getApkDetails: ${stderr}`);
+      logger.error(`getApkDetails: ${stderr}`);
       throw new Error(`Error executing aapt: ${stderr}`);
     }
 

@@ -9,6 +9,7 @@ import { boxedStep } from "../utils";
 import { z } from "zod";
 import { LLMModel } from "@empiricalrun/llm";
 import { ExtractType } from "../types";
+import { logger } from "../logger";
 
 export interface AppwrightVision {
   /**
@@ -94,7 +95,7 @@ export class VisionProvider {
     const scaleFactorWidth = imageSize.width / driverSize.width;
     const scaleFactorHeight = imageSize.height / driverSize.height;
     if (scaleFactorWidth !== scaleFactorHeight) {
-      console.warn(
+      logger.warn(
         `Scale factors are different: ${scaleFactorWidth} vs ${scaleFactorHeight}`,
       );
     }

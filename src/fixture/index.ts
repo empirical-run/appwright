@@ -10,6 +10,7 @@ import {
 } from "../types";
 import { Device } from "../device";
 import { createDeviceProvider, getProviderClass } from "../providers";
+import { logger } from "../logger";
 
 type TestLevelFixtures = {
   /**
@@ -79,7 +80,7 @@ export const test = base.extend<TestLevelFixtures, WorkerLevelFixtures>({
       );
       await use(device);
       await device.close();
-      console.log(`Teardown for worker ${workerIndex}, will download video`);
+      logger.log(`Teardown for worker ${workerIndex}, will download video`);
       const providerName = (project as FullProject<AppwrightConfig>).use.device
         ?.provider;
       const providerClass = getProviderClass(providerName!);

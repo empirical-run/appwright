@@ -5,6 +5,7 @@ import {
 } from "@playwright/test";
 import { AppwrightConfig } from "./types";
 import path from "path";
+import { logger } from "./logger";
 
 const resolveGlobalSetup = () => {
   const pathToInstalledAppwright = require.resolve(".");
@@ -43,7 +44,7 @@ const defaultConfig: PlaywrightTestConfig<AppwrightConfig> = {
 export function defineConfig(config: PlaywrightTestConfig<AppwrightConfig>) {
   const hasGlobalSetup = config.globalSetup !== undefined;
   if (hasGlobalSetup) {
-    console.warn(
+    logger.warn(
       "The `globalSetup` parameter in config will be ignored. See https://github.com/empirical-run/appwright/issues/57",
     );
     delete config.globalSetup;

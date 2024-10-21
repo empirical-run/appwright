@@ -26,7 +26,7 @@ export class LocalDeviceProvider implements DeviceProvider {
     appBundleId: string | undefined,
   ) {
     if (appBundleId) {
-      console.log(
+      logger.log(
         `Bundle id is specified (${appBundleId}) but ignored for local device provider.`,
       );
     }

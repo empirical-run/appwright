@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { spawn } from "child_process";
+import { logger } from "../logger";
 
 function cmd(
   command: string[],
@@ -48,7 +49,7 @@ async function runPlaywrightCmd(args: string) {
   try {
     await runPlaywrightCmd(pwOptions.join(" "));
   } catch (error: any) {
-    console.error("Error while running playwright test:", error.message);
+    logger.error("Error while running playwright test:", error.message);
     process.exit(1);
   }
 })();
