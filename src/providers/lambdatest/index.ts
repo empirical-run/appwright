@@ -305,6 +305,7 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
         platformName: platformName,
         queueTimeout: 600,
         idleTimeout: 600,
+        useResourcesForOrientationDetection: true,
         app: process.env[envVarKey],
         devicelog: true,
         video: true,
