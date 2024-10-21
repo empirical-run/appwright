@@ -100,7 +100,12 @@ export class VisionProvider {
       );
     }
     const tapTargetX = x / scaleFactorWidth;
-    const tapTargetY = y / scaleFactorHeight;
+    // This uses the width scale factor because getWindowRect on LambdaTest returns a smaller
+    // height value than the screenshot height, which causes disproportionate scaling
+    // for width and height.
+    // For example, Pixel 8 screenshot is 1080 (w) x 2400 (h), but LambdaTest returns
+    // 1080 (w) x 2142 (h) for getWindowRect.
+    const tapTargetY = y / scaleFactorWidth;
     await this.device.tap({
       x: tapTargetX,
       y: tapTargetY,

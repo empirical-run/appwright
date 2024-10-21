@@ -28,6 +28,18 @@ type LambdatestSessionDetails = {
   video_url: string;
 };
 
+const browserStackToLambdaTest: {
+  deviceName: Record<string, string>;
+  osVersion: Record<string, string>;
+} = {
+  deviceName: {
+    "Google Pixel 8": "Pixel 8",
+  },
+  osVersion: {
+    "14.0": "14",
+  },
+};
+
 const API_BASE_URL =
   "https://mobile-api.lambdatest.com/mobile-automation/api/v1";
 
@@ -248,6 +260,29 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
     return responseData;
   }
 
+  private deviceInfoForSession() {
+    let deviceName = this.project.use.device?.name;
+    let osVersion = (this.project.use.device as LambdaTestConfig).osVersion;
+    if (
+      deviceName &&
+      Object.keys(browserStackToLambdaTest.deviceName).includes(deviceName)
+    ) {
+      // we map BrowserStack names to LambdaTest for better usability
+      deviceName = browserStackToLambdaTest.deviceName[deviceName];
+    }
+    if (
+      osVersion &&
+      Object.keys(browserStackToLambdaTest.osVersion).includes(osVersion)
+    ) {
+      osVersion = browserStackToLambdaTest.osVersion[osVersion]!;
+    }
+    return {
+      deviceName,
+      platformVersion: osVersion,
+      deviceOrientation: this.project.use.device?.orientation,
+    };
+  }
+
   private createConfig() {
     const platformName = this.project.use.platform;
     const envVarKey = envVarKeyForBuild(this.project.name);
@@ -265,14 +300,11 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
       key: process.env.LAMBDATEST_ACCESS_KEY,
       hostname: "mobile-hub.lambdatest.com",
       capabilities: {
+        ...this.deviceInfoForSession(),
         appiumVersion: "2.3.0",
         platformName: platformName,
         queueTimeout: 600,
         idleTimeout: 600,
-        deviceName: this.project.use.device?.name,
-        deviceOrientation: this.project.use.device?.orientation,
-        platformVersion: (this.project.use.device as LambdaTestConfig)
-          .osVersion,
         app: process.env[envVarKey],
         devicelog: true,
         video: true,
