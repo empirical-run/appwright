@@ -116,6 +116,7 @@ Follow the steps mentioned in ${androidSimulatorConfigDocLink} to run test on An
         "appium:autoAcceptAlerts": true,
         "appium:fullReset": true,
         "appium:deviceOrientation": this.project.use.device?.orientation,
+        "appium:settings[snapshotMaxDepth]": 62,
       },
     };
   }

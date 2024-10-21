@@ -118,6 +118,7 @@ To specify a device, use the udid property. Run "adb devices" to get the UDID fo
         "appium:autoAcceptAlerts": true,
         "appium:fullReset": true,
         "appium:deviceOrientation": this.project.use.device?.orientation,
+        "appium:settings[snapshotMaxDepth]": 62,
       },
     };
   }

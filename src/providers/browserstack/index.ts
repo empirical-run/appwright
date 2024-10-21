@@ -316,6 +316,7 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
         "appium:app": process.env[envVarKey],
         "appium:autoAcceptAlerts": true,
         "appium:fullReset": true,
+        "appium:settings[snapshotMaxDepth]": 62,
       },
     };
   }
