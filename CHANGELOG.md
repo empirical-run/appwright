@@ -1,5 +1,12 @@
 # appwright
 
+## 0.1.29
+
+### Patch Changes
+
+- 896541e: support bs:// and lt:// app urls for providers
+- b2de667: feat: log device.pause and skip it on CI environments
+
 ## 0.1.28
 
 ### Patch Changes
