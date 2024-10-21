@@ -321,10 +321,20 @@ export class Device {
   }
 
   async pause() {
+    const skipPause = process.env.CI === "true";
+    if (skipPause) {
+      return;
+    }
+    logger.log(`device.pause: Use Appium Inspector to attach to the session.`);
+    let iterations = 0;
     // eslint-disable-next-line no-constant-condition
     while (true) {
       await new Promise((resolve) => setTimeout(resolve, 20_000));
       await this.webDriverClient.takeScreenshot();
+      iterations += 1;
+      if (iterations % 3 === 0) {
+        logger.log(`device.pause: ${iterations * 20} secs elapsed.`);
+      }
     }
   }
 
