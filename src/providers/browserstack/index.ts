@@ -94,7 +94,7 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
       );
     }
     const buildPath = this.project.use.buildPath!;
-    const isHttpUrl = buildPath.startsWith("http://");
+    const isHttpUrl = buildPath.startsWith("http");
     const isBrowserStackUrl = buildPath.startsWith("bs://");
     let appUrl: string | undefined = undefined;
     if (isBrowserStackUrl) {
