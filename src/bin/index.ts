@@ -49,7 +49,7 @@ async function runPlaywrightCmd(args: string) {
   try {
     await runPlaywrightCmd(pwOptions.join(" "));
   } catch (error: any) {
-    logger.error("Error while running playwright test:", error.message);
+    logger.error(`Error while running playwright test: ${error}`);
     process.exit(1);
   }
 })();
