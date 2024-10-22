@@ -1,5 +1,12 @@
 # appwright
 
+## 0.1.32
+
+### Patch Changes
+
+- 070625f: fix: handle ffmpeg error on trimming video
+- 56b131e: feat: decorate device methods for reporting
+
 ## 0.1.31
 
 ### Patch Changes
