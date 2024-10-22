@@ -136,7 +136,7 @@ function trimVideo({
   const copyFullPath = path.join(dirPath, copyName);
   const fullOutputPath = path.join(dirPath, outputPath);
   fs.copyFileSync(originalVideoPath, copyFullPath);
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     ffmpeg(copyFullPath)
       .setFfmpegPath(ffmpegInstaller.path)
       .setStartTime(startSecs)
@@ -146,6 +146,10 @@ function trimVideo({
         logger.log(`Trimmed video saved at: ${fullOutputPath}`);
         fs.unlinkSync(copyFullPath);
         resolve(fullOutputPath);
+      })
+      .on("error", (err) => {
+        logger.error("Failed to trim video:", err);
+        reject(err);
       })
       .run();
   });
