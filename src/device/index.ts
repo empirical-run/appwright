@@ -70,9 +70,10 @@ export class Device {
    * await device.close();
    * ```
    */
-  // TODO: Add @boxedStep decorator here; disabled because it breaks persistentDevice
-  // as test.step will throw
   async close() {
+    // TODO: Add @boxedStep decorator here
+    // Disabled because it breaks persistentDevice as test.step will throw as test is
+    // undefined when the function is called
     try {
       await this.webDriverClient.deleteSession();
     } catch (e) {
@@ -234,6 +235,7 @@ export class Device {
     return isAndroid ? Platform.ANDROID : Platform.IOS;
   }
 
+  @boxedStep
   async terminateApp(bundleId?: string) {
     if (!this.bundleId && !bundleId) {
       throw new Error("bundleId is required to terminate the app.");
@@ -247,6 +249,7 @@ export class Device {
     ]);
   }
 
+  @boxedStep
   async activateApp(bundleId?: string) {
     if (!this.bundleId && !bundleId) {
       throw new Error("bundleId is required to activate the app.");
@@ -271,6 +274,7 @@ export class Device {
    *
    * @returns Returns the text content of the clipboard in base64 encoded string.
    */
+  @boxedStep
   async getClipboardText(): Promise<string> {
     if (this.getPlatform() == Platform.ANDROID) {
       return await this.webDriverClient.getClipboard();
@@ -304,6 +308,7 @@ export class Device {
    * @param imagePath path to the image file that will be used as the mock camera view.
    * @returns
    */
+  @boxedStep
   async setMockCameraView(imagePath: string): Promise<void> {
     if (this.provider == "browserstack") {
       const imageURL = await uploadImageToBS(imagePath);
@@ -320,6 +325,7 @@ export class Device {
     }
   }
 
+  @boxedStep
   async pause() {
     // eslint-disable-next-line no-constant-condition
     while (true) {
@@ -328,6 +334,7 @@ export class Device {
     }
   }
 
+  @boxedStep
   async waitForTimeout(timeout: number) {
     await new Promise((resolve) => setTimeout(resolve, timeout));
   }
@@ -335,6 +342,7 @@ export class Device {
   /**
    * Get a screenshot of the current screen as a base64 encoded string.
    */
+  @boxedStep
   async screenshot(): Promise<string> {
     return await this.webDriverClient.takeScreenshot();
   }
