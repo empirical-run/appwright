@@ -46,8 +46,11 @@ export class Device {
   }
 
   beta = {
-    tap: async (prompt: string): Promise<{ x: number; y: number }> => {
-      return await this.vision().tap(prompt);
+    tap: async (
+      prompt: string,
+      options?: { useCache?: boolean },
+    ): Promise<{ x: number; y: number }> => {
+      return await this.vision().tap(prompt, options);
     },
 
     query: async <T extends z.ZodType>(
