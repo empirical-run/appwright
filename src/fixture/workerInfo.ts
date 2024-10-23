@@ -102,13 +102,13 @@ export class WorkerInfoStore {
     nth: number,
   ): Promise<number | undefined> {
     const info = await this.getWorkerFromDisk(idx);
-    const firstTestStartTime = info?.startTime?.beforeAppiumSession;
+    const firstTestStartTime = info?.startTime?.afterAppiumSession;
     if (!info || !info.tests[nth] || !info.startTime || !firstTestStartTime) {
       return undefined;
     } else {
       const testStart = new Date(info.tests[nth].startTime);
-      const firstTestStart = new Date(info.startTime.beforeAppiumSession);
-      return testStart.getTime() - firstTestStart.getTime();
+      const firstTestStart = new Date(info.startTime.afterAppiumSession);
+      return (testStart.getTime() - firstTestStart.getTime()) / 1000;
     }
   }
 }

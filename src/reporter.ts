@@ -108,18 +108,12 @@ class VideoDownloader implements Reporter {
               // In this case, we use the start time of the second test to
               // trim the video. This is not perfect, but it's better than attaching
               // the full video.
-              const secondTestOffset =
-                await getSecondTestStartOffset(workerIndex);
+              videoDuration = await getSecondTestStartOffset(workerIndex);
               test.annotations.push({
                 type: "videoInfo",
                 description:
                   "This is the first test in worker, so video includes setup.",
               });
-              if (!secondTestOffset) {
-                videoDuration = undefined;
-              } else {
-                videoDuration = secondTestOffset / 1000;
-              }
             }
             if (startTime && videoDuration) {
               const trimSkipPoint =
