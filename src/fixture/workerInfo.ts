@@ -96,4 +96,13 @@ export class WorkerInfoStore {
     }
     return this.saveWorkerToDisk(idx, info);
   }
+
+  async getTestStartTime(idx: number, nth: number): Promise<Date | undefined> {
+    const info = await this.getWorkerFromDisk(idx);
+    if (!info || !info.tests[nth]) {
+      return undefined;
+    } else {
+      return new Date(info.tests[nth].startTime);
+    }
+  }
 }

@@ -95,15 +95,24 @@ class VideoDownloader implements Reporter {
             const trimmedFileName = `worker-${workerIndex}-trimmed-${test.id}.mp4`;
             const workerStart = await workerStartTime(workerIndex);
             let pathToAttach = expectedVideoPath;
-            if (startTime.getTime() > workerStart.getTime()) {
+            let testStartTime: Date | undefined = startTime;
+            if (startTime.getTime() < workerStart.getTime()) {
+              // This is the first test running in the worker
+              //
               // The startTime for the first test in the worker tends to be
-              // before worker (session) start time. This would have been manageable
+              // before worker (session) start time, because worker start time is counted
+              // after the Appium server session is created. This would have been manageable
               // if the `duration` included the worker setup time, but the duration only
               // covers the test method execution time.
-              // So in this case, we are not going to trim.
-              // TODO: We can use the startTime of the second test in the worker
+              //
+              // In this case, we use the start time of the second test to
+              // trim the video. This is not perfect, but it's better than attaching
+              // the full video.
+              testStartTime = await getSecondTestStartTime(workerIndex);
+            }
+            if (testStartTime) {
               const trimSkipPoint =
-                (startTime.getTime() - workerStart.getTime()) / 1000;
+                (testStartTime.getTime() - workerStart.getTime()) / 1000;
               try {
                 pathToAttach = await trimVideo({
                   originalVideoPath: expectedVideoPath,
@@ -148,7 +157,9 @@ function trimVideo({
   durationSecs: number;
   outputPath: string;
 }): Promise<string> {
-  logger.log(`Attemping to trim video: ${originalVideoPath}`);
+  logger.log(
+    `Attemping to trim video: ${originalVideoPath} at start: ${startSecs} and duration: ${durationSecs} to ${outputPath}`,
+  );
   const copyName = `draft-for-${outputPath}`;
   const dirPath = path.dirname(originalVideoPath);
   const copyFullPath = path.join(dirPath, copyName);
@@ -179,6 +190,11 @@ function trimVideo({
 async function workerStartTime(idx: number): Promise<Date> {
   const workerInfoStore = new WorkerInfoStore();
   return workerInfoStore.getWorkerStartTime(idx);
+}
+
+async function getSecondTestStartTime(idx: number): Promise<Date | undefined> {
+  const workerInfoStore = new WorkerInfoStore();
+  return workerInfoStore.getTestStartTime(idx, 1);
 }
 
 export default VideoDownloader;
