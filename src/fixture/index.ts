@@ -1,6 +1,4 @@
 import { test as base, FullProject } from "@playwright/test";
-import fs from "fs";
-import path from "path";
 
 import {
   AppwrightLocator,
@@ -11,6 +9,8 @@ import {
 import { Device } from "../device";
 import { createDeviceProvider, getProviderClass } from "../providers";
 import { logger } from "../logger";
+import { WorkerInfoStore } from "./workerInfo";
+import { basePath } from "../utils";
 
 type TestLevelFixtures = {
   /**
@@ -25,12 +25,6 @@ type TestLevelFixtures = {
    * during the test.
    */
   device: Device;
-
-  /**
-   * Saves the test video after completion and attach it to the test report.
-   * Currently, this functionality is supported only for BrowserStack and LambdaTest.
-   */
-  saveVideo: void;
 };
 
 type WorkerLevelFixtures = {
@@ -65,18 +59,20 @@ export const test = base.extend<TestLevelFixtures, WorkerLevelFixtures>({
   persistentDevice: [
     async ({}, use, workerInfo) => {
       const { project, workerIndex } = workerInfo;
+      const beforeSession = new Date();
       const deviceProvider = createDeviceProvider(project);
       const device = await deviceProvider.getDevice();
       const sessionId = deviceProvider.sessionId;
-      // Save session start time to disk for the reporter to use (to trim video)
-      const startTime = new Date();
-      const basePath = `${process.cwd()}/playwright-report/data/videos-store`;
-      if (!fs.existsSync(basePath)) {
-        fs.mkdirSync(basePath);
+      if (!sessionId) {
+        throw new Error("Worker must have a sessionId.");
       }
-      fs.writeFileSync(
-        path.join(basePath, `worker-${workerIndex}-start-time`),
-        startTime.toISOString(),
+      const afterSession = new Date();
+      const workerInfoStore = new WorkerInfoStore();
+      await workerInfoStore.saveWorkerStartTime(
+        workerIndex,
+        sessionId,
+        beforeSession,
+        afterSession,
       );
       await use(device);
       await device.close();
@@ -85,7 +81,7 @@ export const test = base.extend<TestLevelFixtures, WorkerLevelFixtures>({
         ?.provider;
       const providerClass = getProviderClass(providerName!);
       const fileName = `worker-${workerIndex}-video`;
-      await providerClass.downloadVideo(sessionId, basePath, fileName);
+      await providerClass.downloadVideo(sessionId, basePath(), fileName);
     },
     { scope: "worker" },
   ],
