@@ -1,5 +1,11 @@
 # appwright
 
+## 0.1.34
+
+### Patch Changes
+
+- 77b8cd1: fix: ffmpeg error logging
+
 ## 0.1.33
 
 ### Patch Changes
