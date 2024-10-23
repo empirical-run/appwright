@@ -76,6 +76,7 @@ export const test = base.extend<TestLevelFixtures, WorkerLevelFixtures>({
       );
       await use(device);
       await device.close();
+      await workerInfoStore.saveWorkerEndTime(workerIndex, new Date());
       logger.log(`Teardown for worker ${workerIndex}, will download video`);
       const providerName = (project as FullProject<AppwrightConfig>).use.device
         ?.provider;
