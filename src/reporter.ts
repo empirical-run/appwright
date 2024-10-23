@@ -63,6 +63,10 @@ class VideoDownloader implements Reporter {
     } else {
       // This is a test that ran on `persistentDevice` fixture
       const { workerIndex, startTime, duration } = result;
+      test.annotations.push({
+        type: "workerInfo",
+        description: `Ran on worker #${workerIndex}.`,
+      });
       if (duration <= 0) {
         // Skipped tests
         return;
@@ -96,6 +100,10 @@ class VideoDownloader implements Reporter {
                   startSecs: trimSkipPoint,
                   durationSecs: duration / 1000,
                   outputPath: trimmedFileName,
+                });
+                test.annotations.push({
+                  type: "videoError",
+                  description: `Unable to trim video, attaching full video instead. Test starts at ${trimSkipPoint} secs.`,
                 });
               } catch (e) {
                 logger.error("Failed to trim video:", e);
@@ -147,8 +155,11 @@ function trimVideo({
         fs.unlinkSync(copyFullPath);
         resolve(fullOutputPath);
       })
+      .on("stderr", (stderrLine) => {
+        logger.error("ffmpeg stderr:", stderrLine);
+      })
       .on("error", (err) => {
-        logger.error("Failed to trim video:", err);
+        logger.error("ffmpeg error:", err);
         reject(err);
       })
       .run();
