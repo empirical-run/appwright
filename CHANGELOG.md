@@ -1,5 +1,14 @@
 # appwright
 
+## 0.1.33
+
+### Patch Changes
+
+- 4c3c3ec: chore: improve logs for video trimming job
+- 61fd8d2: fix: added option for caching in vision tap calls
+- fc9879c: feat: capture persistentDevice worker info in a file on disk
+- 3dbf6ba: docs: fix persistent device parallelism section
+
 ## 0.1.32
 
 ### Patch Changes
