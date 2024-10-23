@@ -47,7 +47,7 @@ export class WorkerInfoStore {
     return JSON.parse(fs.readFileSync(filePath, "utf-8")) as WorkerInfo;
   }
 
-  async getWorkerStartTime(idx: number) {
+  async getWorkerVideoStartTime(idx: number) {
     const info = await this.getWorkerFromDisk(idx);
     if (!info || !info.startTime) {
       throw new Error(`Worker start time info is not available.`);
@@ -97,12 +97,18 @@ export class WorkerInfoStore {
     return this.saveWorkerToDisk(idx, info);
   }
 
-  async getTestStartTime(idx: number, nth: number): Promise<Date | undefined> {
+  async getTestStartOffset(
+    idx: number,
+    nth: number,
+  ): Promise<number | undefined> {
     const info = await this.getWorkerFromDisk(idx);
-    if (!info || !info.tests[nth]) {
+    const firstTestStartTime = info?.startTime?.beforeAppiumSession;
+    if (!info || !info.tests[nth] || !info.startTime || !firstTestStartTime) {
       return undefined;
     } else {
-      return new Date(info.tests[nth].startTime);
+      const testStart = new Date(info.tests[nth].startTime);
+      const firstTestStart = new Date(info.startTime.beforeAppiumSession);
+      return testStart.getTime() - firstTestStart.getTime();
     }
   }
 }

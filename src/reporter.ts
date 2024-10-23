@@ -93,10 +93,10 @@ class VideoDownloader implements Reporter {
           if (fs.existsSync(expectedVideoPath)) {
             clearInterval(interval);
             const trimmedFileName = `worker-${workerIndex}-trimmed-${test.id}.mp4`;
-            const workerStart = await workerStartTime(workerIndex);
+            const videoStart = await workerVideoStartTime(workerIndex);
             let pathToAttach = expectedVideoPath;
-            let testStartTime: Date | undefined = startTime;
-            if (startTime.getTime() < workerStart.getTime()) {
+            let videoDuration: number | undefined = duration / 1000;
+            if (startTime.getTime() < videoStart.getTime()) {
               // This is the first test running in the worker
               //
               // The startTime for the first test in the worker tends to be
@@ -108,16 +108,29 @@ class VideoDownloader implements Reporter {
               // In this case, we use the start time of the second test to
               // trim the video. This is not perfect, but it's better than attaching
               // the full video.
-              testStartTime = await getSecondTestStartTime(workerIndex);
+              const secondTestOffset =
+                await getSecondTestStartOffset(workerIndex);
+              test.annotations.push({
+                type: "videoInfo",
+                description:
+                  "This is the first test in worker, so video includes setup.",
+              });
+              if (!secondTestOffset) {
+                videoDuration = undefined;
+              } else {
+                videoDuration = secondTestOffset / 1000;
+              }
             }
-            if (testStartTime) {
+            if (startTime && videoDuration) {
               const trimSkipPoint =
-                (testStartTime.getTime() - workerStart.getTime()) / 1000;
+                startTime.getTime() < videoStart.getTime()
+                  ? 0
+                  : (startTime.getTime() - videoStart.getTime()) / 1000;
               try {
                 pathToAttach = await trimVideo({
                   originalVideoPath: expectedVideoPath,
                   startSecs: trimSkipPoint,
-                  durationSecs: duration / 1000,
+                  durationSecs: videoDuration,
                   outputPath: trimmedFileName,
                 });
               } catch (e) {
@@ -189,14 +202,16 @@ function trimVideo({
   });
 }
 
-async function workerStartTime(idx: number): Promise<Date> {
+async function workerVideoStartTime(idx: number): Promise<Date> {
   const workerInfoStore = new WorkerInfoStore();
-  return workerInfoStore.getWorkerStartTime(idx);
+  return workerInfoStore.getWorkerVideoStartTime(idx);
 }
 
-async function getSecondTestStartTime(idx: number): Promise<Date | undefined> {
+async function getSecondTestStartOffset(
+  idx: number,
+): Promise<number | undefined> {
   const workerInfoStore = new WorkerInfoStore();
-  return workerInfoStore.getTestStartTime(idx, 1);
+  return workerInfoStore.getTestStartOffset(idx, 1);
 }
 
 export default VideoDownloader;
