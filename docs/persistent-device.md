@@ -25,27 +25,13 @@ Your suite can have a combination of both fixtures:
 
 ### Parallelism config
 
-By default, Appwright tests in a file are executed in sequential order. Appwright sets the
-`fullyParallel` config parameter in the Playwright test runner to `false`. This is
-required to support scenarios with `persistentDevice`.
+By default, Appwright tests in a file are executed in sequential order. Appwright inherits
+the default value for the `fullyParallel` config parameter from the Playwright test runner
+where it is set to `false`. This means test files are run in parallel, but tests in a file
+run sequentially.
 
-The downside of setting `fullyParallel: false` is that scheduling across workers can
-be sub-optimal. A large group of tests that depend on the same `persistentDevice`
-can skew worker utilization to just one worker. This can be solved by
-- Splitting tests into multiple groups (don't put all of them in one group)
-- Track worker utilization of the test run and make changes if required
-
-If your suite does not use `persistentDevice` you can set `fullyParallel: true` in
-your Appwright config file. This can be also configured for a file (e.g. a file that
-does not use `persistentDevice`).
-
-```ts
-// Set fullyParallel behavior for a file
-test.describe.configure({ mode: "parallel" });
-
-// Your tests go below
-// ...
-```
+You can set `fullyParallel: true` for your tests. This will create 1 or more workers,
+each with a `persistentDevice`.
 
 ### Structuring tests
 
