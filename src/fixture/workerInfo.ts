@@ -17,6 +17,7 @@ type WorkerInfo = {
         afterAppiumSession: string;
       }
     | undefined;
+  endTime?: string | undefined;
   tests: TestInWorkerInfo[];
 };
 
@@ -109,6 +110,19 @@ export class WorkerInfoStore {
       const testStart = new Date(info.tests[nth].startTime);
       const firstTestStart = new Date(info.startTime.afterAppiumSession);
       return (testStart.getTime() - firstTestStart.getTime()) / 1000;
+    }
+  }
+
+  async saveWorkerEndTime(idx: number, endTime: Date) {
+    const info = (await this.getWorkerFromDisk(idx))!;
+    info.endTime = endTime.toISOString();
+    return this.saveWorkerToDisk(idx, info);
+  }
+
+  async getWorkerEndTime(idx: number): Promise<Date | undefined> {
+    const info = await this.getWorkerFromDisk(idx);
+    if (info && info.endTime) {
+      return new Date(info.endTime);
     }
   }
 }

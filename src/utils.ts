@@ -89,3 +89,7 @@ export function longestDeterministicGroup(pattern: RegExp): string | undefined {
 export function basePath() {
   return path.join(process.cwd(), "playwright-report", "data", "videos-store");
 }
+
+export function workerVideoPath(idx: number) {
+  return path.join(basePath(), `worker-${idx}-video.mp4`);
+}
