@@ -44,7 +44,10 @@ export interface AppwrightVision {
    *
    * @param prompt that defines where on the screen the tap action should occur
    */
-  tap(prompt: string): Promise<{ x: number; y: number }>;
+  tap(
+    prompt: string,
+    options?: { useCache?: boolean },
+  ): Promise<{ x: number; y: number }>;
 }
 
 export class VisionProvider {
@@ -74,13 +77,16 @@ export class VisionProvider {
   }
 
   @boxedStep
-  async tap(prompt: string): Promise<{ x: number; y: number }> {
+  async tap(
+    prompt: string,
+    options?: { useCache?: boolean },
+  ): Promise<{ x: number; y: number }> {
     test.skip(
       !process.env.VISION_MODEL_ENDPOINT,
       "LLM vision based tap is not enabled. Set the VISION_MODEL_ENDPOINT environment variable to enable it",
     );
     const base64Image = await this.webDriverClient.takeScreenshot();
-    const coordinates = await getCoordinatesFor(prompt, base64Image);
+    const coordinates = await getCoordinatesFor(prompt, base64Image, options);
     if (coordinates.annotatedImage) {
       const random = Math.floor(1000 + Math.random() * 9000);
       const file = test.info().outputPath(`${random}.png`);
