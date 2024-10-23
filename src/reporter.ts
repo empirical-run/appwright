@@ -120,12 +120,12 @@ class VideoDownloader implements Reporter {
                   durationSecs: duration / 1000,
                   outputPath: trimmedFileName,
                 });
+              } catch (e) {
+                logger.error("Failed to trim video:", e);
                 test.annotations.push({
                   type: "videoError",
                   description: `Unable to trim video, attaching full video instead. Test starts at ${trimSkipPoint} secs.`,
                 });
-              } catch (e) {
-                logger.error("Failed to trim video:", e);
               }
             }
             result.attachments.push({
@@ -166,6 +166,7 @@ function trimVideo({
   const fullOutputPath = path.join(dirPath, outputPath);
   fs.copyFileSync(originalVideoPath, copyFullPath);
   return new Promise((resolve, reject) => {
+    let stdErrs = "";
     ffmpeg(copyFullPath)
       .setFfmpegPath(ffmpegInstaller.path)
       .setStartTime(startSecs)
@@ -177,10 +178,11 @@ function trimVideo({
         resolve(fullOutputPath);
       })
       .on("stderr", (stderrLine) => {
-        logger.error("ffmpeg stderr:", stderrLine);
+        stdErrs += stderrLine + "\n";
       })
       .on("error", (err) => {
         logger.error("ffmpeg error:", err);
+        logger.error("ffmpeg stderr:", stdErrs);
         reject(err);
       })
       .run();
