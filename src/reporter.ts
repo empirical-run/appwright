@@ -5,15 +5,15 @@ import path from "path";
 import ffmpeg from "fluent-ffmpeg";
 import ffmpegInstaller from "@ffmpeg-installer/ffmpeg";
 import { logger } from "./logger";
-
-const videoStoreBasePath = `${process.cwd()}/playwright-report/data/videos-store`;
+import { basePath } from "./utils";
+import { WorkerInfoStore } from "./fixture/workerInfo";
 
 class VideoDownloader implements Reporter {
   private downloadPromises: Promise<any>[] = [];
 
   onBegin() {
-    if (fs.existsSync(videoStoreBasePath)) {
-      fs.rmSync(videoStoreBasePath, {
+    if (fs.existsSync(basePath())) {
+      fs.rmSync(basePath(), {
         recursive: true,
       });
     }
@@ -21,6 +21,12 @@ class VideoDownloader implements Reporter {
 
   onTestBegin(test: TestCase, result: TestResult) {
     logger.log(`Starting test: ${test.title} on worker ${result.workerIndex}`);
+    const workerInfoStore = new WorkerInfoStore();
+    void workerInfoStore.saveTestStartTime(
+      result.workerIndex,
+      test.title,
+      new Date(),
+    );
   }
 
   onTestEnd(test: TestCase, result: TestResult) {
@@ -40,7 +46,7 @@ class VideoDownloader implements Reporter {
       const videoFileName = `${test.id}-${random}`;
       const downloadPromise = new Promise((resolve) => {
         provider
-          .downloadVideo(sessionId, videoStoreBasePath, videoFileName)
+          .downloadVideo(sessionId, basePath(), videoFileName)
           .then(
             (downloadedVideo: { path: string; contentType: string } | null) => {
               if (!downloadedVideo) {
@@ -71,7 +77,10 @@ class VideoDownloader implements Reporter {
         // Skipped tests
         return;
       }
-      const expectedVideoPath = `${videoStoreBasePath}/worker-${workerIndex}-video.mp4`;
+      const expectedVideoPath = path.join(
+        basePath(),
+        `worker-${workerIndex}-video.mp4`,
+      );
       const waitForWorkerToFinish = new Promise((resolve) => {
         let maxIntervalTime = 60 * 60 * 1000; // 1 hour in ms
         const interval = setInterval(async () => {
@@ -84,12 +93,13 @@ class VideoDownloader implements Reporter {
           if (fs.existsSync(expectedVideoPath)) {
             clearInterval(interval);
             const trimmedFileName = `worker-${workerIndex}-trimmed-${test.id}.mp4`;
-            const workerStart = workerStartTime(workerIndex);
+            const workerStart = await workerStartTime(workerIndex);
             let pathToAttach = expectedVideoPath;
             if (startTime.getTime() > workerStart.getTime()) {
               // The startTime for the first test in the worker tends to be
               // before worker (session) start time. This would have been manageable
-              // if the `duration` included the worker setup time, but it doesn't.
+              // if the `duration` included the worker setup time, but the duration only
+              // covers the test method execution time.
               // So in this case, we are not going to trim.
               // TODO: We can use the startTime of the second test in the worker
               const trimSkipPoint =
@@ -166,13 +176,9 @@ function trimVideo({
   });
 }
 
-function workerStartTime(idx: number): Date {
-  // TODO: can we make this unique for a session? avoids ios/android running
-  // into issues when running concurrently on local
-  const fileName = `worker-${idx}-start-time`;
-  const filePath = path.join(videoStoreBasePath, fileName);
-  const content = fs.readFileSync(filePath, "utf-8");
-  return new Date(content);
+async function workerStartTime(idx: number): Promise<Date> {
+  const workerInfoStore = new WorkerInfoStore();
+  return workerInfoStore.getWorkerStartTime(idx);
 }
 
 export default VideoDownloader;

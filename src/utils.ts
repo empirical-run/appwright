@@ -1,5 +1,6 @@
 import test from "@playwright/test";
 import fs from "fs";
+import path from "path";
 
 export function boxedStep(
   target: Function,
@@ -83,4 +84,8 @@ export function longestDeterministicGroup(pattern: RegExp): string | undefined {
     return undefined;
   }
   return longestString;
+}
+
+export function basePath() {
+  return path.join(process.cwd(), "playwright-report", "data", "videos-store");
 }
