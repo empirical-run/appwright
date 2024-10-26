@@ -30,6 +30,9 @@ export interface AppwrightVision {
       responseFormat?: T;
       model?: LLMModel;
       screenshot?: string;
+      telemetry?: {
+        tags?: string[];
+      };
     },
   ): Promise<ExtractType<T>>;
 
@@ -46,7 +49,12 @@ export interface AppwrightVision {
    */
   tap(
     prompt: string,
-    options?: { useCache?: boolean },
+    options?: {
+      useCache?: boolean;
+      telemetry?: {
+        tags?: string[];
+      };
+    },
   ): Promise<{ x: number; y: number }>;
 }
 
