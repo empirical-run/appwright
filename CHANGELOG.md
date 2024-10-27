@@ -1,5 +1,11 @@
 # appwright
 
+## 0.1.35
+
+### Patch Changes
+
+- ed4a96b: chore: update llm package
+
 ## 0.1.34
 
 ### Patch Changes
