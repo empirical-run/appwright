@@ -1,5 +1,11 @@
 # appwright
 
+## 0.1.36
+
+### Patch Changes
+
+- 3430e0e: feat: added telemetry for vision methods
+
 ## 0.1.35
 
 ### Patch Changes
