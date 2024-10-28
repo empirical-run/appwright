@@ -48,7 +48,12 @@ export class Device {
   beta = {
     tap: async (
       prompt: string,
-      options?: { useCache?: boolean },
+      options?: {
+        useCache?: boolean;
+        telemetry?: {
+          tags?: string[];
+        };
+      },
     ): Promise<{ x: number; y: number }> => {
       return await this.vision().tap(prompt, options);
     },
@@ -59,6 +64,9 @@ export class Device {
         responseFormat?: T;
         model?: LLMModel;
         screenshot?: string;
+        telemetry?: {
+          tags?: string[];
+        };
       },
     ): Promise<ExtractType<T>> => {
       return await this.vision().query(prompt, options);
