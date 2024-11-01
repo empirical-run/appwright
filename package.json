@@ -36,7 +36,7 @@
   "license": "Apache-2.0",
   "description": "E2E mobile app testing done right, with the Playwright test runner",
   "dependencies": {
-    "@empiricalrun/llm": "^0.9.19",
+    "@empiricalrun/llm": "^0.9.21",
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "@playwright/test": "^1.47.1",
     "appium": "^2.6.0",
