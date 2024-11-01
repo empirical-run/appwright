@@ -113,7 +113,12 @@ class VideoDownloader implements Reporter {
     }
   }
 
-  attachVideoToDeviceTest(
+  async onEnd() {
+    logger.log(`Triggered onEnd`);
+    await Promise.allSettled(this.downloadPromises);
+  }
+
+  private attachVideoToDeviceTest(
     test: TestCase,
     result: TestResult,
     providerClass: any,
@@ -142,11 +147,6 @@ class VideoDownloader implements Reporter {
         );
     });
     this.downloadPromises.push(downloadPromise);
-  }
-
-  async onEnd() {
-    logger.log(`Triggered onEnd`);
-    await Promise.allSettled(this.downloadPromises);
   }
 }
 
@@ -196,6 +196,11 @@ function trimVideo({
 async function workerStartTime(idx: number): Promise<Date> {
   const workerInfoStore = new WorkerInfoStore();
   return workerInfoStore.getWorkerStartTime(idx);
+}
+
+async function workerEndTime(idx: number): Promise<Date | undefined> {
+  const workerInfoStore = new WorkerInfoStore();
+  return workerInfoStore.getWorkerEndTime(idx);
 }
 
 export default VideoDownloader;
