@@ -81,7 +81,9 @@ export const test = base.extend<TestLevelFixtures, WorkerLevelFixtures>({
         ?.provider;
       const providerClass = getProviderClass(providerName!);
       const fileName = `worker-${workerIndex}-video`;
-      await providerClass.downloadVideo(sessionId, basePath(), fileName);
+      if (providerClass.downloadVideo) {
+        await providerClass.downloadVideo(sessionId, basePath(), fileName);
+      }
     },
     { scope: "worker" },
   ],

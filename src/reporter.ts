@@ -42,26 +42,7 @@ class VideoDownloader implements Reporter {
       const sessionId = sessionIdAnnotation.description;
       const providerName = providerNameAnnotation.description;
       const provider = getProviderClass(providerName!);
-      const random = Math.floor(1000 + Math.random() * 9000);
-      const videoFileName = `${test.id}-${random}`;
-      const downloadPromise = new Promise((resolve) => {
-        provider
-          .downloadVideo(sessionId, basePath(), videoFileName)
-          .then(
-            (downloadedVideo: { path: string; contentType: string } | null) => {
-              if (!downloadedVideo) {
-                resolve(null);
-                return;
-              }
-              result.attachments.push({
-                ...downloadedVideo,
-                name: "video",
-              });
-              resolve(downloadedVideo);
-            },
-          );
-      });
-      this.downloadPromises.push(downloadPromise);
+      this.attachVideoToDeviceTest(test, result, provider, sessionId!);
       const otherAnnotations = test.annotations.filter(
         ({ type }) => type !== "sessionId" && type !== "providerName",
       );
@@ -131,6 +112,38 @@ class VideoDownloader implements Reporter {
       this.downloadPromises.push(waitForWorkerToFinish);
     }
   }
+
+  attachVideoToDeviceTest(
+    test: TestCase,
+    result: TestResult,
+    providerClass: any,
+    sessionId: string,
+  ) {
+    const random = Math.floor(1000 + Math.random() * 9000);
+    const videoFileName = `${test.id}-${random}`;
+    if (!providerClass.downloadVideo) {
+      return;
+    }
+    const downloadPromise = new Promise((resolve) => {
+      providerClass
+        .downloadVideo(sessionId, basePath(), videoFileName)
+        .then(
+          (downloadedVideo: { path: string; contentType: string } | null) => {
+            if (!downloadedVideo) {
+              resolve(null);
+              return;
+            }
+            result.attachments.push({
+              ...downloadedVideo,
+              name: "video",
+            });
+            resolve(downloadedVideo);
+          },
+        );
+    });
+    this.downloadPromises.push(downloadPromise);
+  }
+
   async onEnd() {
     logger.log(`Triggered onEnd`);
     await Promise.allSettled(this.downloadPromises);

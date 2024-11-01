@@ -31,19 +31,6 @@ export interface DeviceProvider {
   getDevice(): Promise<Device>;
 
   /**
-   * Downloads the video of the test.
-   * Currently, this functionality is supported only for BrowserStack.
-   *
-   * @param outputDir directory to save the video
-   * @param fileName name of the downloaded video file
-   * @returns
-   */
-  downloadVideo?: (
-    outputDir: string,
-    fileName: string,
-  ) => Promise<{ path: string; contentType: string } | null>;
-
-  /**
    * Updates test details and test status.
    *
    * @param status of the test
