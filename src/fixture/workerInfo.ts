@@ -7,7 +7,7 @@ type TestInWorkerInfo = {
   startTime: string;
 };
 
-type WorkerInfo = {
+export type WorkerInfo = {
   idx: number;
   sessionId?: string | undefined;
   providerName?: string | undefined;
@@ -57,13 +57,6 @@ export class WorkerInfoStore {
     return new Date(info.startTime.afterAppiumSession);
   }
 
-  async getWorkerEndTime(idx: number): Promise<Date | undefined> {
-    const info = await this.getWorkerFromDisk(idx);
-    if (info && info.endTime) {
-      return new Date(info.endTime);
-    }
-  }
-
   async saveWorkerStartTime(
     idx: number,
     sessionId: string,
@@ -72,21 +65,24 @@ export class WorkerInfoStore {
     afterAppiumSession: Date,
   ) {
     let info = await this.getWorkerFromDisk(idx);
+    const delta = {
+      providerName,
+      sessionId,
+      startTime: {
+        beforeAppiumSession: beforeAppiumSession.toISOString(),
+        afterAppiumSession: afterAppiumSession.toISOString(),
+      },
+    };
     if (!info) {
       info = {
+        ...delta,
         idx,
-        providerName,
-        sessionId,
-        startTime: {
-          beforeAppiumSession: beforeAppiumSession.toISOString(),
-          afterAppiumSession: afterAppiumSession.toISOString(),
-        },
         tests: [],
       };
     } else {
-      info.startTime = {
-        beforeAppiumSession: beforeAppiumSession.toISOString(),
-        afterAppiumSession: afterAppiumSession.toISOString(),
+      info = {
+        ...info,
+        ...delta,
       };
     }
     return this.saveWorkerToDisk(idx, info);

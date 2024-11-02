@@ -6,7 +6,7 @@ import ffmpeg from "fluent-ffmpeg";
 import ffmpegInstaller from "@ffmpeg-installer/ffmpeg";
 import { logger } from "./logger";
 import { basePath } from "./utils";
-import { WorkerInfoStore } from "./fixture/workerInfo";
+import { WorkerInfo, WorkerInfoStore } from "./fixture/workerInfo";
 
 class VideoDownloader implements Reporter {
   private downloadPromises: Promise<any>[] = [];
@@ -37,79 +37,109 @@ class VideoDownloader implements Reporter {
     const providerNameAnnotation = test.annotations.find(
       ({ type }) => type === "providerName",
     );
-    if (sessionIdAnnotation && providerNameAnnotation) {
+    // Check if test ran on `device` or on `persistentDevice`
+    const isTestUsingDevice = sessionIdAnnotation && providerNameAnnotation;
+    if (isTestUsingDevice) {
       // This is a test that ran with the `device` fixture
       const sessionId = sessionIdAnnotation.description;
       const providerName = providerNameAnnotation.description;
       const provider = getProviderClass(providerName!);
-      this.attachVideoToDeviceTest(test, result, provider, sessionId!);
+      this.downloadAndAttachDeviceVideo(test, result, provider, sessionId!);
       const otherAnnotations = test.annotations.filter(
         ({ type }) => type !== "sessionId" && type !== "providerName",
       );
       test.annotations = otherAnnotations;
     } else {
       // This is a test that ran on `persistentDevice` fixture
-      const { workerIndex, startTime, duration } = result;
-      test.annotations.push({
-        type: "workerInfo",
-        description: `Ran on worker #${workerIndex}.`,
-      });
+      const { workerIndex, duration } = result;
       if (duration <= 0) {
         // Skipped tests
         return;
       }
+      test.annotations.push({
+        type: "workerInfo",
+        description: `Ran on worker #${workerIndex}.`,
+      });
       const expectedVideoPath = path.join(
         basePath(),
         `worker-${workerIndex}-video.mp4`,
       );
-      const waitForWorkerToFinish = new Promise((resolve) => {
-        let maxIntervalTime = 60 * 60 * 1000; // 1 hour in ms
-        const interval = setInterval(async () => {
-          maxIntervalTime -= 500;
-          if (maxIntervalTime <= 0) {
-            clearInterval(interval);
-            logger.error("Timed out waiting for worker to finish");
-            resolve(null);
+      const workerDownload = waitFiveSeconds()
+        .then(() => getWorkerInfo(workerIndex))
+        .then(async (workerInfo) => {
+          if (!workerInfo) {
+            throw new Error(`Worker info not found for idx: ${workerIndex}`);
           }
-          if (fs.existsSync(expectedVideoPath)) {
-            clearInterval(interval);
-            const trimmedFileName = `worker-${workerIndex}-trimmed-${test.id}.mp4`;
-            const workerStart = await workerStartTime(workerIndex);
-            let pathToAttach = expectedVideoPath;
-            if (startTime.getTime() > workerStart.getTime()) {
-              // The startTime for the first test in the worker tends to be
-              // before worker (session) start time. This would have been manageable
-              // if the `duration` included the worker setup time, but the duration only
-              // covers the test method execution time.
-              // So in this case, we are not going to trim.
-              // TODO: We can use the startTime of the second test in the worker
-              const trimSkipPoint =
-                (startTime.getTime() - workerStart.getTime()) / 1000;
-              try {
-                pathToAttach = await trimVideo({
-                  originalVideoPath: expectedVideoPath,
-                  startSecs: trimSkipPoint,
-                  durationSecs: duration / 1000,
-                  outputPath: trimmedFileName,
-                });
-              } catch (e) {
-                logger.error("Failed to trim video:", e);
-                test.annotations.push({
-                  type: "videoError",
-                  description: `Unable to trim video, attaching full video instead. Test starts at ${trimSkipPoint} secs.`,
-                });
-              }
-            }
-            result.attachments.push({
-              path: pathToAttach,
-              contentType: "video/mp4",
-              name: "video",
+          const { providerName, sessionId, endTime } = workerInfo;
+          if (!providerName || !sessionId) {
+            throw new Error(
+              `Provider name or session id not found for worker: ${workerIndex}`,
+            );
+          }
+          if (!this.providerSupportsVideo(providerName)) {
+            return; // Nothing to do here
+          }
+          if (!endTime) {
+            // This is an intermediate test in the worker, so let's wait for the
+            return new Promise((resolve) => {
+              let maxIntervalTime = 60 * 60 * 1000; // 1 hour in ms
+              const interval = setInterval(async () => {
+                maxIntervalTime -= 500;
+                if (maxIntervalTime <= 0) {
+                  clearInterval(interval);
+                  logger.error("Timed out waiting for worker to finish");
+                  resolve(null);
+                }
+                if (fs.existsSync(expectedVideoPath)) {
+                  clearInterval(interval);
+                  void this.trimAndAttachPersistentDeviceVideo(
+                    test,
+                    result,
+                    expectedVideoPath,
+                  ).then((trimmedPath) => {
+                    resolve(trimmedPath);
+                  });
+                }
+              }, 500);
             });
-            resolve(expectedVideoPath);
+          } else {
+            // This is the last test in the worker, so let's download the video
+            const provider = getProviderClass(providerName);
+            return new Promise((resolve) => {
+              provider
+                .downloadVideo(
+                  sessionId,
+                  basePath(),
+                  `worker-${workerIndex}-video`,
+                )
+                .then(
+                  (
+                    downloadedVideo: {
+                      path: string;
+                      contentType: string;
+                    } | null,
+                  ) => {
+                    if (!downloadedVideo) {
+                      resolve(null);
+                      return;
+                    }
+                    void this.trimAndAttachPersistentDeviceVideo(
+                      test,
+                      result,
+                      downloadedVideo.path,
+                    ).then((trimmedPath) => {
+                      resolve(trimmedPath);
+                    });
+                  },
+                );
+              resolve(null);
+            });
           }
-        }, 500);
-      });
-      this.downloadPromises.push(waitForWorkerToFinish);
+        })
+        .catch((e) => {
+          logger.error("Failed to get worker end time:", e);
+        });
+      this.downloadPromises.push(workerDownload);
     }
   }
 
@@ -118,7 +148,51 @@ class VideoDownloader implements Reporter {
     await Promise.allSettled(this.downloadPromises);
   }
 
-  private attachVideoToDeviceTest(
+  private async trimAndAttachPersistentDeviceVideo(
+    test: TestCase,
+    result: TestResult,
+    workerVideoPath: string,
+  ) {
+    const workerIdx = result.workerIndex;
+    const workerStart = await getWorkerStartTime(workerIdx);
+    let pathToAttach = workerVideoPath;
+    const testStart = result.startTime;
+    if (testStart.getTime() < workerStart.getTime()) {
+      // This is the first test for the worker
+      // The startTime for the first test in the worker tends to be
+      // before worker (session) start time. This would have been manageable
+      // if the `duration` included the worker setup time, but the duration only
+      // covers the test method execution time.
+      // So in this case, we are not going to trim.
+      // TODO: We can use the startTime of the second test in the worker
+      pathToAttach = workerVideoPath;
+    } else {
+      const trimSkipPoint =
+        (testStart.getTime() - workerStart.getTime()) / 1000;
+      const trimmedFileName = `worker-${workerIdx}-trimmed-${test.id}.mp4`;
+      try {
+        pathToAttach = await trimVideo({
+          originalVideoPath: workerVideoPath,
+          startSecs: trimSkipPoint,
+          durationSecs: result.duration / 1000,
+          outputPath: trimmedFileName,
+        });
+      } catch (e) {
+        logger.error("Failed to trim video:", e);
+        test.annotations.push({
+          type: "videoError",
+          description: `Unable to trim video, attaching full video instead. Test starts at ${trimSkipPoint} secs.`,
+        });
+      }
+    }
+    result.attachments.push({
+      path: pathToAttach,
+      contentType: "video/mp4",
+      name: "video",
+    });
+  }
+
+  private downloadAndAttachDeviceVideo(
     test: TestCase,
     result: TestResult,
     providerClass: any,
@@ -147,6 +221,11 @@ class VideoDownloader implements Reporter {
         );
     });
     this.downloadPromises.push(downloadPromise);
+  }
+
+  private providerSupportsVideo(providerName: string) {
+    const provider = getProviderClass(providerName);
+    return !!provider.downloadVideo;
   }
 }
 
@@ -193,14 +272,17 @@ function trimVideo({
   });
 }
 
-async function workerStartTime(idx: number): Promise<Date> {
+async function getWorkerStartTime(idx: number): Promise<Date> {
   const workerInfoStore = new WorkerInfoStore();
   return workerInfoStore.getWorkerStartTime(idx);
 }
 
-async function workerEndTime(idx: number): Promise<Date | undefined> {
+async function getWorkerInfo(idx: number): Promise<WorkerInfo | undefined> {
   const workerInfoStore = new WorkerInfoStore();
-  return workerInfoStore.getWorkerEndTime(idx);
+  return workerInfoStore.getWorkerFromDisk(idx);
 }
+
+const waitFiveSeconds = () =>
+  new Promise((resolve) => setTimeout(resolve, 5000));
 
 export default VideoDownloader;

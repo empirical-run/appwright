@@ -8,7 +8,6 @@ import {
 } from "../types";
 import { Device } from "../device";
 import { createDeviceProvider } from "../providers";
-import { logger } from "../logger";
 import { WorkerInfoStore } from "./workerInfo";
 
 type TestLevelFixtures = {
@@ -77,9 +76,8 @@ export const test = base.extend<TestLevelFixtures, WorkerLevelFixtures>({
         afterSession,
       );
       await use(device);
-      await device.close();
-      logger.log(`Teardown for worker ${workerIndex}, will download video`);
       await workerInfoStore.saveWorkerEndTime(workerIndex, new Date());
+      await device.close();
     },
     { scope: "worker" },
   ],
