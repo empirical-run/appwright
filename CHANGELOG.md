@@ -1,5 +1,13 @@
 # appwright
 
+## 0.1.37
+
+### Patch Changes
+
+- 01bb396: fix: move worker video download to reporter
+- f7ca94a: fix: updated llm package version to fix the langfuse errors
+- 22d3ce8: fix: worker info store needs recursive mkdir
+
 ## 0.1.36
 
 ### Patch Changes
