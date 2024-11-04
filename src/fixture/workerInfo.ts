@@ -31,7 +31,7 @@ export class WorkerInfoStore {
 
   async saveWorkerToDisk(idx: number, contents: WorkerInfo) {
     if (!fs.existsSync(this.basePath)) {
-      fs.mkdirSync(this.basePath);
+      fs.mkdirSync(this.basePath, { recursive: true });
     }
     // TODO: can we make this file path unique for a session?
     // will avoidd ios/android running into issues when running concurrently on local
