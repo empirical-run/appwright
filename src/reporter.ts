@@ -64,6 +64,9 @@ class VideoDownloader implements Reporter {
         basePath(),
         `worker-${workerIndex}-video.mp4`,
       );
+      // The `onTestEnd` is method is called before the worker ends and
+      // the worker's `endTime` is saved to disk. We add a 5 secs delay
+      // to prevent a harmful race condition.
       const workerDownload = waitFiveSeconds()
         .then(() => getWorkerInfo(workerIndex))
         .then(async (workerInfo) => {
@@ -79,61 +82,34 @@ class VideoDownloader implements Reporter {
           if (!this.providerSupportsVideo(providerName)) {
             return; // Nothing to do here
           }
-          if (!endTime) {
-            // This is an intermediate test in the worker, so let's wait for the
-            return new Promise((resolve) => {
-              let maxIntervalTime = 60 * 60 * 1000; // 1 hour in ms
-              const interval = setInterval(async () => {
-                maxIntervalTime -= 500;
-                if (maxIntervalTime <= 0) {
-                  clearInterval(interval);
-                  logger.error("Timed out waiting for worker to finish");
-                  resolve(null);
-                }
-                if (fs.existsSync(expectedVideoPath)) {
-                  clearInterval(interval);
-                  void this.trimAndAttachPersistentDeviceVideo(
-                    test,
-                    result,
-                    expectedVideoPath,
-                  ).then((trimmedPath) => {
-                    resolve(trimmedPath);
-                  });
-                }
-              }, 500);
-            });
-          } else {
+          if (endTime) {
             // This is the last test in the worker, so let's download the video
             const provider = getProviderClass(providerName);
-            return new Promise((resolve) => {
-              provider
-                .downloadVideo(
-                  sessionId,
-                  basePath(),
-                  `worker-${workerIndex}-video`,
-                )
-                .then(
-                  (
-                    downloadedVideo: {
-                      path: string;
-                      contentType: string;
-                    } | null,
-                  ) => {
-                    if (!downloadedVideo) {
-                      resolve(null);
-                      return;
-                    }
-                    void this.trimAndAttachPersistentDeviceVideo(
-                      test,
-                      result,
-                      downloadedVideo.path,
-                    ).then((trimmedPath) => {
-                      resolve(trimmedPath);
-                    });
-                  },
-                );
-              resolve(null);
-            });
+            const downloaded: {
+              path: string;
+              contentType: string;
+            } | null = await provider.downloadVideo(
+              sessionId,
+              basePath(),
+              `worker-${workerIndex}-video`,
+            );
+            if (!downloaded) {
+              return;
+            }
+            return this.trimAndAttachPersistentDeviceVideo(
+              test,
+              result,
+              downloaded.path,
+            );
+          } else {
+            // This is an intermediate test in the worker, so let's wait for the
+            // video file to be found on disk. Once it is, we trim and attach it.
+            await waitFor(() => fs.existsSync(expectedVideoPath));
+            return this.trimAndAttachPersistentDeviceVideo(
+              test,
+              result,
+              expectedVideoPath,
+            );
           }
         })
         .catch((e) => {
@@ -198,28 +174,22 @@ class VideoDownloader implements Reporter {
     providerClass: any,
     sessionId: string,
   ) {
-    const random = Math.floor(1000 + Math.random() * 9000);
-    const videoFileName = `${test.id}-${random}`;
+    const videoFileName = `${test.id}`;
     if (!providerClass.downloadVideo) {
       return;
     }
-    const downloadPromise = new Promise((resolve) => {
-      providerClass
-        .downloadVideo(sessionId, basePath(), videoFileName)
-        .then(
-          (downloadedVideo: { path: string; contentType: string } | null) => {
-            if (!downloadedVideo) {
-              resolve(null);
-              return;
-            }
-            result.attachments.push({
-              ...downloadedVideo,
-              name: "video",
-            });
-            resolve(downloadedVideo);
-          },
-        );
-    });
+    const downloadPromise = providerClass
+      .downloadVideo(sessionId, basePath(), videoFileName)
+      .then((downloadedVideo: { path: string; contentType: string } | null) => {
+        if (!downloadedVideo) {
+          return;
+        }
+        result.attachments.push({
+          ...downloadedVideo,
+          name: "video",
+        });
+        return downloadedVideo;
+      });
     this.downloadPromises.push(downloadPromise);
   }
 
@@ -227,6 +197,26 @@ class VideoDownloader implements Reporter {
     const provider = getProviderClass(providerName);
     return !!provider.downloadVideo;
   }
+}
+
+function waitFor(
+  condition: () => boolean,
+  timeout: number = 60 * 60 * 1000, // 1 hour in ms
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    let interval: any;
+    const timeoutId = setTimeout(() => {
+      clearInterval(interval);
+      reject(new Error("Timed out waiting for condition"));
+    }, timeout);
+    interval = setInterval(() => {
+      if (condition()) {
+        clearInterval(interval);
+        clearTimeout(timeoutId);
+        resolve();
+      }
+    }, 500);
+  });
 }
 
 function trimVideo({
