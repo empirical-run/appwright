@@ -7,9 +7,10 @@ type TestInWorkerInfo = {
   startTime: string;
 };
 
-type WorkerInfo = {
+export type WorkerInfo = {
   idx: number;
   sessionId?: string | undefined;
+  providerName?: string | undefined;
   startTime?:
     | {
         // Dates stored as ISO datetime strings
@@ -17,6 +18,7 @@ type WorkerInfo = {
         afterAppiumSession: string;
       }
     | undefined;
+  endTime?: string | undefined;
   tests: TestInWorkerInfo[];
 };
 
@@ -58,26 +60,40 @@ export class WorkerInfoStore {
   async saveWorkerStartTime(
     idx: number,
     sessionId: string,
+    providerName: string,
     beforeAppiumSession: Date,
     afterAppiumSession: Date,
   ) {
     let info = await this.getWorkerFromDisk(idx);
+    const delta = {
+      providerName,
+      sessionId,
+      startTime: {
+        beforeAppiumSession: beforeAppiumSession.toISOString(),
+        afterAppiumSession: afterAppiumSession.toISOString(),
+      },
+    };
     if (!info) {
       info = {
+        ...delta,
         idx,
-        sessionId,
-        startTime: {
-          beforeAppiumSession: beforeAppiumSession.toISOString(),
-          afterAppiumSession: afterAppiumSession.toISOString(),
-        },
         tests: [],
       };
     } else {
-      info.startTime = {
-        beforeAppiumSession: beforeAppiumSession.toISOString(),
-        afterAppiumSession: afterAppiumSession.toISOString(),
+      info = {
+        ...info,
+        ...delta,
       };
     }
+    return this.saveWorkerToDisk(idx, info);
+  }
+
+  async saveWorkerEndTime(idx: number, endTime: Date) {
+    let info = await this.getWorkerFromDisk(idx);
+    if (!info) {
+      throw new Error(`Worker info not found for idx: ${idx}`);
+    }
+    info.endTime = endTime.toISOString();
     return this.saveWorkerToDisk(idx, info);
   }
 

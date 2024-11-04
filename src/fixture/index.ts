@@ -7,10 +7,8 @@ import {
   AppwrightConfig,
 } from "../types";
 import { Device } from "../device";
-import { createDeviceProvider, getProviderClass } from "../providers";
-import { logger } from "../logger";
+import { createDeviceProvider } from "../providers";
 import { WorkerInfoStore } from "./workerInfo";
-import { basePath } from "../utils";
 
 type TestLevelFixtures = {
   /**
@@ -66,22 +64,20 @@ export const test = base.extend<TestLevelFixtures, WorkerLevelFixtures>({
       if (!sessionId) {
         throw new Error("Worker must have a sessionId.");
       }
+      const providerName = (project as FullProject<AppwrightConfig>).use.device
+        ?.provider;
       const afterSession = new Date();
       const workerInfoStore = new WorkerInfoStore();
       await workerInfoStore.saveWorkerStartTime(
         workerIndex,
         sessionId,
+        providerName!,
         beforeSession,
         afterSession,
       );
       await use(device);
+      await workerInfoStore.saveWorkerEndTime(workerIndex, new Date());
       await device.close();
-      logger.log(`Teardown for worker ${workerIndex}, will download video`);
-      const providerName = (project as FullProject<AppwrightConfig>).use.device
-        ?.provider;
-      const providerClass = getProviderClass(providerName!);
-      const fileName = `worker-${workerIndex}-video`;
-      await providerClass.downloadVideo(sessionId, basePath(), fileName);
     },
     { scope: "worker" },
   ],
