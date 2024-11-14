@@ -21,6 +21,8 @@ const isLoginButtonVisible = await device.beta.query(
     );
 ```
 
+### Using custom screenshot
+
 By default, the query method retrieves information from the current screen. Alternatively, you can specify a screenshot to perform operations on that particular image.
 
 ```ts
@@ -31,6 +33,8 @@ const text = await device.beta.query(
       },
     );
 ```
+
+### Using a different model
 
 By default, the `query` method uses the `gpt-4o-mini` model. You can also specify a different model.
 
