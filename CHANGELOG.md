@@ -1,5 +1,11 @@
 # appwright
 
+## 0.1.38
+
+### Patch Changes
+
+- a5eacf0: feat: added api key in vision APIs
+
 ## 0.1.37
 
 ### Patch Changes
