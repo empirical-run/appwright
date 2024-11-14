@@ -90,8 +90,8 @@ export class VisionProvider {
     options?: { useCache?: boolean },
   ): Promise<{ x: number; y: number }> {
     test.skip(
-      !process.env.VISION_MODEL_ENDPOINT,
-      "LLM vision based tap is not enabled. Set the VISION_MODEL_ENDPOINT environment variable to enable it",
+      !process.env.EMPIRICAL_API_KEY,
+      "LLM vision based tap is not enabled. Set the EMPIRICAL_API_KEY environment variable to enable it",
     );
     const base64Image = await this.webDriverClient.takeScreenshot();
     const coordinates = await getCoordinatesFor(prompt, base64Image, options);
