@@ -50,3 +50,9 @@ The `tap` method allows you to tap on the screen based on a prompt. Ensure the `
 ```ts
 await device.beta.tap("point at the 'Login' button.");
 ```
+
+If the position of the element you wish to tap is fixed you can pass `useCache` option as `true` to use the cached coordinates.
+
+```ts
+await device.beta.tap("point at the 'Login' button.", { useCache: true });
+```
