@@ -1,5 +1,11 @@
 # appwright
 
+## 0.1.39
+
+### Patch Changes
+
+- a3e369d: chore: added docs for vision
+
 ## 0.1.38
 
 ### Patch Changes
