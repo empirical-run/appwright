@@ -21,7 +21,7 @@ const isLoginButtonVisible = await device.beta.query(
     );
 ```
 
-By default, the `query` method extracts information from the current screen. You can also specify a screenshot to perform operation on a specific screenshot.
+By default, the query method retrieves information from the current screen. Alternatively, you can specify a screenshot to perform operations on that particular image.
 
 ```ts
 const text = await device.beta.query(
