@@ -84,6 +84,12 @@ export type BrowserStackConfig = {
    * Default orientation is "portrait".
    */
   orientation?: DeviceOrientation;
+
+  /**
+   * Whether to enable camera injection on the device.
+   * Default is false.
+   */
+  enableCameraImageInjection?: boolean;
 };
 
 export type LambdaTestConfig = {
@@ -108,6 +114,12 @@ export type LambdaTestConfig = {
    * Default orientation is "portrait".
    */
   orientation?: DeviceOrientation;
+
+  /**
+   * Whether to enable camera injection on the device.
+   * Default is false.
+   */
+  enableCameraImageInjection?: boolean;
 };
 
 /**

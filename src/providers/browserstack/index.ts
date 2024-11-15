@@ -307,7 +307,9 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
           interactiveDebugging: true,
           networkLogs: true,
           appiumVersion: "2.6.0",
-          enableCameraImageInjection: true,
+          enableCameraImageInjection: (
+            this.project.use.device as BrowserStackConfig
+          )?.enableCameraImageInjection,
           idleTimeout: 180,
           deviceName: this.project.use.device?.name,
           osVersion: (this.project.use.device as BrowserStackConfig).osVersion,
