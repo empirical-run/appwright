@@ -89,7 +89,7 @@ export type BrowserStackConfig = {
    * Whether to enable camera injection on the device.
    * Default is false.
    */
-  enableCameraInjection?: boolean;
+  enableCameraImageInjection?: boolean;
 };
 
 export type LambdaTestConfig = {
@@ -119,7 +119,7 @@ export type LambdaTestConfig = {
    * Whether to enable camera injection on the device.
    * Default is false.
    */
-  enableCameraInjection?: boolean;
+  enableCameraImageInjection?: boolean;
 };
 
 /**

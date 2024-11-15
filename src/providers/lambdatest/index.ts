@@ -323,8 +323,8 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
         autoGrantPermissions: true,
         autoAcceptAlerts: true,
         isRealMobile: true,
-        enableCameraInjection: (this.project.use.device as LambdaTestConfig)
-          ?.enableCameraInjection,
+        enableImageInjection: (this.project.use.device as LambdaTestConfig)
+          ?.enableCameraImageInjection,
         "settings[snapshotMaxDepth]": 62,
       },
     };
