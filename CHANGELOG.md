@@ -1,5 +1,11 @@
 # appwright
 
+## 0.1.40
+
+### Patch Changes
+
+- fbcbe5a: fix: added capability to enable camera injection using config
+
 ## 0.1.39
 
 ### Patch Changes
