@@ -1,5 +1,11 @@
 # appwright
 
+## 0.1.41
+
+### Patch Changes
+
+- 216e9f5: fix: multiple appium session creation
+
 ## 0.1.40
 
 ### Patch Changes
