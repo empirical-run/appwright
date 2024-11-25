@@ -9,6 +9,7 @@ import {
 import { Device } from "../device";
 import { createDeviceProvider } from "../providers";
 import { WorkerInfoStore } from "./workerInfo";
+import { stopAppiumServer } from "../providers/appium";
 
 type TestLevelFixtures = {
   /**
@@ -36,10 +37,12 @@ export const test = base.extend<TestLevelFixtures, WorkerLevelFixtures>({
   },
   device: async ({ deviceProvider }, use, testInfo) => {
     const device = await deviceProvider.getDevice();
+    const deviceProviderName = (
+      testInfo.project as FullProject<AppwrightConfig>
+    ).use.device?.provider;
     testInfo.annotations.push({
       type: "providerName",
-      description: (testInfo.project as FullProject<AppwrightConfig>).use.device
-        ?.provider,
+      description: deviceProviderName,
     });
     testInfo.annotations.push({
       type: "sessionId",
@@ -48,6 +51,12 @@ export const test = base.extend<TestLevelFixtures, WorkerLevelFixtures>({
     await deviceProvider.syncTestDetails?.({ name: testInfo.title });
     await use(device);
     await device.close();
+    if (
+      deviceProviderName === "emulator" ||
+      deviceProviderName === "local-device"
+    ) {
+      await stopAppiumServer();
+    }
     await deviceProvider.syncTestDetails?.({
       name: testInfo.title,
       status: testInfo.status,

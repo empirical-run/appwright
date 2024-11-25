@@ -86,6 +86,19 @@ export async function startAppiumServer(
   });
 }
 
+export function stopAppiumServer() {
+  return new Promise((resolve, reject) => {
+    exec(`pkill -f appium`, (error, stdout) => {
+      if (error) {
+        logger.error(`Error stopping Appium server: ${error.message}`);
+        reject(error);
+      }
+      logger.log("Appium server stopped successfully.");
+      resolve(stdout);
+    });
+  });
+}
+
 export function isEmulatorInstalled(platform: Platform): Promise<boolean> {
   return new Promise((resolve) => {
     if (platform == Platform.ANDROID) {
