@@ -45,9 +45,12 @@ export async function startAppiumServer(
     const appiumProcess = spawn("npx", ["appium"], {
       stdio: "pipe",
     });
-
+    appiumProcess.stderr.on("data", async (data: Buffer) => {
+      console.log(data.toString());
+    });
     appiumProcess.stdout.on("data", async (data: Buffer) => {
       const output = data.toString();
+      console.log(output);
 
       if (output.includes("Error: listen EADDRINUSE")) {
         // TODO: Kill the appium server if it is already running
@@ -82,6 +85,19 @@ export async function startAppiumServer(
 
     appiumProcess.on("close", (code: number) => {
       logger.log(`Appium server exited with code ${code}`);
+    });
+  });
+}
+
+export function stopAppiumServer() {
+  return new Promise((resolve, reject) => {
+    exec(`pkill -f appium`, (error, stdout) => {
+      if (error) {
+        logger.error(`Error stopping Appium server: ${error.message}`);
+        reject(error);
+      }
+      logger.log("Appium server stopped successfully.");
+      resolve(stdout);
     });
   });
 }
