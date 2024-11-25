@@ -117,6 +117,7 @@ Follow the steps mentioned in ${androidSimulatorConfigDocLink} to run test on An
         "appium:fullReset": true,
         "appium:deviceOrientation": this.project.use.device?.orientation,
         "appium:settings[snapshotMaxDepth]": 62,
+        "appium:wdaLaunchTimeout": 300_000,
       },
     };
   }

@@ -45,9 +45,12 @@ export async function startAppiumServer(
     const appiumProcess = spawn("npx", ["appium"], {
       stdio: "pipe",
     });
-
+    appiumProcess.stderr.on("data", async (data: Buffer) => {
+      console.log(data.toString());
+    });
     appiumProcess.stdout.on("data", async (data: Buffer) => {
       const output = data.toString();
+      console.log(output);
 
       if (output.includes("Error: listen EADDRINUSE")) {
         // TODO: Kill the appium server if it is already running
