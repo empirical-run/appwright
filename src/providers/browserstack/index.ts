@@ -206,13 +206,15 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
           });
           if (response.status !== 200) {
             // Retry if not 200
-            throw new Error(
+            logger.error(
               `Video not found: ${response.status} (URL: ${videoURL})`,
             );
+            return;
           }
           const reader = response.body?.getReader();
           if (!reader) {
-            throw new Error("Failed to get reader from response body.");
+            logger.error("Failed to get reader from response body.");
+            return;
           }
           const streamToFile = async () => {
             // eslint-disable-next-line no-constant-condition
