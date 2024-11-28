@@ -1,5 +1,11 @@
 # appwright
 
+## 0.1.42
+
+### Patch Changes
+
+- ed2762a: fix: provider video download failure should not stop tests
+
 ## 0.1.41
 
 ### Patch Changes
