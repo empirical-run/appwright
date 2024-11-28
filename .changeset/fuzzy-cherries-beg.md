@@ -2,4 +2,4 @@
 "appwright": patch
 ---
 
-fix: device provider video should not throw error
+fix: provider video download failure should not stop tests
