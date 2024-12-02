@@ -189,15 +189,13 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
           });
           if (response.status !== 200) {
             // Retry if not 200
-            logger.error(
+            throw new Error(
               `Video not found: ${response.status} (URL: ${videoURL})`,
             );
-            return;
           }
           const reader = response.body?.getReader();
           if (!reader) {
-            logger.error("Failed to get reader from response body.");
-            return;
+            throw new Error("Failed to get reader from response body.");
           }
           const streamToFile = async () => {
             // eslint-disable-next-line no-constant-condition
@@ -223,9 +221,14 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
       return new Promise((resolve, reject) => {
         // Ensure file stream is closed even in case of an error
         fileStream.on("finish", () => {
-          fs.renameSync(tempPathForWriting, pathToTestVideo);
-          logger.log(`Download finished and file closed: ${pathToTestVideo}`);
-          resolve({ path: pathToTestVideo, contentType: "video/mp4" });
+          try {
+            fs.renameSync(tempPathForWriting, pathToTestVideo);
+            logger.log(`Download finished and file closed: ${pathToTestVideo}`);
+            resolve({ path: pathToTestVideo, contentType: "video/mp4" });
+          } catch (err) {
+            logger.error(`Failed to rename file: `, err);
+            reject(err);
+          }
         });
 
         fileStream.on("error", (err) => {
