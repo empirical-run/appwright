@@ -1,5 +1,11 @@
 # appwright
 
+## 0.1.43
+
+### Patch Changes
+
+- 651cce1: fix: file write error when file is not present
+
 ## 0.1.42
 
 ### Patch Changes
