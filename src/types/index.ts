@@ -177,7 +177,7 @@ export interface AppwrightLocator {
    *
    * **Usage:**
    * ```js
-   * await device.getByText("Submit").click();
+   * await device.getByText("Submit").tap();
    * ```
    *
    * @param options Use this to override the timeout for this action
