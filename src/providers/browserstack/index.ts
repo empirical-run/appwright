@@ -198,6 +198,7 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
      */
     await new Promise((resolve) => setTimeout(resolve, 10_000));
     const fileStream = fs.createWriteStream(tempPathForWriting);
+    //To catch the browserstack error in case all retries fails
     try {
       if (videoURL) {
         await retry(
