@@ -1,5 +1,11 @@
 # appwright
 
+## 0.1.44
+
+### Patch Changes
+
+- 4074400: fix: video download issue on lambdatest
+
 ## 0.1.43
 
 ### Patch Changes
