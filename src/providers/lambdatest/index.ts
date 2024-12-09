@@ -181,6 +181,7 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
     const dir = path.dirname(pathToTestVideo);
     fs.mkdirSync(dir, { recursive: true });
     const fileStream = fs.createWriteStream(tempPathForWriting);
+    //To catch the lambdatest error in case all retries fails
     try {
       if (videoURL) {
         await retry(
