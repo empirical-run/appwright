@@ -1,5 +1,11 @@
 # appwright
 
+## 0.1.45
+
+### Patch Changes
+
+- 146116a: fix: added comments
+
 ## 0.1.44
 
 ### Patch Changes
