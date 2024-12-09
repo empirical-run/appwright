@@ -181,62 +181,69 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
     const dir = path.dirname(pathToTestVideo);
     fs.mkdirSync(dir, { recursive: true });
     const fileStream = fs.createWriteStream(tempPathForWriting);
-    if (videoURL) {
-      await retry(
-        async () => {
-          const response = await fetch(videoURL, {
-            method: "GET",
-          });
-          if (response.status !== 200) {
-            // Retry if not 200
-            throw new Error(
-              `Video not found: ${response.status} (URL: ${videoURL})`,
-            );
-          }
-          const reader = response.body?.getReader();
-          if (!reader) {
-            throw new Error("Failed to get reader from response body.");
-          }
-          const streamToFile = async () => {
-            // eslint-disable-next-line no-constant-condition
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) break;
-              fileStream.write(value);
+    try {
+      if (videoURL) {
+        await retry(
+          async () => {
+            const response = await fetch(videoURL, {
+              method: "GET",
+            });
+            if (response.status !== 200) {
+              // Retry if not 200
+              throw new Error(
+                `Video not found: ${response.status} (URL: ${videoURL})`,
+              );
             }
-          };
-          await streamToFile();
-          fileStream.close();
-        },
-        {
-          retries: 10,
-          minTimeout: 3_000,
-          onRetry: (err, i) => {
-            if (i > 5) {
-              logger.warn(`Retry attempt ${i} failed: ${err.message}`);
+            const reader = response.body?.getReader();
+            if (!reader) {
+              throw new Error("Failed to get reader from response body.");
             }
+            const streamToFile = async () => {
+              // eslint-disable-next-line no-constant-condition
+              while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                fileStream.write(value);
+              }
+            };
+            await streamToFile();
+            fileStream.close();
           },
-        },
-      );
-      return new Promise((resolve, reject) => {
-        // Ensure file stream is closed even in case of an error
-        fileStream.on("finish", () => {
-          try {
-            fs.renameSync(tempPathForWriting, pathToTestVideo);
-            logger.log(`Download finished and file closed: ${pathToTestVideo}`);
-            resolve({ path: pathToTestVideo, contentType: "video/mp4" });
-          } catch (err) {
-            logger.error(`Failed to rename file: `, err);
-            reject(err);
-          }
-        });
+          {
+            retries: 10,
+            minTimeout: 3_000,
+            onRetry: (err, i) => {
+              if (i > 5) {
+                logger.warn(`Retry attempt ${i} failed: ${err.message}`);
+              }
+            },
+          },
+        );
+        return new Promise((resolve, reject) => {
+          // Ensure file stream is closed even in case of an error
+          fileStream.on("finish", () => {
+            try {
+              fs.renameSync(tempPathForWriting, pathToTestVideo);
+              logger.log(
+                `Download finished and file closed: ${pathToTestVideo}`,
+              );
+              resolve({ path: pathToTestVideo, contentType: "video/mp4" });
+            } catch (err) {
+              logger.error(`Failed to rename file: `, err);
+              reject(err);
+            }
+          });
 
-        fileStream.on("error", (err) => {
-          logger.error(`Failed to write file: ${err.message}`);
-          reject(err);
+          fileStream.on("error", (err) => {
+            logger.error(`Failed to write file: ${err.message}`);
+            reject(err);
+          });
         });
-      });
-    } else {
+      } else {
+        return null;
+      }
+    } catch (e) {
+      logger.log(`Error Downloading video: `, e);
       return null;
     }
   }
