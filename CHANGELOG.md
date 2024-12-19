@@ -1,5 +1,11 @@
 # appwright
 
+## 0.1.46
+
+### Patch Changes
+
+- f53d282: feat: add udid parameter to EmulatorConfig
+
 ## 0.1.45
 
 ### Patch Changes
