@@ -150,6 +150,11 @@ export type EmulatorConfig = {
   osVersion?: string;
 
   /**
+   * The unique device identifier (UDID) of the emulator.
+   */
+  udid?: string;
+
+  /**
    * The orientation of the emulator.
    * Default orientation is "portrait".
    */
