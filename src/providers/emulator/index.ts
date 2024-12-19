@@ -90,6 +90,7 @@ Follow the steps mentioned in ${androidSimulatorConfigDocLink} to run test on An
 
   private async createConfig() {
     const platformName = this.project.use.platform;
+    const udid = (this.project.use.device as EmulatorConfig).udid;
     let appPackageName: string | undefined;
     let appLaunchableActivity: string | undefined;
 
@@ -104,6 +105,7 @@ Follow the steps mentioned in ${androidSimulatorConfigDocLink} to run test on An
       port: 4723,
       capabilities: {
         "appium:deviceName": this.project.use.device?.name,
+        "appium:udid": udid,
         "appium:automationName":
           platformName == Platform.ANDROID ? "uiautomator2" : "xcuitest",
         "appium:platformVersion": (this.project.use.device as EmulatorConfig)
