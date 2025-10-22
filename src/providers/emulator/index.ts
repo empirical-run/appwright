@@ -15,6 +15,7 @@ import {
 import { FullProject } from "@playwright/test";
 import { validateBuildPath } from "../../utils";
 import { logger } from "../../logger";
+import { dependencies } from "../../../package.json";
 
 export class EmulatorProvider implements DeviceProvider {
   sessionId?: string;
@@ -65,9 +66,13 @@ Follow the steps mentioned in ${androidSimulatorConfigDocLink} to run test on An
   }
 
   private async createDriver(): Promise<Device> {
+    const appiumMajorVersion = dependencies.appium.split(".")[0] ?? "";
+    const uiAutomatorVersion = appiumMajorVersion.includes("2")
+      ? "uiautomator2@2"
+      : "uiautomator2";
     await installDriver(
       this.project.use.platform == Platform.ANDROID
-        ? "uiautomator2"
+        ? uiAutomatorVersion
         : "xcuitest",
     );
     await startAppiumServer(this.project.use.device?.provider!);
