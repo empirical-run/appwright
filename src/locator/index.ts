@@ -10,6 +10,7 @@ import {
 } from "../types";
 import { boxedStep } from "../utils";
 import { RetryableError, TimeoutError } from "../types/errors";
+import { VisualTraceService } from "../visualTrace";
 
 export class Locator {
   constructor(
@@ -20,6 +21,7 @@ export class Locator {
     private findStrategy: string,
     // Used to filter elements received from Appium server
     private textToMatch?: string | RegExp,
+    readonly visualTraceService?: VisualTraceService,
   ) {}
 
   @boxedStep

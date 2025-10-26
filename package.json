@@ -38,10 +38,9 @@
   "dependencies": {
     "@empiricalrun/llm": "^0.9.25",
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
-    "@playwright/test": "^1.47.1",
-    "appium": "^2.6.0",
-    "appium-uiautomator2-driver": "^3.8.0",
-    "appium-xcuitest-driver": "^7.27.0",
+    "@playwright/test": "^1.56.1",
+    "appium": "^3.1.0",
+    "appium-xcuitest-driver": "^10.2.2",
     "async-retry": "^1.3.3",
     "fluent-ffmpeg": "^2.1.3",
     "form-data": "4.0.0",
@@ -56,6 +55,7 @@
     "@types/async-retry": "^1.4.8",
     "@types/fluent-ffmpeg": "^2.1.26",
     "@types/node": "^22.5.2",
+    "appium-uiautomator2-driver": "^6.0.0",
     "eslint": "8.57.0",
     "typedoc": "0.26.7",
     "vitest": "^2.1.3"

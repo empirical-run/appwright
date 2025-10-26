@@ -14,6 +14,21 @@ export type TimeoutOptions = {
   expectTimeout: number;
 };
 
+export type VisualTraceConfig = {
+  /**
+   * Enable per-action screenshot capture for trace bundles.
+   */
+  enableScreenshots?: boolean;
+  /**
+   * Maximum number of screenshots to capture per test. Unlimited when undefined.
+   */
+  maxScreenshotsPerTest?: number;
+  /**
+   * Skip writing duplicate screenshots (matching hash) when enabled.
+   */
+  dedupe?: boolean;
+};
+
 export interface DeviceProvider {
   /**
    * Identifier for the Appium session. Can be undefined if the session was not created.
@@ -51,6 +66,7 @@ export type AppwrightConfig = {
   appBundleId: string;
   // TODO: use expect timeout from playwright config
   expectTimeout: number;
+  visualTrace?: VisualTraceConfig;
 };
 
 export type DeviceConfig =

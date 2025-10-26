@@ -165,6 +165,7 @@ export class LambdaTestDeviceProvider implements DeviceProvider {
       this.appBundleId,
       testOptions,
       this.project.use.device?.provider!,
+      this.project.use.visualTrace,
     );
   }
 

@@ -162,6 +162,7 @@ export class BrowserStackDeviceProvider implements DeviceProvider {
       bundleId,
       testOptions,
       this.project.use.device?.provider!,
+      this.project.use.visualTrace,
     );
   }
 

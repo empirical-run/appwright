@@ -6,6 +6,7 @@ import {
   ExtractType,
   Platform,
   TimeoutOptions,
+  VisualTraceConfig,
 } from "../types";
 import { AppwrightVision, VisionProvider } from "../vision";
 import { boxedStep, longestDeterministicGroup } from "../utils";
@@ -14,6 +15,10 @@ import { uploadImageToLambdaTest } from "../providers/lambdatest/utils";
 import { z } from "zod";
 import { LLMModel } from "@empiricalrun/llm";
 import { logger } from "../logger";
+import {
+  VisualTraceService,
+  createVisualTraceService,
+} from "../visualTrace";
 
 export class Device {
   constructor(
@@ -21,7 +26,12 @@ export class Device {
     private bundleId: string | undefined,
     private timeoutOpts: TimeoutOptions,
     private provider: string,
-  ) {}
+    visualTraceConfig?: VisualTraceConfig,
+  ) {
+    this.visualTraceService = createVisualTraceService(visualTraceConfig);
+  }
+
+  readonly visualTraceService: VisualTraceService;
 
   locator({
     selector,
@@ -38,11 +48,16 @@ export class Device {
       selector,
       findStrategy,
       textToMatch,
+      this.visualTraceService,
     );
   }
 
   private vision(): AppwrightVision {
-    return new VisionProvider(this, this.webDriverClient);
+    return new VisionProvider(
+      this,
+      this.webDriverClient,
+      this.visualTraceService,
+    );
   }
 
   beta = {

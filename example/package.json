@@ -12,6 +12,6 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "appwright": "^0.1.1"
+    "appwright": "file:../"
   }
 }

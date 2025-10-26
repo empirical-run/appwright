@@ -74,6 +74,7 @@ export class LocalDeviceProvider implements DeviceProvider {
       bundleId,
       testOptions,
       this.project.use.device?.provider!,
+      this.project.use.visualTrace,
     );
   }
 

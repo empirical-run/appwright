@@ -85,6 +85,7 @@ Follow the steps mentioned in ${androidSimulatorConfigDocLink} to run test on An
       undefined,
       testOptions,
       this.project.use.device?.provider!,
+      this.project.use.visualTrace,
     );
   }
 

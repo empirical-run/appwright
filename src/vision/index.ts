@@ -10,6 +10,7 @@ import { z } from "zod";
 import { LLMModel } from "@empiricalrun/llm";
 import { ExtractType } from "../types";
 import { logger } from "../logger";
+import { VisualTraceService } from "../visualTrace";
 
 export interface AppwrightVision {
   /**
@@ -62,6 +63,7 @@ export class VisionProvider {
   constructor(
     private device: Device,
     private webDriverClient: WebDriverClient,
+    readonly visualTraceService?: VisualTraceService,
   ) {}
 
   @boxedStep
