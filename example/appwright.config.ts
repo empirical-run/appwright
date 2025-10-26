@@ -2,7 +2,6 @@ import { defineConfig, Platform } from "appwright";
 import path from "path";
 
 export default defineConfig({
-  retries: 1,
   projects: [
     {
       name: "ios",
@@ -13,7 +12,6 @@ export default defineConfig({
           name: "iPhone 14 Pro",
         },
         buildPath: path.join("builds", "Wikipedia.app"),
-        trace: "on",
       },
     },
     {
@@ -24,8 +22,6 @@ export default defineConfig({
           provider: "emulator",
         },
         buildPath: path.join("builds", "wikipedia.apk"),
-        trace: "on",
-        video: "on",
       },
     },
   ],
