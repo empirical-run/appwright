@@ -128,6 +128,13 @@ export type BrowserStackConfig = {
    * Defaults to false. When true, BrowserStack captures detailed performance metrics.
    */
   appProfiling?: boolean;
+
+  /**
+   * Maximum time (in seconds) that a test session can remain idle without any commands.
+   * BrowserStack terminates sessions that exceed this timeout.
+   * Defaults to 180 seconds (3 minutes).
+   */
+  idleTimeout?: number;
 };
 
 export type LambdaTestConfig = {

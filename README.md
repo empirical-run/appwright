@@ -109,6 +109,7 @@ the provider in your config.
       osVersion: "14.0",
       appiumVersion: "3.1.0", // Override if your BrowserStack account does not yet support Appium 3
       appProfiling: true, // Optional: enable BrowserStack App Performance profiling
+      idleTimeout: 300, // Optional: max session idle time in seconds (default: 180)
     },
     buildPath: "app-release.apk",
   },
