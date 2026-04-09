@@ -56,6 +56,7 @@ export type AppwrightConfig = {
 export type DeviceConfig =
   | BrowserStackConfig
   | LambdaTestConfig
+  | KobitonConfig
   | LocalDeviceConfig
   | EmulatorConfig;
 
@@ -120,6 +121,31 @@ export type LambdaTestConfig = {
    * Default is false.
    */
   enableCameraImageInjection?: boolean;
+};
+/**
+ * Configuration for devices running on Kobiton.
+ */
+export type KobitonConfig = {
+  provider: "kobiton";
+
+  /**
+   * The name of the device to be used on Kobiton.
+   * Find device names in the Kobiton portal under Devices.
+   * Example: "iPhone 15 Pro Max", "Galaxy S24".
+   */
+  name: string;
+
+  /**
+   * The operating system version of the device.
+   * Example: "17", "14".
+   */
+  osVersion?: string;
+
+  /**
+   * The orientation of the device on Kobiton.
+   * Default orientation is "portrait".
+   */
+  orientation?: DeviceOrientation;
 };
 
 /**

@@ -4,6 +4,7 @@ import { LocalDeviceProvider } from "./local";
 import { EmulatorProvider } from "./emulator";
 import { FullProject } from "@playwright/test";
 import { LambdaTestDeviceProvider } from "./lambdatest";
+import { KobitonDeviceProvider } from "./kobiton";
 
 export function getProviderClass(provider: string): any {
   switch (provider) {
@@ -11,6 +12,8 @@ export function getProviderClass(provider: string): any {
       return BrowserStackDeviceProvider;
     case "lambdatest":
       return LambdaTestDeviceProvider;
+    case "kobiton":
+      return KobitonDeviceProvider;
     case "emulator":
       return EmulatorProvider;
     case "local-device":
