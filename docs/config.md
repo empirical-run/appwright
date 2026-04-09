@@ -12,6 +12,7 @@ providers are supported:
 - `emulator`
 - `browserstack`
 - `lambdatest`
+- `kobiton`
 
 ### BrowserStack
 
@@ -36,6 +37,20 @@ These environment variables are required for the LambdaTest
 - LAMBDATEST_ACCESS_KEY
 
 LambdaTest also requires `name` and `osVersion` of the device to be set in the projects in appwright config file.
+
+### Kobiton
+
+Kobiton [Real Device Cloud](https://kobiton.com/) can be used to provide
+remote devices to Appwright.
+
+These environment variables are required for Kobiton:
+
+- KOBITON_USERNAME
+- KOBITON_API_KEY
+
+You can find your API key in the Kobiton portal under **Settings > API Keys**.
+
+Kobiton requires `name` of the device to be set in the projects in appwright config file. `osVersion` is optional but recommended.
 
 ### Android Emulator
 
