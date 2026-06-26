@@ -12,6 +12,7 @@ providers are supported:
 - `emulator`
 - `browserstack`
 - `lambdatest`
+- `digitalai`
 
 ### BrowserStack
 
@@ -36,6 +37,20 @@ These environment variables are required for the LambdaTest
 - LAMBDATEST_ACCESS_KEY
 
 LambdaTest also requires `name` and `osVersion` of the device to be set in the projects in appwright config file.
+
+### Digital.ai Testing
+
+Digital.ai [Testing](https://digital.ai/products/continuous-testing/) can be used to provide
+remote devices to Appwright.
+
+These environment variables are required for Digital.ai Testing:
+
+- DIGITALAI_ACCESS_KEY
+- DIGITALAI_CLOUD_SERVER
+
+You can find your access key in the Digital.ai Testing portal under **Settings > Access Keys**. The cloud server is your tenant URL (e.g. `https://cloud.seetest.io`).
+
+Digital.ai Testing requires `name` and `osVersion` of the device to be set in the projects in appwright config file. An optional `deviceQuery` can be provided for advanced device selection.
 
 ### Android Emulator
 
