@@ -77,7 +77,7 @@ export default defineConfig({
 - `platform`: The platform you want to test on, such as 'android' or 'ios'.
 
 - `provider`: The device provider where you want to run your tests.
-              You can choose between `browserstack`, `lambdatest`, `emulator`, or `local-device`.
+              You can choose between `browserstack`, `lambdatest`, `digitalai`, `emulator`, or `local-device`.
 
 - `buildPath`: The path to your build file. For Android, it should be an APK file.
                For iOS, if you are running tests on real device, it should be an `.ipa` file. For running tests on an emulator, it should be a `.app` file.
@@ -131,6 +131,28 @@ the provider in your config.
       osVersion: "14",
     },
     buildPath: "app-release.apk",
+  },
+},
+```
+
+#### Run tests on Digital.ai Testing
+
+Appwright supports Digital.ai Testing out of the box. To run tests on Digital.ai Testing, configure
+the provider in your config.
+
+```ts
+{
+  name: "android",
+  use: {
+    platform: Platform.ANDROID,
+    device: {
+      provider: "digitalai",
+      // Specify device to run the tests on
+      name: "Galaxy S24",
+      osVersion: "14",
+    },
+    buildPath: "app-release.apk",
+    appBundleId: "com.example.app",
   },
 },
 ```

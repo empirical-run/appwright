@@ -56,6 +56,7 @@ export type AppwrightConfig = {
 export type DeviceConfig =
   | BrowserStackConfig
   | LambdaTestConfig
+  | DigitalAiConfig
   | LocalDeviceConfig
   | EmulatorConfig;
 
@@ -120,6 +121,54 @@ export type LambdaTestConfig = {
    * Default is false.
    */
   enableCameraImageInjection?: boolean;
+};
+
+/**
+ * Configuration for devices running on Digital.ai Testing.
+ */
+export type DigitalAiConfig = {
+  provider: "digitalai";
+
+  /**
+   * The name of the device to be used on Digital.ai Testing.
+   * Example: "Galaxy S24", "iPhone 15 Pro".
+   * Required when `deviceQuery` is not set.
+   */
+  name?: string;
+
+  /**
+   * The operating system version of the device.
+   * Example: "14", "17.0".
+   * Required when `deviceQuery` is not set.
+   */
+  osVersion?: string;
+
+  /**
+   * Device query for device selection on Digital.ai Testing.
+   * When set, `name` and `osVersion` are not required.
+   * Example: "@os='android' and @category='PHONE'"
+   */
+  deviceQuery?: string;
+
+  /**
+   * The orientation of the device.
+   * Default orientation is "portrait".
+   */
+  orientation?: DeviceOrientation;
+
+  /**
+   * Any additional Digital.ai-specific capabilities to pass into `digitalai:options`.
+   * See the full list: https://docs.digital.ai/continuous-testing/docs/te/test-execution-home/mobile-android-and-ios/appium/appium-server-test-execution/appium-server-supported-capabilities
+   * Example: { reservationDuration: 100, releaseDevice: false, onlyAvailable: true }
+   */
+  digitalAiOptions?: Record<string, unknown>;
+
+  /**
+   * Any additional Appium capabilities to pass into `appium:options`.
+   * See the full list: https://appium.io/docs/en/2.0/guides/caps/
+   * Example: { newCommandTimeout: 60, autoGrantPermissions: true }
+   */
+  appiumOptions?: Record<string, unknown>;
 };
 
 /**
