@@ -12,6 +12,7 @@ providers are supported:
 - `emulator`
 - `browserstack`
 - `lambdatest`
+- `robotactions`
 
 ### BrowserStack
 
@@ -36,6 +37,24 @@ These environment variables are required for the LambdaTest
 - LAMBDATEST_ACCESS_KEY
 
 LambdaTest also requires `name` and `osVersion` of the device to be set in the projects in appwright config file.
+
+### RobotActions
+
+A [RobotActions](https://robotactions.com) grid can be used to provide remote real devices
+to Appwright.
+
+These environment variables are required for RobotActions
+
+- ROBOTACTIONS_GRID_URL — the grid URL, e.g. `https://grid.robotactions.com`
+- ROBOTACTIONS_TOKEN — an access token from the RobotActions dashboard
+
+Session videos are downloaded from the grid and attached to the Playwright report. Set
+`ROBOTACTIONS_API_URL` only if recordings should be fetched from a different host than the
+grid URL (e.g. the grid's LAN-only history API on port 3001).
+
+RobotActions requires `appBundleId` to be set, and `buildPath` must be an `http(s)://` URL the
+grid can download the build from. `udid`, `osVersion`, `orientation`, `testSuite` and
+`capabilities` (extra Appium capabilities) are optional.
 
 ### Android Emulator
 

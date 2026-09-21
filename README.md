@@ -77,7 +77,7 @@ export default defineConfig({
 - `platform`: The platform you want to test on, such as 'android' or 'ios'.
 
 - `provider`: The device provider where you want to run your tests.
-              You can choose between `browserstack`, `lambdatest`, `emulator`, or `local-device`.
+              You can choose between `browserstack`, `lambdatest`, `robotactions`, `emulator`, or `local-device`.
 
 - `buildPath`: The path to your build file. For Android, it should be an APK file.
                For iOS, if you are running tests on real device, it should be an `.ipa` file. For running tests on an emulator, it should be a `.app` file.
@@ -131,6 +131,32 @@ the provider in your config.
       osVersion: "14",
     },
     buildPath: "app-release.apk",
+  },
+},
+```
+
+#### Run tests on RobotActions
+
+Appwright supports [RobotActions](https://robotactions.com) real-device grids out of the box.
+Set `ROBOTACTIONS_GRID_URL` and `ROBOTACTIONS_TOKEN` in your environment, host the build
+somewhere the grid can download it, and configure the provider in your config. Test names and
+pass/fail land on the grid dashboard, and each session's recording is attached to the Playwright
+report.
+
+```ts
+{
+  name: "android",
+  use: {
+    platform: Platform.ANDROID,
+    device: {
+      provider: "robotactions",
+      // Optional: pin a device by UDID and/or OS version; omit to take any free device
+      udid: "R5CT30XXXXX",
+      osVersion: "14",
+    },
+    // Must be an http(s) URL — the grid's devices download the build themselves
+    buildPath: "https://ci.example.com/artifacts/app-release.apk",
+    appBundleId: "com.example.app",
   },
 },
 ```

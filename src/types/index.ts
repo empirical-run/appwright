@@ -56,6 +56,7 @@ export type AppwrightConfig = {
 export type DeviceConfig =
   | BrowserStackConfig
   | LambdaTestConfig
+  | RobotActionsConfig
   | LocalDeviceConfig
   | EmulatorConfig;
 
@@ -120,6 +121,52 @@ export type LambdaTestConfig = {
    * Default is false.
    */
   enableCameraImageInjection?: boolean;
+};
+
+/**
+ * Configuration for devices on a RobotActions grid.
+ *
+ * Requires `ROBOTACTIONS_GRID_URL` and `ROBOTACTIONS_TOKEN` environment variables.
+ * `buildPath` must be an `http(s)://` URL that the grid can download the build from.
+ */
+export type RobotActionsConfig = {
+  provider: "robotactions";
+
+  /**
+   * The name of the device to be used on the grid, e.g. "Pixel 8".
+   * Informational only — the grid routes on `udid` and `osVersion`.
+   */
+  name?: string;
+
+  /**
+   * The UDID of the device to run the tests on. When omitted, the grid
+   * picks any free device matching the platform and `osVersion`.
+   */
+  udid?: string;
+
+  /**
+   * The operating system version of the device, e.g. "14", "17.5".
+   * When omitted, any OS version is accepted.
+   */
+  osVersion?: string;
+
+  /**
+   * The orientation of the device.
+   * Default orientation is "portrait".
+   */
+  orientation?: DeviceOrientation;
+
+  /**
+   * Suite name the sessions are reported under on the grid dashboard.
+   * Defaults to "AppWright <project name>".
+   */
+  testSuite?: string;
+
+  /**
+   * Extra WebDriver capabilities merged into the session request, e.g.
+   * `{ "appium:noReset": true }`. Takes precedence over the defaults.
+   */
+  capabilities?: Record<string, unknown>;
 };
 
 /**
